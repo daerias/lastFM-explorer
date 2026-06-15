@@ -1,0 +1,1102 @@
+/* ============================================================
+   Settings — Premium Atmospheric Control Panel
+   Compact 2-col layout • Deep glass cards • Neon accents
+   Multi-layer 3D depth • Custom sliders • Segmented controls
+   ============================================================ */
+
+/* ── Container ── */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 920px;
+  animation: fadeSlideUp 0.5s ease-out;
+  transform-style: preserve-3d;
+  perspective: 1200px;
+}
+
+.settings h1 { margin: 0; }
+
+.desc {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: -8px 0 0;
+}
+
+/* ── 2-Column Section Grid ── */
+.sectionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.sectionFull {
+  grid-column: 1 / -1;
+}
+
+/* ── Glass Card ── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg-glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.3),
+    0 8px 24px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card:hover {
+  transform: translateZ(3px);
+  border-color: rgba(200,100,255,0.14);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.35),
+    0 12px 32px rgba(0,0,0,0.25),
+    0 0 2px var(--accent-glow),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* ── Section Heading ── */
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.sectionHead h2 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.sectionDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+/* ── Form Fields ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field + .field { margin-top: 8px; }
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input {
+  background: rgba(8,4,14,0.6);
+  border: 1px solid rgba(200,100,255,0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.input:focus {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--accent-glass), 0 0 16px var(--accent-glow);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+}
+
+.secretRow {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.secretRow .input { padding-right: 40px; }
+
+.toggleBtn {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  opacity: 1;
+  background: var(--accent-glass);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.helpText {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.helpText a {
+  color: var(--accent-hover);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.helpText a:hover { text-shadow: 0 0 10px var(--accent-glow); }
+
+.statusOk {
+  color: #66bb6a;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(102,187,106,0.3);
+  animation: statusPulse 2.5s ease-in-out infinite;
+  padding: 6px 10px;
+  background: rgba(102,187,106,0.06);
+  border: 1px solid rgba(102,187,106,0.15);
+  border-radius: 8px;
+}
+
+@keyframes statusPulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(102,187,106,0.3); }
+  50% { text-shadow: 0 0 22px rgba(102,187,106,0.6); }
+}
+
+/* ============================================================
+   Shared Components: Segmented Pills, Toggle, Slider, Badge
+   ============================================================ */
+
+/* ── Segmented Pill Row ── */
+.pillRow {
+  display: flex;
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(200,100,255,0.1);
+}
+
+.pillBtn {
+  flex: 1;
+  padding: 5px 10px;
+  border: none;
+  background: rgba(15,10,24,0.4);
+  color: var(--text-muted);
+  font-size: 0.64rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.pillBtn:not(:last-child) { border-right: 1px solid rgba(200,100,255,0.08); }
+
+.pillBtn:hover { color: var(--text-secondary); background: rgba(30,18,50,0.5); }
+
+.pillBtnActive {
+  background: var(--accent-glass);
+  color: var(--accent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.pillBtnActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* ── iOS-Style Toggle Switch ── */
+.toggle {
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  border: 1px solid rgba(200,100,255,0.15);
+  background: rgba(15,10,24,0.5);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+  padding: 0;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.toggleOn {
+  background: var(--accent);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.toggleOn .toggleKnob {
+  left: 20px;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255,255,255,0.4);
+}
+
+/* ── Range Slider ── */
+.slider {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(200,100,255,0.08);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 0 10px var(--accent-glow);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* ── Value Badge ── */
+.badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-glass);
+  padding: 2px 7px;
+  border-radius: 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badgeUnsaved {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  padding: 2px 8px;
+  border-radius: 9px;
+  animation: neon-pulse 2s ease-in-out infinite alternate;
+}
+
+/* ── Active Indicator Dot ── */
+.activeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+.activeBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  flex-wrap: wrap;
+}
+
+.activeName {
+  color: var(--text-secondary);
+}
+
+.activeName strong { color: var(--text-primary); }
+
+/* ============================================================
+   Theme Studio
+   ============================================================ */
+
+/* ── Category Tabs ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover { color: var(--text-secondary); border-color: rgba(200,100,255,0.15); }
+
+.tabActive {
+  border-color: var(--accent-glow);
+  background: var(--accent-glass);
+  color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* ── Theme Grid ── */
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 8px;
+}
+
+.themeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  font-family: inherit;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+
+.themeCard:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: var(--theme-accent, var(--accent-glow));
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 16px var(--theme-accent, var(--accent-glow));
+}
+
+.themeCardActive {
+  border-color: var(--theme-accent, var(--accent-glow));
+  box-shadow: 0 0 0 2px var(--theme-accent, var(--accent-glow)), 0 0 24px var(--theme-accent, var(--accent-glow));
+  cursor: default;
+  transform: translateY(-1px);
+}
+
+/* Gradient swatch — replaces emoji icon */
+.themeSwatch {
+  width: 100%;
+  height: 48px;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height 0.25s ease;
+}
+
+.themeCard:hover .themeSwatch { height: 56px; }
+
+.themeCheckGlow {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--theme-accent, var(--accent));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  box-shadow: 0 0 14px var(--theme-accent, var(--accent-glow));
+  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes checkPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.themeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.themeName {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: color 0.2s;
+}
+
+.themeCardActive .themeName { color: var(--theme-accent, var(--accent)); }
+
+.themeDesc {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Active indicator dot — bottom right */
+.themeIndicator {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--theme-accent, var(--accent));
+  box-shadow: 0 0 8px var(--theme-accent, var(--accent-glow));
+}
+
+/* ── Effects 2-Column Grid ── */
+.effectsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.effectsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 11px;
+  background: rgba(15,10,24,0.35);
+  border: 1px solid rgba(200,100,255,0.06);
+  border-radius: 10px;
+}
+
+.effectsTitle {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Effect Group (label + pills) ── */
+.effectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.effectLabel {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Profiles Bar ── */
+.profiles {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 11px;
+  background: rgba(15,10,24,0.3);
+  border: 1px solid rgba(200,100,255,0.06);
+  border-radius: 10px;
+}
+
+.profilesHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profilesTitle {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profilesCount {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+}
+
+.profilesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.profileChip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-primary);
+}
+
+.profileChipActive {
+  border-color: var(--accent-glow);
+  background: var(--accent-glass);
+}
+
+.profileChipName {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.profileChipActive .profileChipName { color: var(--accent); }
+
+.profileChipBtn {
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: none;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.55rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.profileChipBtn:hover { background: var(--accent-glass); color: var(--accent); }
+
+/* ── Footer Bar ── */
+.footerBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 11px;
+  background: var(--bg-glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+}
+
+.footerBarUnsaved {
+  background: var(--accent-glass);
+  border-color: var(--accent-glow);
+}
+
+.saveDialog {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.saveInput {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 0.7rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-glow);
+  border-radius: 7px;
+  font-family: inherit;
+  outline: none;
+}
+
+.saveInput:focus { box-shadow: 0 0 10px var(--accent-glow); }
+
+/* ── Quick Cycle Dots ── */
+.cycleRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.cycleLabel {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.cycleDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  font-family: inherit;
+}
+
+.cycleDot:hover { transform: scale(1.15); }
+
+.cycleDotActive {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* ============================================================
+   Icon Style Picker
+   ============================================================ */
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 5px;
+}
+
+.iconCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.iconCard:hover { border-color: rgba(200,100,255,0.15); }
+
+.iconCardActive {
+  border-color: var(--accent-glow);
+  background: var(--accent-glass);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.iconCheck {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  font-weight: 900;
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.iconSwatch {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.iconCardLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.iconCardActive .iconCardLabel { color: var(--accent); }
+
+.iconPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(15,10,24,0.35);
+  border: 1px solid rgba(200,100,255,0.06);
+  border-radius: 10px;
+}
+
+.iconPanelHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iconPanelTitle {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Slider Group (icon picker) ── */
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sliderLabel {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ============================================================
+   Cinematic Picker
+   ============================================================ */
+
+.cineGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 5px;
+}
+
+.cineCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 5px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+  position: relative;
+}
+
+.cineCard:hover { border-color: rgba(200,100,255,0.15); }
+
+.cineCardActive {
+  border-color: var(--accent-glow);
+  background: var(--accent-glass);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.cineSwatch {
+  width: 32px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.cineCardActive .cineSwatch { border-color: var(--accent-glow); }
+
+.cineCardLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cineCardActive .cineCardLabel { color: var(--accent); }
+
+/* ── DOF Panel ── */
+.dofPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(15,10,24,0.35);
+  border: 1px solid rgba(200,100,255,0.06);
+  border-radius: 10px;
+}
+
+.dofRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dofInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dofLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dofDesc {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.dofHint {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 6px 9px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Help Info Box ── */
+.infoBox {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 6px 9px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+}
+
+/* ============================================================
+   Audio Reactive Panel
+   ============================================================ */
+
+.audioPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(15,10,24,0.35);
+  border: 1px solid rgba(200,100,255,0.06);
+  border-radius: 10px;
+}
+
+.audioTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.audioRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.audioInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.audioLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.audioDesc {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.audioSlider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.audioSliderLabel {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.audioRange {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+.audioDivider {
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(200,100,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.audioDenied {
+  font-size: 0.56rem;
+  color: var(--accent);
+  padding: 6px 9px;
+  background: var(--accent-glass);
+  border-radius: 6px;
+  border: 1px solid var(--accent-glow);
+}
+
+/* ── Mini Button (for small actions) ── */
+.miniBtn {
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: none;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.55rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.miniBtn:hover { background: var(--accent-glass); color: var(--accent); }
+
+/* ── Accent Button (pulse when unsaved) ── */
+.accentBtn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid var(--accent-glow);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.accentBtn:hover { box-shadow: 0 0 20px var(--accent-glow-strong); transform: translateY(-1px); }
+
+/* ── Ghost Button ── */
+.ghostBtn {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ghostBtn:hover { border-color: rgba(200,100,255,0.2); color: var(--text-secondary); }
+
+/* ── Active Indicator Row (icon style + cinematic shared) ── */
+.pickerActive {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  flex-wrap: wrap;
+}
+
+.pickerSwatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px var(--glass-border);
+}
+
+.pickerSwatchGlow {
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.pickerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pickerName {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pickerDesc {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes neon-pulse {
+  0% { box-shadow: 0 0 6px var(--accent-glow); }
+  100% { box-shadow: 0 0 16px var(--accent-glow-strong); }
+}
+
+/* ============================================================
+   Compact Overrides (atmopshere section)
+   ============================================================ */
+
+/* Group header + description into packed row */
+.headerRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+}

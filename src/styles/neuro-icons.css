@@ -1,0 +1,1094 @@
+/* ============================================================
+   Neumorphic Icons — replaces emoji with CSS-based 3D icons
+   ============================================================ */
+
+/* --- Base --- */
+.neuro-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  border: none;
+  transition: all var(--transition);
+}
+
+/* --- Play (▶) — accent circle with triangle --- */
+.neuro-icon-play {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+  box-shadow:
+    3px 3px 6px var(--shadow-dark),
+    -3px -3px 6px var(--shadow-light),
+    inset 1px 1px 1px var(--highlight-glass);
+  cursor: pointer;
+}
+
+.neuro-icon-play::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent var(--accent);
+  margin-left: 2px;
+  filter: drop-shadow(0 0 3px var(--accent-glow));
+  transition: border-color var(--transition);
+}
+
+.neuro-icon-play:hover {
+  box-shadow:
+    1px 1px 3px var(--shadow-dark),
+    -1px -1px 3px var(--shadow-light),
+    inset 1px 1px 1px var(--highlight-glass);
+  transform: scale(1.08);
+}
+
+.neuro-icon-play:hover::after {
+  border-left-color: var(--accent-hover);
+}
+
+.neuro-icon-play:active {
+  box-shadow:
+    inset 3px 3px 6px var(--shadow-dark),
+    inset -3px -3px 6px var(--shadow-light);
+  transform: scale(0.95);
+}
+
+/* --- Note (🎵) — neutral circle with two dots --- */
+.neuro-icon-note {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+  box-shadow:
+    3px 3px 8px var(--shadow-dark),
+    -3px -3px 8px var(--shadow-light),
+    inset 1px 1px 1px var(--highlight-glass);
+  animation: shadow-breathe-sm 3.5s ease-in-out infinite;
+}
+
+.neuro-icon-note::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  box-shadow:
+    1px 1px 2px var(--shadow-dark),
+    -1px -1px 2px var(--shadow-light),
+    4px -6px 0 0 var(--text-muted),
+    5px -5px 2px 1px var(--shadow-dark),
+    -3px -7px 2px 1px var(--shadow-light);
+}
+
+/* --- Trophy (🏆) — warm golden circle with cup shape --- */
+.neuro-icon-trophy {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+  box-shadow:
+    3px 3px 8px var(--shadow-dark),
+    -3px -3px 8px var(--shadow-light),
+    inset 1px 1px 1px var(--highlight-glass),
+    0 0 12px var(--toxic-yellow-glow);
+  animation: shadow-breathe-sm 3.5s ease-in-out infinite;
+}
+
+.neuro-icon-trophy::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 2px 2px 50% 50%;
+  background: linear-gradient(180deg, var(--toxic-yellow), var(--toxic-orange));
+  box-shadow:
+    0 0 6px var(--toxic-yellow-glow),
+    1px 1px 2px var(--shadow-dark),
+    -1px -1px 2px var(--shadow-light);
+}
+
+/* --- Close (✕) — neutral circle with X cross --- */
+.neuro-icon-close {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+  box-shadow:
+    2px 2px 4px var(--shadow-dark),
+    -2px -2px 4px var(--shadow-light);
+  cursor: pointer;
+}
+
+.neuro-icon-close::before,
+.neuro-icon-close::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  background: var(--text-secondary);
+  border-radius: 1px;
+  transition: background var(--transition);
+}
+
+.neuro-icon-close::before {
+  transform: rotate(45deg);
+}
+.neuro-icon-close::after {
+  transform: rotate(-45deg);
+}
+
+.neuro-icon-close:hover {
+  box-shadow:
+    1px 1px 3px var(--shadow-dark),
+    -1px -1px 3px var(--shadow-light);
+}
+
+.neuro-icon-close:hover::before,
+.neuro-icon-close:hover::after {
+  background: var(--text-primary);
+}
+
+.neuro-icon-close:active {
+  box-shadow:
+    inset 3px 3px 6px var(--shadow-dark),
+    inset -3px -3px 6px var(--shadow-light);
+  transform: scale(0.92);
+}
+
+/* --- Edit (✎) — neutral circle with diagonal line + dot --- */
+.neuro-icon-edit {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+  box-shadow:
+    2px 2px 4px var(--shadow-dark),
+    -2px -2px 4px var(--shadow-light);
+  transition: all var(--transition);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.neuro-icon-edit::after {
+  content: '';
+  width: 2px;
+  height: 10px;
+  background: var(--text-secondary);
+  border-radius: 1px;
+  transform: rotate(-45deg);
+  box-shadow:
+    -4px 4px 0 -1px var(--text-secondary),
+    -5px 5px 1px 0 var(--shadow-dark);
+  transition: background var(--transition);
+}
+
+.neuro-icon-edit:hover {
+  box-shadow:
+    1px 1px 2px var(--shadow-dark),
+    -1px -1px 2px var(--shadow-light);
+}
+
+.neuro-icon-edit:hover::after {
+  background: var(--accent);
+}
+
+.neuro-icon-edit:active {
+  box-shadow:
+    inset 2px 2px 4px var(--shadow-dark),
+    inset -2px -2px 4px var(--shadow-light);
+  transform: scale(0.9);
+}
+
+.neuro-icon-edit:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* --- Deezer (🟢) — small toxic-green raised circle --- */
+.neuro-icon-deezer {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--toxic-green), #2cd068);
+  box-shadow:
+    2px 2px 4px var(--shadow-dark),
+    -2px -2px 4px var(--shadow-light),
+    0 0 6px var(--toxic-green-glow);
+}
+
+/* --- iTunes (🍎) — small accent-colored raised circle --- */
+.neuro-icon-itunes {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--accent-hover), var(--accent));
+  box-shadow:
+    2px 2px 4px var(--shadow-dark),
+    -2px -2px 4px var(--shadow-light),
+    0 0 6px var(--accent-glow);
+}
+
+/* --- External link (↗) — small square with arrow --- */
+.neuro-icon-external {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+  box-shadow:
+    1px 1px 3px var(--shadow-dark),
+    -1px -1px 3px var(--shadow-light);
+  position: relative;
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.neuro-icon-external::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 6px 6px 0;
+  border-color: transparent var(--text-muted) transparent transparent;
+  transform: rotate(-45deg);
+  margin-bottom: 1px;
+  margin-left: 1px;
+  transition: border-color var(--transition);
+}
+
+.neuro-icon-external:hover {
+  box-shadow:
+    0 0 8px var(--accent-glow),
+    1px 1px 2px var(--shadow-dark),
+    -1px -1px 2px var(--shadow-light);
+}
+
+.neuro-icon-external:hover::after {
+  border-right-color: var(--accent-hover);
+}
+
+/* --- Brand icon (Sidebar) — Premium Audiophile Logo ---
+     Orbiting vinyl ring + crystal prism core + dancing equalizer bars
+     Toxic green / accent / gold neon glow, color-cycling aura */
+.neuro-icon-brand {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Outer rotating vinyl ring */
+.neuro-icon-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--bg-base, #0e0f13), var(--bg-base, #0e0f13)) padding-box,
+    conic-gradient(
+      from 0deg,
+      var(--accent, #d418d4),
+      var(--toxic-green, #3bf07a),
+      var(--toxic-yellow, #f0c83b),
+      var(--accent, #d418d4)
+    ) border-box;
+  animation: brandRingSpin 8s linear infinite;
+  box-shadow:
+    0 0 8px var(--accent-glow, rgba(212,24,212,0.45)),
+    0 0 16px rgba(59,240,122,0.15),
+    inset 0 0 4px rgba(255,255,255,0.03);
+}
+
+@keyframes brandRingSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Crystal prism core — hexagonal gem */
+.neuro-icon-brand::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 16px;
+  clip-path: polygon(50% 0%, 80% 25%, 80% 75%, 50% 100%, 20% 75%, 20% 25%);
+  background: linear-gradient(
+    160deg,
+    rgba(212,24,212,0.9) 0%,
+    rgba(160,20,200,0.7) 30%,
+    rgba(59,240,122,0.5) 55%,
+    rgba(240,200,59,0.4) 75%,
+    rgba(212,24,212,0.8) 100%
+  );
+  background-size: 200% 200%;
+  animation: brandPrismCycle 5s ease-in-out infinite;
+  box-shadow:
+    0 0 10px rgba(212,24,212,0.5),
+    0 0 20px rgba(59,240,122,0.2),
+    inset 0 0 6px rgba(255,255,255,0.12);
+  z-index: 1;
+}
+
+@keyframes brandPrismCycle {
+  0%, 100% { background-position: 0% 50%; }
+  33% { background-position: 100% 0%; }
+  66% { background-position: 100% 100%; }
+}
+
+/* Equalizer bars — nested inside the prism via the icon wrapper */
+/* (brandSpark and brandParticle styles live in Sidebar.module.css as CSS Modules) */
+
+/* ============================================================
+   Sidebar Nav Icons — Psychedelic EDM Cyberpunk
+   Neon glow, breathing animations, musical/edm shapes
+   ============================================================ */
+
+/* Home — Pulsing soundwave / audio spectrum */
+.neuro-icon-home {
+  width: 20px;
+  height: 18px;
+}
+
+.neuro-icon-home::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1px;
+  width: 2px;
+  height: 6px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: bottom;
+  box-shadow:
+    4px -4px 0 0 currentColor,
+    8px -10px 0 0 currentColor,
+    12px -3px 0 0 currentColor,
+    16px -7px 0 0 currentColor;
+  animation: eqBounce 1.2s ease-in-out infinite;
+}
+
+.neuro-icon-home::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  box-shadow: 0 0 8px currentColor;
+  animation: waveformGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes eqBounce {
+  0%, 100% { opacity: 0.6; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.3); }
+}
+
+@keyframes waveformGlow {
+  0%, 100% { opacity: 0.3; box-shadow: 0 0 6px currentColor; }
+  50% { opacity: 0.8; box-shadow: 0 0 14px currentColor, 0 0 22px currentColor; }
+}
+
+/* Explore — Pulsing radar / compass with neon rings */
+.neuro-icon-explore {
+  width: 20px;
+  height: 20px;
+}
+
+.neuro-icon-explore::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  animation: radarPulse 2s ease-in-out infinite;
+}
+
+@keyframes radarPulse {
+  0%, 100% { box-shadow: 0 0 4px currentColor; transform: scale(1); border-width: 1.5px; }
+  50% { box-shadow: 0 0 12px currentColor, 0 0 20px currentColor; transform: scale(1.08); border-width: 2px; }
+}
+
+.neuro-icon-explore::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: radarDot 1.5s ease-in-out infinite;
+}
+
+@keyframes radarDot {
+  0%, 100% { box-shadow: 0 0 6px currentColor; transform: translate(-50%, -50%) scale(1); }
+  50% { box-shadow: 0 0 14px currentColor, 0 0 20px currentColor; transform: translate(-50%, -50%) scale(1.4); }
+}
+
+/* Library — Dancing equalizer bars */
+.neuro-icon-library {
+  width: 20px;
+  height: 18px;
+}
+
+.neuro-icon-library::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  background: currentColor;
+  box-shadow:
+    6px 0 0 0 currentColor,
+    12px 0 0 0 currentColor;
+  animation: eqDance 0.9s ease-in-out infinite;
+}
+
+@keyframes eqDance {
+  0%, 100% { box-shadow: 6px 0 0 0 currentColor, 12px 0 0 0 currentColor; opacity: 0.6; }
+  30% { box-shadow: 6px -5px 0 0 currentColor, 12px 0 0 0 currentColor; opacity: 0.8; }
+  60% { box-shadow: 6px 0 0 0 currentColor, 12px -8px 0 0 currentColor; opacity: 1; }
+}
+
+.neuro-icon-library::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 4px;
+  width: 14px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.3;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* Themes — Spinning trippy color wheel */
+.neuro-icon-themes {
+  width: 20px;
+  height: 20px;
+}
+
+.neuro-icon-themes::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  animation: wheelSpin 4s linear infinite;
+}
+
+@keyframes wheelSpin {
+  to { transform: rotate(360deg); }
+}
+
+.neuro-icon-themes::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor, 0 0 14px currentColor;
+  animation: wheelDot 2s ease-in-out infinite;
+}
+
+@keyframes wheelDot {
+  0%, 100% { box-shadow: 0 0 8px currentColor, 0 0 14px currentColor; }
+  50% { box-shadow: 0 0 16px currentColor, 0 0 28px currentColor; }
+}
+
+/* Tags — Glowing play-triangle with tag pulse */
+.neuro-icon-tags {
+  width: 20px;
+  height: 18px;
+}
+
+.neuro-icon-tags::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 0 7px 12px;
+  border-color: transparent transparent transparent currentColor;
+  filter: drop-shadow(0 0 4px currentColor);
+  animation: tagPulse 2s ease-in-out infinite;
+}
+
+@keyframes tagPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); opacity: 0.7; }
+  50% { filter: drop-shadow(0 0 10px currentColor); opacity: 1; }
+}
+
+.neuro-icon-tags::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: tagDot 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes tagDot {
+  0% { box-shadow: 0 0 4px currentColor; transform: translateY(-50%) scale(1); }
+  100% { box-shadow: 0 0 12px currentColor, 0 0 18px currentColor; transform: translateY(-50%) scale(1.3); }
+}
+
+/* Settings — Spinning neon gear */
+.neuro-icon-settings {
+  width: 20px;
+  height: 20px;
+}
+
+.neuro-icon-settings::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  animation: gearSpin 8s linear infinite;
+}
+
+@keyframes gearSpin {
+  to { transform: rotate(360deg); }
+}
+
+.neuro-icon-settings::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow:
+    0 -7px 0 -1px currentColor,
+    0 7px 0 -1px currentColor,
+    -7px 0 0 -1px currentColor,
+    7px 0 0 -1px currentColor,
+    -5px -5px 0 -1px currentColor,
+    5px 5px 0 -1px currentColor,
+    -5px 5px 0 -1px currentColor,
+    5px -5px 0 -1px currentColor,
+    0 0 8px currentColor;
+  animation: gearGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes gearGlow {
+  0%, 100% { box-shadow: 0 -7px 0 -1px currentColor, 0 7px 0 -1px currentColor, -7px 0 0 -1px currentColor, 7px 0 0 -1px currentColor, -5px -5px 0 -1px currentColor, 5px 5px 0 -1px currentColor, -5px 5px 0 -1px currentColor, 5px -5px 0 -1px currentColor, 0 0 6px currentColor; }
+  50% { box-shadow: 0 -7px 0 -1px currentColor, 0 7px 0 -1px currentColor, -7px 0 0 -1px currentColor, 7px 0 0 -1px currentColor, -5px -5px 0 -1px currentColor, 5px 5px 0 -1px currentColor, -5px 5px 0 -1px currentColor, 5px -5px 0 -1px currentColor, 0 0 16px currentColor, 0 0 24px currentColor; }
+}
+
+/* ============================================================
+   Icon Style System — 7 presets via [data-icon-style]
+   Controlled by src/store/iconStyle.ts
+   Fine-tuning via CSS custom properties:
+     --icon-glow (0–1), --icon-size-mult (0.75–1.5),
+     --icon-anim-mult (0=off, 0.5=slow, 1=normal, 2=fast),
+     --icon-anim-state (paused|running)
+   ============================================================ */
+
+/* ── Fine-tune: size scale ── */
+[data-icon-style] .neuro-icon {
+  transform-origin: center;
+}
+
+/* Size scaling via CSS custom property */
+[data-icon-style] .neuro-icon-play,
+[data-icon-style] .neuro-icon-note,
+[data-icon-style] .neuro-icon-trophy,
+[data-icon-style] .neuro-icon-close,
+[data-icon-style] .neuro-icon-edit,
+[data-icon-style] .neuro-icon-deezer,
+[data-icon-style] .neuro-icon-itunes,
+[data-icon-style] .neuro-icon-external,
+[data-icon-style] .neuro-icon-brand,
+[data-icon-style] .neuro-icon-home,
+[data-icon-style] .neuro-icon-explore,
+[data-icon-style] .neuro-icon-library,
+[data-icon-style] .neuro-icon-themes,
+[data-icon-style] .neuro-icon-tags,
+[data-icon-style] .neuro-icon-settings {
+  scale: var(--icon-size-mult, 1);
+}
+
+/* ── Animation state via fine-tune ── */
+[data-icon-style] .neuro-icon-note,
+[data-icon-style] .neuro-icon-trophy,
+[data-icon-style] .neuro-icon-play,
+[data-icon-style] .neuro-icon-close,
+[data-icon-style] .neuro-icon-edit,
+[data-icon-style] .neuro-icon-external,
+[data-icon-style] .neuro-icon-home::before,
+[data-icon-style] .neuro-icon-home::after,
+[data-icon-style] .neuro-icon-explore::before,
+[data-icon-style] .neuro-icon-explore::after,
+[data-icon-style] .neuro-icon-library::before,
+[data-icon-style] .neuro-icon-themes::before,
+[data-icon-style] .neuro-icon-themes::after,
+[data-icon-style] .neuro-icon-tags::before,
+[data-icon-style] .neuro-icon-tags::after,
+[data-icon-style] .neuro-icon-settings::before,
+[data-icon-style] .neuro-icon-settings::after,
+[data-icon-style] .neuro-icon-brand::before,
+[data-icon-style] .neuro-icon-brand::after {
+  animation-play-state: var(--icon-anim-state, running);
+}
+
+/* Animation duration scaling */
+[data-icon-style] .neuro-icon-note,
+[data-icon-style] .neuro-icon-trophy,
+[data-icon-style] .neuro-icon-play,
+[data-icon-style] .neuro-icon-close,
+[data-icon-style] .neuro-icon-edit,
+[data-icon-style] .neuro-icon-external,
+[data-icon-style] .neuro-icon-home::before,
+[data-icon-style] .neuro-icon-home::after,
+[data-icon-style] .neuro-icon-explore::before,
+[data-icon-style] .neuro-icon-explore::after,
+[data-icon-style] .neuro-icon-library::before,
+[data-icon-style] .neuro-icon-themes::before,
+[data-icon-style] .neuro-icon-themes::after,
+[data-icon-style] .neuro-icon-tags::before,
+[data-icon-style] .neuro-icon-tags::after,
+[data-icon-style] .neuro-icon-settings::before,
+[data-icon-style] .neuro-icon-settings::after,
+[data-icon-style] .neuro-icon-brand::before {
+  animation-duration: calc(var(--icon-anim-base-dur, 1s) * var(--icon-anim-mult, 1));
+}
+
+/* ── Glow intensity — scales box-shadow glow via opacity ── */
+[data-icon-style] .neuro-icon-trophy,
+[data-icon-style] .neuro-icon-deezer,
+[data-icon-style] .neuro-icon-itunes {
+  --glow-opacity: calc(var(--icon-glow, 1) * 1);
+}
+
+/* =============================================
+   Style 1 — Neon (default, cyberpunk glow)
+   ============================================= */
+[data-icon-style='neon'] {
+  --icon-anim-base-dur: 1s;
+}
+
+[data-icon-style='neon'] .neuro-icon {
+  color: var(--accent);
+}
+
+[data-icon-style='neon'] .neuro-icon-play,
+[data-icon-style='neon'] .neuro-icon-note,
+[data-icon-style='neon'] .neuro-icon-trophy,
+[data-icon-style='neon'] .neuro-icon-close,
+[data-icon-style='neon'] .neuro-icon-edit,
+[data-icon-style='neon'] .neuro-icon-external {
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--bg-surface), var(--bg-primary));
+}
+
+[data-icon-style='neon'] .neuro-icon-play::after,
+[data-icon-style='neon'] .neuro-icon-tags::before,
+[data-icon-style='neon'] .neuro-icon-tags::after {
+  filter: drop-shadow(0 0 calc(4px * var(--icon-glow, 1)) currentColor);
+}
+
+/* Neon glow boost on hover */
+[data-icon-style='neon'] .neuro-icon-play:hover,
+[data-icon-style='neon'] .neuro-icon-external:hover,
+[data-icon-style='neon'] .neuro-icon-note:hover,
+[data-icon-style='neon'] .neuro-icon-trophy:hover {
+  box-shadow: 0 0 calc(14px * var(--icon-glow, 1)) var(--accent-glow);
+}
+
+/* =============================================
+   Style 2 — Glass (frosted glass, soft)
+   ============================================= */
+[data-icon-style='glass'] {
+  --icon-anim-base-dur: 2s;
+}
+
+[data-icon-style='glass'] .neuro-icon {
+  color: var(--text-secondary);
+}
+
+[data-icon-style='glass'] .neuro-icon-play,
+[data-icon-style='glass'] .neuro-icon-note,
+[data-icon-style='glass'] .neuro-icon-trophy,
+[data-icon-style='glass'] .neuro-icon-close,
+[data-icon-style='glass'] .neuro-icon-edit,
+[data-icon-style='glass'] .neuro-icon-external {
+  border-radius: 40%;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.02)
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 0.5px solid rgba(255,255,255,0.1);
+}
+
+[data-icon-style='glass'] .neuro-icon-play::after {
+  border-left-color: rgba(255,255,255,0.6);
+  filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
+}
+
+[data-icon-style='glass'] .neuro-icon-close::before,
+[data-icon-style='glass'] .neuro-icon-close::after {
+  background: rgba(255,255,255,0.4);
+}
+
+[data-icon-style='glass'] .neuro-icon-edit::after {
+  background: rgba(255,255,255,0.4);
+}
+
+/* =============================================
+   Style 3 — Minimal (flat, clean, no shadows)
+   ============================================= */
+[data-icon-style='minimal'] {
+  --icon-anim-base-dur: 0s;
+}
+
+[data-icon-style='minimal'] .neuro-icon {
+  color: var(--text-secondary);
+}
+
+[data-icon-style='minimal'] .neuro-icon-play,
+[data-icon-style='minimal'] .neuro-icon-note,
+[data-icon-style='minimal'] .neuro-icon-trophy,
+[data-icon-style='minimal'] .neuro-icon-close,
+[data-icon-style='minimal'] .neuro-icon-edit,
+[data-icon-style='minimal'] .neuro-icon-external {
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-icon-style='minimal'] .neuro-icon-play::after {
+  filter: none;
+}
+
+[data-icon-style='minimal'] .neuro-icon-play:hover,
+[data-icon-style='minimal'] .neuro-icon-note:hover,
+[data-icon-style='minimal'] .neuro-icon-close:hover,
+[data-icon-style='minimal'] .neuro-icon-edit:hover,
+[data-icon-style='minimal'] .neuro-icon-external:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+[data-icon-style='minimal'] .neuro-icon-play:active,
+[data-icon-style='minimal'] .neuro-icon-close:active,
+[data-icon-style='minimal'] .neuro-icon-edit:active {
+  box-shadow: none;
+  transform: scale(0.92);
+}
+
+/* =============================================
+   Style 4 — Brutal (sharp, geometric, mono)
+   ============================================= */
+[data-icon-style='brutal'] {
+  --icon-anim-base-dur: 0s;
+}
+
+[data-icon-style='brutal'] .neuro-icon {
+  color: var(--text-primary);
+  font-weight: 900;
+}
+
+[data-icon-style='brutal'] .neuro-icon-play,
+[data-icon-style='brutal'] .neuro-icon-note,
+[data-icon-style='brutal'] .neuro-icon-trophy,
+[data-icon-style='brutal'] .neuro-icon-close,
+[data-icon-style='brutal'] .neuro-icon-edit,
+[data-icon-style='brutal'] .neuro-icon-external {
+  border-radius: 0;
+  background: var(--bg-primary);
+  box-shadow: none;
+  border: 2px solid var(--text-primary);
+}
+
+[data-icon-style='brutal'] .neuro-icon-play::after {
+  border-left-color: var(--text-primary);
+  filter: none;
+}
+
+[data-icon-style='brutal'] .neuro-icon-play:hover,
+[data-icon-style='brutal'] .neuro-icon-close:hover,
+[data-icon-style='brutal'] .neuro-icon-external:hover {
+  box-shadow: 3px 3px 0 var(--text-primary);
+  transform: translate(-2px, -2px);
+  border: 2px solid var(--text-primary);
+}
+
+[data-icon-style='brutal'] .neuro-icon-play:active,
+[data-icon-style='brutal'] .neuro-icon-close:active {
+  box-shadow: none;
+  transform: translate(1px, 1px);
+}
+
+[data-icon-style='brutal'] .neuro-icon-close::before,
+[data-icon-style='brutal'] .neuro-icon-close::after {
+  background: var(--text-primary);
+  border-radius: 0;
+}
+
+[data-icon-style='brutal'] .neuro-icon-edit::after {
+  background: var(--text-primary);
+  border-radius: 0;
+}
+
+/* =============================================
+   Style 5 — Retro (pixelated, 8-bit, blocky)
+   ============================================= */
+[data-icon-style='retro'] {
+  --icon-anim-base-dur: 1.5s;
+}
+
+[data-icon-style='retro'] .neuro-icon {
+  color: var(--toxic-green);
+  image-rendering: pixelated;
+}
+
+[data-icon-style='retro'] .neuro-icon-play,
+[data-icon-style='retro'] .neuro-icon-note,
+[data-icon-style='retro'] .neuro-icon-trophy,
+[data-icon-style='retro'] .neuro-icon-close,
+[data-icon-style='retro'] .neuro-icon-edit,
+[data-icon-style='retro'] .neuro-icon-external {
+  border-radius: 0;
+  background: linear-gradient(180deg, #1a1a2e, #16213e);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.1),
+    inset 0 -2px 0 rgba(0,0,0,0.3),
+    0 0 0 2px #0f3460,
+    0 0 6px rgba(59,240,122,0.3);
+}
+
+[data-icon-style='retro'] .neuro-icon-play::after {
+  border-left-color: var(--toxic-green);
+  filter: drop-shadow(2px 2px 0 #0f3460);
+}
+
+[data-icon-style='retro'] .neuro-icon-play:hover,
+[data-icon-style='retro'] .neuro-icon-external:hover,
+[data-icon-style='retro'] .neuro-icon-close:hover {
+  box-shadow:
+    0 0 0 2px var(--toxic-green),
+    0 0 12px rgba(59,240,122,0.5);
+  transform: translateY(-2px);
+}
+
+[data-icon-style='retro'] .neuro-icon-play:active,
+[data-icon-style='retro'] .neuro-icon-close:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 0 rgba(0,0,0,0.3),
+    0 0 0 2px #0f3460;
+}
+
+[data-icon-style='retro'] .neuro-icon-close::before,
+[data-icon-style='retro'] .neuro-icon-close::after {
+  background: var(--toxic-green);
+  border-radius: 0;
+  box-shadow: 0 0 4px rgba(59,240,122,0.5);
+}
+
+[data-icon-style='retro'] .neuro-icon-edit::after {
+  background: var(--toxic-green);
+  border-radius: 0;
+}
+
+/* =============================================
+   Style 6 — Sketch (hand-drawn, organic, warm)
+   ============================================= */
+[data-icon-style='sketch'] {
+  --icon-anim-base-dur: 2.5s;
+}
+
+[data-icon-style='sketch'] .neuro-icon {
+  color: #c9a96e;
+}
+
+[data-icon-style='sketch'] .neuro-icon-play,
+[data-icon-style='sketch'] .neuro-icon-note,
+[data-icon-style='sketch'] .neuro-icon-trophy,
+[data-icon-style='sketch'] .neuro-icon-close,
+[data-icon-style='sketch'] .neuro-icon-edit,
+[data-icon-style='sketch'] .neuro-icon-external {
+  border-radius: 30% 70% 50% 50% / 40% 60% 40% 60%;
+  background: linear-gradient(
+    145deg,
+    rgba(201,169,110,0.12),
+    rgba(139,115,85,0.06)
+  );
+  box-shadow:
+    2px 3px 4px rgba(0,0,0,0.1),
+    -1px -1px 2px rgba(201,169,110,0.15),
+    inset 0 0 0 1px rgba(201,169,110,0.12);
+  transform: rotate(-1deg);
+}
+
+[data-icon-style='sketch'] .neuro-icon-play::after {
+  border-left-color: #c9a96e;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+  transform: rotate(-2deg);
+}
+
+[data-icon-style='sketch'] .neuro-icon-play:hover,
+[data-icon-style='sketch'] .neuro-icon-external:hover {
+  transform: rotate(1deg) scale(1.04);
+  box-shadow:
+    3px 4px 6px rgba(0,0,0,0.12),
+    -2px -2px 4px rgba(201,169,110,0.2);
+}
+
+[data-icon-style='sketch'] .neuro-icon-play:active,
+[data-icon-style='sketch'] .neuro-icon-close:active {
+  transform: rotate(-1deg) scale(0.94);
+}
+
+[data-icon-style='sketch'] .neuro-icon-close::before,
+[data-icon-style='sketch'] .neuro-icon-close::after {
+  background: #c9a96e;
+  border-radius: 0;
+  transform: rotate(43deg);
+}
+
+[data-icon-style='sketch'] .neuro-icon-close::after {
+  transform: rotate(-43deg);
+}
+
+[data-icon-style='sketch'] .neuro-icon-edit::after {
+  background: #c9a96e;
+  border-radius: 0;
+  transform: rotate(-42deg);
+}
+
+/* =============================================
+   Style 7 — Chrome (metallic, reflective)
+   ============================================= */
+[data-icon-style='chrome'] {
+  --icon-anim-base-dur: 1.2s;
+}
+
+[data-icon-style='chrome'] .neuro-icon {
+  color: #d0d0d0;
+}
+
+[data-icon-style='chrome'] .neuro-icon-play,
+[data-icon-style='chrome'] .neuro-icon-note,
+[data-icon-style='chrome'] .neuro-icon-trophy,
+[data-icon-style='chrome'] .neuro-icon-close,
+[data-icon-style='chrome'] .neuro-icon-edit,
+[data-icon-style='chrome'] .neuro-icon-external {
+  border-radius: 30%;
+  background: linear-gradient(
+    160deg,
+    #e8e8e8 0%,
+    #a0a0a0 25%,
+    #e0e0e0 50%,
+    #808080 75%,
+    #c0c0c0 100%
+  );
+  background-size: 200% 200%;
+  animation: chromeShift 3s ease-in-out infinite;
+  box-shadow:
+    2px 3px 6px rgba(0,0,0,0.2),
+    -1px -1px 3px rgba(255,255,255,0.3),
+    inset 0 0 0 1px rgba(255,255,255,0.15),
+    0 0 10px rgba(200,200,200,0.2);
+}
+
+@keyframes chromeShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+[data-icon-style='chrome'] .neuro-icon-play::after {
+  border-left-color: #606060;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+[data-icon-style='chrome'] .neuro-icon-play:hover,
+[data-icon-style='chrome'] .neuro-icon-external:hover,
+[data-icon-style='chrome'] .neuro-icon-close:hover {
+  box-shadow:
+    3px 4px 8px rgba(0,0,0,0.25),
+    -2px -2px 4px rgba(255,255,255,0.4),
+    inset 0 0 0 1px rgba(255,255,255,0.2),
+    0 0 16px rgba(200,200,200,0.3);
+  transform: scale(1.06);
+}
+
+[data-icon-style='chrome'] .neuro-icon-play:active,
+[data-icon-style='chrome'] .neuro-icon-close:active {
+  transform: scale(0.94);
+  box-shadow:
+    1px 1px 3px rgba(0,0,0,0.2),
+    inset 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+[data-icon-style='chrome'] .neuro-icon-close::before,
+[data-icon-style='chrome'] .neuro-icon-close::after {
+  background: #606060;
+  border-radius: 1px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+[data-icon-style='chrome'] .neuro-icon-edit::after {
+  background: #606060;
+  border-radius: 1px;
+}
+
+/* ============================================================
+   Reduced motion — disable all icon animations
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .neuro-icon-home::before,
+  .neuro-icon-home::after,
+  .neuro-icon-explore::before,
+  .neuro-icon-explore::after,
+  .neuro-icon-library::before,
+  .neuro-icon-themes::before,
+  .neuro-icon-themes::after,
+  .neuro-icon-tags::before,
+  .neuro-icon-tags::after,
+  .neuro-icon-settings::before,
+  .neuro-icon-settings::after {
+    animation: none !important;
+  }
+}

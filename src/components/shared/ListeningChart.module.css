@@ -1,0 +1,406 @@
+.container {
+  animation: fadeSlideUp 0.5s ease-out;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* --- Period pills --- */
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pills {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pill {
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  background: linear-gradient(145deg, var(--bg-primary), var(--bg-base));
+  color: var(--text-muted);
+  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px rgba(0,0,0,0.2);
+  transition: all var(--transition);
+}
+
+.pill:hover {
+  color: var(--text-secondary);
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px rgba(0,0,0,0.2);
+}
+
+.pillActive {
+  background: linear-gradient(145deg, var(--accent-hover), var(--accent));
+  color: #fff;
+  box-shadow:
+    0 0 10px var(--accent-glow),
+    inset 1px 1px 1px rgba(255,255,255,0.2);
+  animation: pillGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes pillGlow {
+  0% { box-shadow: 0 0 8px var(--accent-glow), 0 0 16px var(--accent-glow), inset 1px 1px 1px rgba(255,255,255,0.2); }
+  100% { box-shadow: 0 0 14px var(--accent-glow), 0 0 28px var(--accent-glow), inset 1px 1px 1px rgba(255,255,255,0.2); }
+}
+
+/* --- Chart wrapper --- */
+.chartWrap {
+  padding: 18px 16px 12px !important;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.chartWrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(ellipse 100% 50% at 50% 100%, var(--accent-glass), transparent 60%);
+}
+
+/* --- Chart area --- */
+.chart {
+  position: relative;
+  height: 170px;
+  padding-left: 42px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.chartScrollable {
+  /* Scrollable for long periods — shows a subtle scrollbar */
+}
+
+.chart::-webkit-scrollbar {
+  height: 4px;
+}
+
+.chart::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chart::-webkit-scrollbar-thumb {
+  background: rgba(227, 27, 35, 0.15);
+  border-radius: 2px;
+}
+
+/* --- Y-axis grid --- */
+.yAxis {
+  position: absolute;
+  inset: 0 0 0 46px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed rgba(255,255,255,0.05);
+}
+
+.gridLabel {
+  position: absolute;
+  left: -42px;
+  top: -8px;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  width: 36px;
+  text-align: right;
+}
+
+/* --- Bars --- */
+.bars {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  perspective: 600px;
+  perspective-origin: 50% 50%;
+  transition: perspective-origin 0.15s ease-out;
+}
+
+.barsTiltActive {
+  perspective-origin: calc(50% + var(--tilt-x, 0) * 80px) calc(50% + var(--tilt-y, 0) * 40px);
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 24px;
+  position: relative;
+}
+
+/* Bar stack for compare mode — places bars side by side */
+.barStack {
+  width: 100%;
+  max-width: 48px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  gap: 1px;
+}
+
+.barCompare {
+  width: 100%;
+  background: linear-gradient(180deg,
+    rgba(120, 140, 255, 0.6) 0%,
+    rgba(100, 120, 255, 0.35) 100%);
+  border-radius: 6px 6px 0 0;
+  min-height: 3px;
+  animation: barGrow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  transition: opacity 0.25s ease;
+}
+
+.barValue {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.barCol:hover .barValue {
+  opacity: 1;
+  color: var(--text-primary);
+}
+
+.bar {
+  width: 100%;
+  max-width: 48px;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    filter 0.25s ease;
+  animation: barGrow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  min-height: 4px;
+  z-index: 1;
+}
+
+/* Parallax tilt on bars — rotate toward cursor, shift shadows */
+.barsTiltActive .bar {
+  will-change: transform;
+  transform:
+    rotateY(calc(var(--tilt-x, 0) * 8deg))
+    rotateX(calc(var(--tilt-y, 0) * -3deg))
+    translateZ(calc(6px + var(--tilt-y, 0) * 8px));
+  box-shadow:
+    calc(var(--tilt-x, 0) * -8px) calc(var(--tilt-y, 0) * -6px) 16px rgba(0,0,0,0.35),
+    0 0 calc(8px + var(--glow-intensity, 0.3) * 24px)
+      rgba(var(--glow-r, 227), var(--glow-g, 27), var(--glow-b, 35), calc(0.3 + var(--glow-intensity, 0.3) * 0.5)),
+    inset 1px 1px 1px rgba(255,255,255,0.15) !important;
+}
+
+/* Specular highlight shifts with tilt */
+.barsTiltActive .bar::after {
+  left: calc(12% + var(--tilt-x, 0) * 18%);
+  right: calc(12% - var(--tilt-x, 0) * 18%);
+  opacity: calc(0.6 + var(--tilt-y, 0) * 0.3);
+  transition:
+    left 0.15s ease-out,
+    right 0.15s ease-out,
+    opacity 0.2s ease;
+}
+
+/* --- Legend for compare mode --- */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg,
+    rgba(227, 27, 35, 0.85) 0%,
+    rgba(227, 27, 35, 0.5) 100%);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.legendDotCompare {
+  background: linear-gradient(180deg,
+    rgba(120, 140, 255, 0.6) 0%,
+    rgba(100, 120, 255, 0.35) 100%);
+  box-shadow: 0 0 6px rgba(100, 120, 255, 0.3);
+  margin-left: 12px;
+}
+
+.bar::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 12%;
+  right: 12%;
+  height: 30%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2), transparent);
+  pointer-events: none;
+}
+
+.bar:hover {
+  transform: translateY(-6px) scaleY(1.04);
+  filter: brightness(1.3) saturate(1.2);
+  box-shadow:
+    0 0 18px var(--accent-glow-strong),
+    0 0 36px var(--accent-glow),
+    0 6px 20px rgba(227,27,35,0.3) !important;
+}
+
+@keyframes barGrow {
+  from { transform: scaleY(0); transform-origin: bottom; }
+  to { transform: scaleY(1); transform-origin: bottom; }
+}
+
+/* Bar breathing animation — subtle pulse */
+.barCol:nth-child(odd) .bar {
+  animation: barGrow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both,
+             barBreathe 4s ease-in-out infinite alternate;
+  animation-delay: 0s, 0.8s;
+}
+
+.barCol:nth-child(even) .bar {
+  animation: barGrow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both,
+             barBreathe 4s ease-in-out 0.6s infinite alternate;
+  animation-delay: 0s, 1.4s;
+}
+
+@keyframes barBreathe {
+  0% { box-shadow: inset 1px 1px 1px rgba(255,255,255,0.12); }
+  100% { box-shadow: inset 1px 1px 2px rgba(255,255,255,0.22), 0 0 10px rgba(227,27,35,0.15); }
+}
+
+/* Disable barBreathe when tilt is active — it fights the dynamic shadows */
+.barsTiltActive .barCol:nth-child(odd) .bar,
+.barsTiltActive .barCol:nth-child(even) .bar {
+  animation: barGrow 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.barLabel {
+  margin-top: 5px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.barCol:hover .barLabel {
+  color: var(--text-primary);
+}
+
+/* --- Clickable bar column (for navigating to day detail) --- */
+.barColClickable {
+  cursor: pointer;
+}
+
+.barColClickable:focus-visible {
+  outline: 2px solid var(--accent-glow);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.barColClickable:hover .bar {
+  filter: brightness(1.35) saturate(1.25);
+}
+
+.barColClickable:active .bar {
+  filter: brightness(1.55);
+  transform: scaleY(0.93);
+}
+
+/* --- Skeleton loading --- */
+.skeleton {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 170px;
+  padding-left: 42px;
+}
+
+.skelBar {
+  flex: 1;
+  max-width: 48px;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(145deg, var(--bg-primary), var(--bg-base));
+  box-shadow: inset 3px 3px 8px var(--shadow-dark), inset -3px -3px 8px rgba(0,0,0,0.2);
+  animation: skelPulse 1.8s ease-in-out infinite;
+}
+
+.skelBar:nth-child(1) { height: 65%; animation-delay: 0s; }
+.skelBar:nth-child(2) { height: 82%; animation-delay: 0.12s; }
+.skelBar:nth-child(3) { height: 55%; animation-delay: 0.24s; }
+.skelBar:nth-child(4) { height: 90%; animation-delay: 0.36s; }
+.skelBar:nth-child(5) { height: 48%; animation-delay: 0.48s; }
+.skelBar:nth-child(6) { height: 75%; animation-delay: 0.6s; }
+.skelBar:nth-child(7) { height: 60%; animation-delay: 0.72s; }
+
+@keyframes skelPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+/* --- Empty state --- */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 170px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}

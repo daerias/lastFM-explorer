@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Toxic green glow -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Inner shadow for neuromorphic depth -->
+    <filter id="neuroShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+      <feOffset dx="2" dy="2" result="offsetDark"/>
+      <feOffset dx="-1" dy="-1" result="offsetLight"/>
+      <feComposite in="SourceGraphic" in2="offsetDark" operator="out" result="darkEdge"/>
+      <feComposite in="SourceGraphic" in2="offsetLight" operator="out" result="lightEdge"/>
+      <feMerge>
+        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode in="darkEdge"/>
+        <feMergeNode in="lightEdge"/>
+      </feMerge>
+    </filter>
+    <!-- Neuromorphic gradient -->
+    <linearGradient id="neuroBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2aff41"/>
+      <stop offset="100%" stop-color="#00cc1a"/>
+    </linearGradient>
+    <!-- Highlight gradient -->
+    <linearGradient id="highlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+      <stop offset="40%" stop-color="rgba(255,255,255,0.05)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.15)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer glow ring -->
+  <rect x="4" y="4" width="56" height="56" rx="16" ry="16"
+        fill="none" stroke="#39ff14" stroke-width="3"
+        opacity="0.4" filter="url(#glow)"/>
+
+  <!-- Neuromorphic base -->
+  <rect x="6" y="6" width="52" height="52" rx="14" ry="14"
+        fill="url(#neuroBg)"
+        stroke="#1a8c1a" stroke-width="1"/>
+
+  <!-- Specular highlight overlay -->
+  <rect x="6" y="6" width="52" height="52" rx="14" ry="14"
+        fill="url(#highlight)"/>
+
+  <!-- Inset shadow edges -->
+  <rect x="8" y="8" width="48" height="48" rx="12" ry="12"
+        fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+  <rect x="8" y="8" width="48" height="48" rx="12" ry="12"
+        fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"
+        transform="translate(-1,-1)"/>
+
+  <!-- "LF" monogram with glow -->
+  <text x="32" y="43" text-anchor="middle"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="26" font-weight="800"
+        fill="#ffffff"
+        filter="url(#glow)"
+        letter-spacing="-1">
+    LF
+  </text>
+
+  <!-- Specular reflection line -->
+  <line x1="14" y1="16" x2="50" y2="16"
+        stroke="rgba(255,255,255,0.3)" stroke-width="1"
+        stroke-linecap="round"/>
+</svg>

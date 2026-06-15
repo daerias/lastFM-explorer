@@ -1,0 +1,47 @@
+.selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: var(--bg-primary);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow:
+    inset 2px 2px 5px var(--shadow-dark),
+    inset -2px -2px 5px rgba(0,0,0,0.2);
+}
+
+.pill:hover {
+  color: var(--text-primary);
+  box-shadow:
+    inset 1px 1px 3px var(--shadow-dark),
+    inset -1px -1px 3px rgba(0,0,0,0.2);
+}
+
+.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow:
+    0 0 10px var(--accent-glow),
+    4px 4px 8px var(--shadow-dark);
+  animation: activePillGlow 3s ease-in-out infinite;
+}
+
+@keyframes activePillGlow {
+  0%, 100% { box-shadow: 0 0 10px var(--accent-glow), 4px 4px 8px var(--shadow-dark); }
+  50% { box-shadow: 0 0 22px var(--accent-glow-strong), 4px 4px 8px var(--shadow-dark); }
+}
+
+.active:hover {
+  color: #fff;
+  background: var(--accent-hover);
+}

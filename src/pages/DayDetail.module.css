@@ -1,0 +1,286 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeSlideUp 0.6s ease-out;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  width: fit-content;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: var(--accent-hover);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header h1 {
+  font-size: 1.6rem;
+  animation: none;
+}
+
+.sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* Search */
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius-sm);
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  box-shadow: inset 4px 4px 10px var(--shadow-dark), inset -4px -4px 10px rgba(0,0,0,0.2);
+  outline: none;
+  transition: all var(--transition);
+}
+
+.searchInput:focus {
+  border-color: var(--accent-glow);
+  box-shadow: inset 4px 4px 10px var(--shadow-dark), inset -4px -4px 10px rgba(0,0,0,0.2), 0 0 0 1px var(--accent-glow), 0 0 14px var(--accent-glow);
+  animation: border-glow-breathe 2.5s ease-in-out infinite;
+}
+
+.searchInput::placeholder { color: var(--text-muted); }
+
+.searchCount {
+  position: absolute;
+  right: 14px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* Track list */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px !important;
+  cursor: pointer;
+  position: relative;
+}
+
+.row:hover {
+  transform: translateX(4px) !important;
+  box-shadow:
+    14px 14px 30px var(--shadow-dark),
+    -14px -14px 30px rgba(0,0,0,0.2),
+    inset 1px 1px 2px transparent,
+    0 0 16px var(--accent-glow) !important;
+}
+
+.rowIndex {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rowCover {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px rgba(0,0,0,0.2);
+}
+
+.rowImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.row:hover .rowImg {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+.rowNoImg {
+  font-size: 1.2rem;
+  opacity: 0.3;
+}
+
+.rowInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rowName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowArtist {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowTime {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.rowPlayBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: none;
+  font-size: 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.row:hover .rowPlayBtn {
+  opacity: 1;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.rowPlayBtn:hover {
+  background: var(--accent-hover) !important;
+  transform: scale(1.2);
+}
+
+/* Tags toggle */
+.tagsToggle {
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.tagsToggle:hover {
+  color: var(--accent);
+  border-color: var(--accent-glow);
+  box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px rgba(0,0,0,0.2), 0 0 8px var(--accent-glow);
+}
+
+/* Inline tag chips in rows */
+.rowTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.rowTagChip {
+  --rh: 150;
+  --rs: 70%;
+  --rl: 58%;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: hsl(var(--rh) var(--rs) var(--rl));
+  background: hsl(var(--rh) var(--rs) var(--rl) / 0.08);
+  border: 1px solid hsl(var(--rh) var(--rs) var(--rl) / 0.18);
+  border-radius: 8px;
+  padding: 1px 6px;
+  box-shadow: 0 0 2px hsl(var(--rh) var(--rs) var(--rl) / 0.06);
+}
+
+.rowTagChip:nth-child(8n+1) { --rh: 150; --rs: 70%; --rl: 58%; }
+.rowTagChip:nth-child(8n+2) { --rh: 170; --rs: 65%; --rl: 50%; }
+.rowTagChip:nth-child(8n+3) { --rh: 45; --rs: 75%; --rl: 58%; }
+.rowTagChip:nth-child(8n+4) { --rh: 22; --rs: 75%; --rl: 58%; }
+.rowTagChip:nth-child(8n+5) { --rh: 358; --rs: 65%; --rl: 50%; }
+.rowTagChip:nth-child(8n+6) { --rh: 302; --rs: 65%; --rl: 48%; }
+.rowTagChip:nth-child(8n+7) { --rh: 215; --rs: 72%; --rl: 58%; }
+.rowTagChip:nth-child(8n) { --rh: 268; --rs: 65%; --rl: 58%; }
+
+.rowTagMore {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Skeleton */
+.skelRow {
+  height: 62px;
+  cursor: default;
+  opacity: 0.4;
+  animation: skelPulse 1.8s ease-in-out infinite;
+}
+
+.skelRow:nth-child(1) { animation-delay: 0s; }
+.skelRow:nth-child(2) { animation-delay: 0.1s; }
+.skelRow:nth-child(3) { animation-delay: 0.2s; }
+.skelRow:nth-child(4) { animation-delay: 0.3s; }
+.skelRow:nth-child(5) { animation-delay: 0.4s; }
+.skelRow:nth-child(6) { animation-delay: 0.5s; }
+.skelRow:nth-child(7) { animation-delay: 0.6s; }
+.skelRow:nth-child(8) { animation-delay: 0.7s; }
+
+@keyframes skelPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}

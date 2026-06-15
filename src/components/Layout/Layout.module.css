@@ -1,0 +1,178 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Zen Mode — hide sidebar, full-width content */
+.zenMode .main {
+  margin-left: 0;
+}
+
+.zenBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  background: var(--bg-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.zenBar:hover {
+  opacity: 1;
+}
+
+.zenTitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.zenExit {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.zenExit:hover {
+  background: var(--bg-surface);
+  color: var(--accent);
+}
+
+/* Hide decorative elements in zen mode */
+:global([data-zen="on"]) .neuro-pressed,
+:global([data-zen="on"]) .neuro-raised {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+:global([data-zen="on"]) [class*="gauge"],
+:global([data-zen="on"]) [class*="controlPanel"],
+:global([data-zen="on"]) [class*="rotary"],
+:global([data-zen="on"]) [class*="vuMeter"],
+:global([data-zen="on"]) [class*="crossfader"],
+:global([data-zen="on"]) [class*="insightRow"],
+:global([data-zen="on"]) [class*="gauges"],
+:global([data-zen="on"]) [class*="hero"],
+:global([data-zen="on"]) [class*="topSections"] {
+  display: none !important;
+}
+
+.main {
+  flex: 1;
+  margin-left: 72px;
+  padding: 20px 32px;
+  min-height: 100vh;
+  transition: margin-left 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Sidebar expanded (hovered or locked) — push content right */
+.layout:has([data-expanded="true"]) .main {
+  margin-left: 220px;
+}
+
+.mainInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: pageFadeIn 0.35s ease-out;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Global Playlist Creator — right slide-out panel ── */
+
+.playlistOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  z-index: 95;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.playlistOverlayOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.playlistPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: 90vw;
+  background: var(--bg-base);
+  border-left: 1px solid rgba(200,130,50,0.12);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.4), inset -1px 0 0 rgba(255,255,255,0.02);
+  z-index: 96;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.playlistPanelOpen {
+  transform: translateX(0);
+}
+
+.playlistPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(200,130,50,0.1);
+  flex-shrink: 0;
+}
+
+.playlistPanelTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.playlistPanelClose {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.playlistPanelClose:hover {
+  color: var(--accent);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.playlistPanelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}

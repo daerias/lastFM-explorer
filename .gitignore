@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+Thumbs.db
+
+# Private documentation & planning (never on GitHub)
+knowledge.md
+PLAN.md
+inspirations.md
+*-spec.md
+git-cleanup-spec.md
+token-efficiency-spec.md
+
+# Internal tooling
+.agents/
+.codebuff/
+
+# Sync script (local only)
+sync-memory.sh
+
+# Buffy persistent memory (local only, never commit)
+.buffy/
+
+# Private Dokumentation & Planung (nie auf GitHub)
+knowledge.md
+PLAN.md
+inspirations.md
+*-spec.md
+
+# Interne Tooling-Definitionen
+.agents/
+
+# Codebuff workspace
+.codebuff/

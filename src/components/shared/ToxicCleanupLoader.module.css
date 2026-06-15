@@ -1,0 +1,764 @@
+/* ============================================================
+   Toxic Cleanup Loader — Psychedelic Cyberpunk Progress
+   Factory → Toxic River → Creature Cleanup → Nature Bloom
+   ============================================================ */
+
+.scene {
+  position: relative;
+  width: 100%;
+  min-height: 160px;
+  border-radius: 14px;
+  overflow: hidden;
+  isolation: isolate;
+  margin-bottom: 16px;
+
+  /* Dark organic earth background */
+  background:
+    /* Deep earth gradient */
+    linear-gradient(180deg,
+      #0a0a0a 0%,
+      #0d0f08 30%,
+      #0a0f0a 60%,
+      #080e08 100%
+    );
+
+  /* Cyber grid overlay */
+  background-image:
+    linear-gradient(0deg, transparent 24%, rgba(59,240,122,0.02) 25%, rgba(59,240,122,0.02) 26%, transparent 27%, transparent 74%, rgba(59,240,122,0.02) 75%, rgba(59,240,122,0.02) 76%, transparent 77%),
+    linear-gradient(90deg, transparent 24%, rgba(59,240,122,0.02) 25%, rgba(59,240,122,0.02) 26%, transparent 27%, transparent 74%, rgba(59,240,122,0.02) 75%, rgba(59,240,122,0.02) 76%, transparent 77%);
+  background-size: 60px 60px;
+  border: 1px solid rgba(59,240,122,0.08);
+
+  /* Subtle scanlines */
+  box-shadow:
+    inset 0 0 60px rgba(59,240,122,0.03),
+    inset 0 0 120px rgba(0,0,0,0.4);
+}
+
+/* Scanline overlay */
+.scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+}
+
+/* ============================================================
+   Factory — Left Side
+   ============================================================ */
+
+.factory {
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  width: 90px;
+  height: 110px;
+  z-index: 2;
+}
+
+/* Factory body */
+.factoryBody {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  width: 56px;
+  height: 48px;
+  background: linear-gradient(180deg, #1a1a1a, #0f0f0f);
+  border: 1px solid rgba(59,240,122,0.12);
+  border-radius: 3px 3px 0 0;
+  box-shadow:
+    inset 0 0 10px rgba(59,240,122,0.04),
+    0 0 10px rgba(0,0,0,0.5);
+}
+
+/* Factory windows — glow green when active */
+.factoryWindows {
+  position: absolute;
+  top: 20px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+}
+
+.factoryWindow {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: rgba(59,240,122,0.15);
+  border-radius: 1px;
+  animation: windowFlicker 0.3s ease-in-out infinite alternate;
+}
+
+.factoryWindow:nth-child(1) { left: 4px; top: 6px; animation-delay: 0s; }
+.factoryWindow:nth-child(2) { left: 14px; top: 6px; animation-delay: 0.1s; }
+.factoryWindow:nth-child(3) { left: 24px; top: 6px; animation-delay: 0.05s; }
+.factoryWindow:nth-child(4) { left: 34px; top: 6px; animation-delay: 0.15s; }
+.factoryWindow:nth-child(5) { left: 9px; top: 16px; animation-delay: 0.08s; }
+.factoryWindow:nth-child(6) { left: 29px; top: 16px; animation-delay: 0.12s; }
+
+@keyframes windowFlicker {
+  0% { opacity: 0.1; background: rgba(59,240,122,0.15); }
+  50% { opacity: 0.3; background: rgba(59,240,122,0.3); }
+  100% { opacity: 0.15; background: rgba(100,255,150,0.2); }
+}
+
+/* Completion: windows go dark */
+.done .factoryWindow {
+  animation: windowFadeOut 1.5s ease forwards;
+}
+
+@keyframes windowFadeOut {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.02; background: rgba(59,240,122,0.04); }
+}
+
+/* Smokestack 1 */
+.smokestack1 {
+  position: absolute;
+  bottom: 48px;
+  left: 16px;
+  width: 12px;
+  height: 32px;
+  background: linear-gradient(180deg, #1a1a1a, #111);
+  border: 1px solid rgba(59,240,122,0.1);
+  border-bottom: none;
+}
+
+/* Smokestack 2 */
+.smokestack2 {
+  position: absolute;
+  bottom: 48px;
+  left: 38px;
+  width: 10px;
+  height: 28px;
+  background: linear-gradient(180deg, #1a1a1a, #111);
+  border: 1px solid rgba(59,240,122,0.1);
+  border-bottom: none;
+}
+
+/* Smoke particles */
+.smoke {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  width: 30px;
+  height: 20px;
+  z-index: 3;
+}
+
+.smokePuff1, .smokePuff2, .smokePuff3 {
+  position: absolute;
+  background: rgba(100,255,120,0.06);
+  border-radius: 50%;
+  animation: smokeRise 2s ease-out infinite;
+}
+
+.smokePuff1 {
+  width: 8px;
+  height: 8px;
+  left: 4px;
+  bottom: 0;
+  animation-delay: 0s;
+}
+
+.smokePuff2 {
+  width: 6px;
+  height: 6px;
+  left: 10px;
+  bottom: -2px;
+  animation-delay: 0.7s;
+}
+
+.smokePuff3 {
+  width: 10px;
+  height: 10px;
+  left: 1px;
+  bottom: -4px;
+  animation-delay: 1.4s;
+}
+
+@keyframes smokeRise {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 0.15;
+  }
+  100% {
+    transform: translateY(-45px) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Done: smoke stops */
+.done .smokePuff1,
+.done .smokePuff2,
+.done .smokePuff3 {
+  animation: smokeFade 1.5s ease forwards;
+}
+
+@keyframes smokeFade {
+  0% { opacity: 0.3; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ============================================================
+   Toxic Pipe — Spews green goo into the river
+   ============================================================ */
+
+.pipe {
+  position: absolute;
+  bottom: 28px;
+  left: 80px;
+  width: 36px;
+  height: 8px;
+  background: linear-gradient(90deg, #1a1a1a, #222);
+  border: 1px solid rgba(59,240,122,0.12);
+  border-radius: 0 3px 3px 0;
+  z-index: 3;
+}
+
+/* Goo dripping from pipe */
+.pipeDrip {
+  position: absolute;
+  bottom: 20px;
+  left: 112px;
+  width: 4px;
+  height: 6px;
+  background: linear-gradient(180deg, rgba(59,240,122,0.8), rgba(59,240,122,0.4));
+  border-radius: 0 0 2px 2px;
+  z-index: 3;
+  animation: dripFall 1.5s ease-in infinite;
+  opacity: 0;
+}
+
+@keyframes dripFall {
+  0%, 30% { transform: translateY(0) scaleY(1); opacity: 0; }
+  35% { opacity: 0.8; }
+  80% { transform: translateY(18px) scaleY(2.5); opacity: 0.6; }
+  85% { transform: translateY(20px) scaleY(0.3); opacity: 0; }
+  100% { transform: translateY(0) scaleY(1); opacity: 0; }
+}
+
+.done .pipeDrip { animation: none; opacity: 0; }
+
+/* ============================================================
+   Toxic River — The Progress Bar
+   ============================================================ */
+
+.river {
+  position: absolute;
+  bottom: 4px;
+  left: 120px;
+  right: 20px;
+  height: 26px;
+  border-radius: 3px;
+  overflow: hidden;
+  z-index: 1;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(59,240,122,0.06);
+}
+
+/* The toxic liquid fill — width controlled by React */
+.riverFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(59,240,122,0.15) 0%,
+    rgba(30,220,80,0.35) 30%,
+    rgba(59,240,122,0.5) 50%,
+    rgba(20,180,50,0.45) 70%,
+    rgba(10,100,30,0.3) 100%
+  );
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  box-shadow:
+    inset 0 0 20px rgba(59,240,122,0.2),
+    0 0 15px rgba(59,240,122,0.15);
+  overflow: hidden;
+}
+
+/* Toxic swirls inside the liquid */
+.riverFill::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background:
+    radial-gradient(ellipse 40% 30% at 20% 50%, rgba(100,255,150,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 25% at 50% 40%, rgba(59,240,122,0.2) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 20% at 75% 55%, rgba(120,255,160,0.25) 0%, transparent 65%);
+  animation: toxicSwirl 3s ease-in-out infinite;
+}
+
+@keyframes toxicSwirl {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* Boiling bubbles on the liquid surface */
+.riverBubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.riverBubble {
+  position: absolute;
+  background: radial-gradient(circle at 30% 30%, rgba(150,255,180,0.6), rgba(59,240,122,0.2));
+  border-radius: 50%;
+  animation: bubblePop var(--bubble-dur, 2s) ease-in infinite;
+}
+
+.riverBubble:nth-child(1) { width: 3px; height: 3px; left: 8%; bottom: 2px; --bubble-dur: 1.8s; animation-delay: 0s; }
+.riverBubble:nth-child(2) { width: 5px; height: 5px; left: 22%; bottom: 1px; --bubble-dur: 2.4s; animation-delay: 0.4s; }
+.riverBubble:nth-child(3) { width: 2px; height: 2px; left: 35%; bottom: 3px; --bubble-dur: 1.5s; animation-delay: 0.8s; }
+.riverBubble:nth-child(4) { width: 4px; height: 4px; left: 48%; bottom: 2px; --bubble-dur: 2.1s; animation-delay: 1.2s; }
+.riverBubble:nth-child(5) { width: 6px; height: 6px; left: 60%; bottom: 1px; --bubble-dur: 2.7s; animation-delay: 0.3s; }
+.riverBubble:nth-child(6) { width: 3px; height: 3px; left: 72%; bottom: 3px; --bubble-dur: 1.9s; animation-delay: 0.7s; }
+.riverBubble:nth-child(7) { width: 4px; height: 4px; left: 85%; bottom: 2px; --bubble-dur: 2.2s; animation-delay: 1.1s; }
+.riverBubble:nth-child(8) { width: 3px; height: 3px; left: 92%; bottom: 1px; --bubble-dur: 1.6s; animation-delay: 1.5s; }
+
+@keyframes bubblePop {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  15% { opacity: 0.8; transform: translateY(-2px) scale(1); }
+  70% { opacity: 0.5; transform: translateY(-6px) scale(1.3); }
+  100% { opacity: 0; transform: translateY(-10px) scale(0); }
+}
+
+/* Indeterminate: river pulsates 30–70% — pollution is spreading but not complete */
+.indeterminate .riverFill {
+  width: 50% !important;
+  animation: riverBreathe 2.5s ease-in-out infinite;
+}
+
+@keyframes riverBreathe {
+  0%, 100% { width: 35%; }
+  50% { width: 65%; }
+}
+
+/* Completion: liquid turns clear/blue, becomes pure water */
+.done .riverFill {
+  width: 100% !important;
+  animation: none;
+  background: linear-gradient(
+    180deg,
+    rgba(100,200,255,0.15) 0%,
+    rgba(80,180,240,0.3) 30%,
+    rgba(100,200,255,0.4) 50%,
+    rgba(60,150,220,0.35) 70%,
+    rgba(30,100,180,0.2) 100%
+  );
+  box-shadow:
+    inset 0 0 30px rgba(100,200,255,0.2),
+    0 0 20px rgba(100,200,255,0.1);
+}
+
+/* ============================================================
+   Tiny Cleanup Creatures — glowing dots moving along the river
+   ============================================================ */
+
+.creatures {
+  position: absolute;
+  bottom: 32px;
+  left: 130px;
+  right: 30px;
+  height: 20px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.creature {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: creatureWork 4s ease-in-out infinite;
+}
+
+/* Creature colors — neon cyberpunk palette */
+.creature:nth-child(1)  { background: #ff3b8b; box-shadow: 0 0 6px #ff3b8b, 0 0 12px rgba(255,59,139,0.4); animation-delay: 0s; left: 5%; }
+.creature:nth-child(2)  { background: #3bf07a; box-shadow: 0 0 6px #3bf07a, 0 0 12px rgba(59,240,122,0.4); animation-delay: 0.8s; left: 25%; }
+.creature:nth-child(3)  { background: #f0c83b; box-shadow: 0 0 6px #f0c83b, 0 0 12px rgba(240,200,59,0.4); animation-delay: 1.6s; left: 45%; }
+.creature:nth-child(4)  { background: #3bd4f0; box-shadow: 0 0 6px #3bd4f0, 0 0 12px rgba(59,212,240,0.4); animation-delay: 2.4s; left: 65%; }
+.creature:nth-child(5)  { background: #d43bff; box-shadow: 0 0 6px #d43bff, 0 0 12px rgba(212,59,255,0.4); animation-delay: 3.2s; left: 85%; }
+.creature:nth-child(6)  { background: #ff8b3b; box-shadow: 0 0 6px #ff8b3b, 0 0 12px rgba(255,139,59,0.4); animation-delay: 1.2s; left: 15%; }
+.creature:nth-child(7)  { background: #3bffd4; box-shadow: 0 0 6px #3bffd4, 0 0 12px rgba(59,255,212,0.4); animation-delay: 2.0s; left: 55%; }
+.creature:nth-child(8)  { background: #ff3b5c; box-shadow: 0 0 6px #ff3b5c, 0 0 12px rgba(255,59,92,0.4); animation-delay: 2.8s; left: 75%; }
+
+/* Trails — tiny spark particles behind each creature */
+.creature::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -3px;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.4;
+  animation: trailSpark 0.5s ease-out infinite;
+}
+
+@keyframes creatureWork {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.7;
+  }
+  15% {
+    transform: translate(8px, -6px) scale(1.3);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(12px, 2px) scale(0.9);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(4px, -4px) scale(1.1);
+    opacity: 0.9;
+  }
+  65% {
+    transform: translate(-2px, -8px) scale(1.4);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(2px, 0px) scale(0.8);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes trailSpark {
+  0% { transform: translateX(0); opacity: 0.5; }
+  100% { transform: translateX(-4px); opacity: 0; }
+}
+
+/* Completion: creatures gather and celebrate */
+.done .creature {
+  animation: creatureCelebrate 2s ease-in-out infinite;
+}
+
+@keyframes creatureCelebrate {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-10px) scale(1.3); }
+  50% { transform: translateY(-5px) scale(1.1); filter: brightness(1.5); }
+  75% { transform: translateY(-8px) scale(1.2); }
+}
+
+/* ============================================================
+   Nature Bloom — Flowers + Colors on Completion
+   ============================================================ */
+
+.bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 1s ease 0.5s;
+}
+
+.done .bloom {
+  opacity: 1;
+}
+
+/* Flower positions around the scene */
+.flower {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  animation: flowerGrow 1.5s ease-out forwards;
+  transform: scale(0);
+  animation-delay: var(--flower-delay, 0s);
+}
+
+.done .flower {
+  animation-play-state: running;
+}
+
+.flower::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--flower-color, #ff3b8b);
+  box-shadow:
+    0 0 6px var(--flower-color, #ff3b8b),
+    0 0 12px var(--flower-glow, rgba(255,59,139,0.4));
+}
+
+/* Petals */
+.flower::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 16px;
+  height: 16px;
+  background:
+    radial-gradient(circle at 30% 30%, var(--flower-petal, #ff6ba0) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, var(--flower-petal, #ff6ba0) 0%, transparent 50%),
+    radial-gradient(circle at 30% 70%, var(--flower-petal, #ff6ba0) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, var(--flower-petal, #ff6ba0) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, var(--flower-center, #fff) 0%, transparent 40%);
+  opacity: 0.7;
+}
+
+.flower:nth-child(1)  { bottom: 60px; left: 30px; --flower-color: #ff3b8b; --flower-petal: #ff6ba0; --flower-center: #fff; --flower-delay: 0.2s; }
+.flower:nth-child(2)  { bottom: 50px; left: 55px; --flower-color: #3bf07a; --flower-petal: #7bffa0; --flower-center: #fff; --flower-delay: 0.4s; }
+.flower:nth-child(3)  { bottom: 65px; left: 100px; --flower-color: #f0c83b; --flower-petal: #ffe07b; --flower-center: #fff; --flower-delay: 0.6s; }
+.flower:nth-child(4)  { top: 30px; right: 60px; --flower-color: #3bd4f0; --flower-petal: #7beaff; --flower-center: #fff; --flower-delay: 0.3s; }
+.flower:nth-child(5)  { top: 40px; right: 90px; --flower-color: #d43bff; --flower-petal: #e87bff; --flower-center: #fff; --flower-delay: 0.5s; }
+.flower:nth-child(6)  { bottom: 55px; right: 40px; --flower-color: #ff8b3b; --flower-petal: #ffb07b; --flower-center: #fff; --flower-delay: 0.7s; }
+.flower:nth-child(7)  { top: 25px; left: 180px; --flower-color: #3bffd4; --flower-petal: #7bffe8; --flower-center: #fff; --flower-delay: 0.15s; }
+.flower:nth-child(8)  { bottom: 45px; left: 160px; --flower-color: #ff3b5c; --flower-petal: #ff7b90; --flower-center: #fff; --flower-delay: 0.45s; }
+
+@keyframes flowerGrow {
+  0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+  40% { transform: scale(1.3) rotate(10deg); opacity: 0.9; }
+  70% { transform: scale(0.9) rotate(-5deg); opacity: 0.8; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+}
+
+/* Ambient color burst particles on completion */
+.colorBursts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.done .colorBursts {
+  opacity: 0.6;
+}
+
+.colorBurst {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  animation: burstFloat 3s ease-in-out infinite;
+}
+
+.colorBurst:nth-child(1)  { top: 50%; left: 50%; background: #ff3b8b; box-shadow: 0 0 8px #ff3b8b; animation-delay: 0s; }
+.colorBurst:nth-child(2)  { top: 45%; left: 55%; background: #3bf07a; box-shadow: 0 0 8px #3bf07a; animation-delay: 0.4s; }
+.colorBurst:nth-child(3)  { top: 55%; left: 48%; background: #f0c83b; box-shadow: 0 0 8px #f0c83b; animation-delay: 0.8s; }
+.colorBurst:nth-child(4)  { top: 48%; left: 52%; background: #3bd4f0; box-shadow: 0 0 8px #3bd4f0; animation-delay: 1.2s; }
+.colorBurst:nth-child(5)  { top: 52%; left: 46%; background: #d43bff; box-shadow: 0 0 8px #d43bff; animation-delay: 0.6s; }
+.colorBurst:nth-child(6)  { top: 43%; left: 50%; background: #ff8b3b; box-shadow: 0 0 8px #ff8b3b; animation-delay: 1.0s; }
+
+@keyframes burstFloat {
+  0%, 100% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  25% { transform: translate(10px, -15px) scale(1.5); opacity: 0.8; }
+  50% { transform: translate(-5px, -25px) scale(1); opacity: 0.4; }
+  75% { transform: translate(-10px, -10px) scale(1.8); opacity: 0.6; }
+}
+
+/* ============================================================
+   Progress Text
+   ============================================================ */
+
+.progressInfo {
+  position: absolute;
+  top: 12px;
+  left: 130px;
+  right: 20px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--toxic-green, #3bf07a);
+  text-shadow: 0 0 8px rgba(59,240,122,0.5);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  animation: labelFlicker 2s ease-in-out infinite;
+}
+
+@keyframes labelFlicker {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.6; }
+}
+
+.progressPercent {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(59,240,122,0.6), 0 0 24px rgba(59,240,122,0.3);
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+}
+
+/* Factory collapse on completion */
+.done .factoryBody {
+  transform: scaleY(0);
+  transform-origin: bottom;
+  opacity: 0;
+  transition: transform 1s ease 0.4s, opacity 0.5s ease 0.8s;
+}
+
+.done .smokestack1,
+.done .smokestack2 {
+  transform: scaleY(0);
+  transform-origin: bottom;
+  opacity: 0;
+  transition: transform 0.7s ease 0.2s, opacity 0.4s ease 0.6s;
+}
+
+/* Pipe breaks */
+.done .pipe {
+  transform: rotate(-8deg) translateY(4px);
+  opacity: 0.25;
+  transition: all 0.6s ease 0.3s;
+}
+
+/* Trash specks — small dark pollution dots that shrink on done */
+.trash {
+  position: absolute;
+  bottom: 34px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.trashSpeck {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 1px;
+  background: rgba(40,40,40,0.5);
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+  transition: all 1.2s ease 0.3s;
+}
+
+.trashSpeck:nth-child(1) { left: 130px; bottom: 8px; }
+.trashSpeck:nth-child(2) { left: 180px; bottom: 6px; }
+.trashSpeck:nth-child(3) { left: 240px; bottom: 10px; }
+.trashSpeck:nth-child(4) { left: 310px; bottom: 5px; }
+.trashSpeck:nth-child(5) { left: 380px; bottom: 9px; }
+.trashSpeck:nth-child(6) { left: 450px; bottom: 7px; }
+.trashSpeck:nth-child(7) { left: 200px; bottom: 12px; }
+.trashSpeck:nth-child(8) { left: 350px; bottom: 11px; }
+
+.done .trashSpeck {
+  transform: scale(0);
+  opacity: 0;
+}
+
+/* Completion: golden celebration text */
+.done .progressLabel {
+  color: #f0c83b;
+  text-shadow: 0 0 12px rgba(240,200,59,0.6), 0 0 24px rgba(240,200,59,0.3);
+  animation: none;
+  opacity: 1;
+}
+
+.done .progressPercent {
+  color: #f0c83b;
+  text-shadow: 0 0 14px rgba(240,200,59,0.7), 0 0 30px rgba(240,200,59,0.4);
+}
+
+/* Spinner for indeterminate progress */
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(59,240,122,0.2);
+  border-top-color: var(--toxic-green, #3bf07a);
+  border-radius: 50%;
+  animation: toxicSpin 0.7s linear infinite;
+}
+
+@keyframes toxicSpin {
+  to { transform: rotate(360deg); }
+}
+
+.done .spinner {
+  animation: none;
+  border-color: rgba(240,200,59,0.3);
+  border-top-color: #f0c83b;
+}
+
+/* ============================================================
+   Done Overlay — \"CLEAN\" badge
+   ============================================================ */
+
+.doneBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow:
+    0 0 20px rgba(240,200,59,0.8),
+    0 0 40px rgba(59,240,122,0.6),
+    0 0 60px rgba(59,212,240,0.4);
+  z-index: 7;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s;
+  pointer-events: none;
+}
+
+.done .doneBadge {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .smokePuff1, .smokePuff2, .smokePuff3,
+  .creature, .riverBubble, .pipeDrip,
+  .colorBurst, .flower,
+  .factoryWindow,
+  .indeterminate .riverFill {
+    animation: none !important;
+  }
+  
+  .riverFill::before {
+    animation: none;
+  }
+  
+  .doneBadge {
+    transition: none;
+  }
+  
+  .done .doneBadge {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  
+  .done .factoryBody,
+  .done .smokestack1,
+  .done .smokestack2,
+  .done .pipe {
+    transition: none;
+  }
+  
+  .done .trashSpeck {
+    transition: none;
+  }
+}

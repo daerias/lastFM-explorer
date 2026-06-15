@@ -1,0 +1,928 @@
+.library {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeSlideUp 0.6s ease-out;
+}
+
+@keyframes fadeSlideUp { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+@keyframes filterBarPulse {
+  0%, 100% { box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px rgba(0,0,0,0.2); }
+  50% { box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px rgba(0,0,0,0.2), 0 0 12px var(--accent-glow); }
+}
+
+
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.desc { color: var(--text-secondary); font-size: 1.05rem; margin-top: 4px; }
+
+.searchWrap { position: relative; display: flex; align-items: center; }
+
+.searchInput {
+  width: 100%;
+  background: var(--bg-primary); border: 2px solid transparent;
+  border-radius: var(--border-radius-sm); padding: 12px 16px;
+  font-size: 0.9rem; font-family: inherit; color: var(--text-primary);
+  box-shadow: inset 5px 5px 12px var(--shadow-dark), inset -5px -5px 12px rgba(0,0,0,0.2);
+  outline: none; transition: all var(--transition);
+}
+
+.searchInput:focus {
+  border-color: var(--accent-glow);
+  box-shadow: inset 6px 6px 14px var(--shadow-dark), inset -6px -6px 14px rgba(0,0,0,0.2), 0 0 0 1px var(--accent-glow), 0 0 16px var(--accent-glow);
+}
+
+.searchInput::placeholder { color: var(--text-muted); }
+
+.searchCount {
+  position: absolute; right: 16px;
+  font-size: 0.7rem; color: var(--text-muted); font-weight: 500; pointer-events: none;
+}
+
+/* ============================================================
+   Timeline — Deep neuromorphism, tracks sink into the surface
+   Ultra-compact: ~32px rows, maximum density without eye cancer
+   ============================================================ */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 84px;
+  border-radius: var(--border-radius-sm);
+  /* Pressed-in surface — tracks sink INTO the background */
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.06) 0%,
+    rgba(0,0,0,0.02) 20%,
+    rgba(0,0,0,0.02) 80%,
+    rgba(0,0,0,0.06) 100%
+  );
+  box-shadow:
+    inset 3px 3px 8px var(--shadow-dark),
+    inset -3px -3px 8px rgba(0,0,0,0.3);
+}
+
+/* ── Row: featherweight, sinking into the surface ── */
+
+.row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 !important;
+  min-height: 32px;
+  gap: 0;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: background 0.15s ease;
+}
+
+/* Ultra-subtle alternating tint — micro-structure, barely there */
+.row:nth-child(even) {
+  background: rgba(128, 128, 128, 0.01);
+}
+
+.row:hover {
+  background: var(--accent-glass);
+  box-shadow: none;
+}
+
+/* ── Play button — left of cover, slides in on hover ── */
+
+.rowPlayBtn {
+  width: 0;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: 0.45rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  padding: 0;
+  margin-right: 0;
+  transition: all 0.18s ease;
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.row:hover .rowPlayBtn {
+  width: 20px;
+  opacity: 1;
+  margin-right: 5px;
+}
+
+.rowPlayBtn:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 14px var(--accent-glow-strong);
+}
+
+/* ── Timeline: time label ── */
+
+.rowTime {
+  position: absolute;
+  left: -84px;
+  width: 75px;
+  text-align: right;
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+
+.row:hover .rowTime {
+  opacity: 0.7;
+}
+
+.nowBadge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.52rem;
+  font-weight: 700;
+  padding: 0px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.6 } }
+
+.timeText {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Timeline dot + line ── */
+
+.rowLine {
+  width: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-right: 5px;
+}
+
+.dot {
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--accent-glow);
+  z-index: 1;
+  opacity: 0.4;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.row:hover .dot {
+  opacity: 1;
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: scale(1.5);
+}
+
+/* Vertical timeline line — subtle */
+.row::before {
+  content: '';
+  position: absolute;
+  left: 91px;
+  top: 0;
+  bottom: -1px;
+  width: 1px;
+  background: var(--shadow-dark);
+  opacity: 0.12;
+  z-index: 0;
+}
+
+.row:last-child::before {
+  bottom: 50%;
+}
+
+/* ── Row content: cover + info — ultra compact ── */
+
+.rowContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 2px 8px 2px 0;
+  min-width: 0;
+}
+
+/* Cover — tiny, blends in */
+.rowImageWrap {
+  width: 24px; height: 24px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  box-shadow: none;
+  position: relative;
+  transition: transform 0.2s ease, border-radius 0.2s ease;
+}
+
+.row:hover .rowImageWrap {
+  border-radius: 5px;
+  transform: scale(1.08);
+}
+
+.rowImage { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s ease; }
+
+.rowNoImg {
+  font-size: 0.65rem;
+  opacity: 0.18;
+  transition: opacity 0.15s ease;
+}
+
+.row:hover .rowNoImg {
+  opacity: 0.35;
+}
+
+/* ── Track info: Artist – Title single-line, album micro-text ── */
+
+.rowInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Single-line: Artist – Title */
+.rowArtistLine {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.rowArtist {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s ease;
+}
+
+.row:hover .rowArtist {
+  color: var(--accent);
+}
+
+.rowDash {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  opacity: 0.35;
+  flex-shrink: 0;
+  font-weight: 300;
+  transition: opacity 0.15s ease;
+}
+
+.row:hover .rowDash {
+  opacity: 0.55;
+}
+
+.rowName {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  transition: color 0.15s ease;
+}
+
+.row:hover .rowName {
+  color: var(--text-primary);
+}
+
+/* Album — micro-text, tucked away */
+.rowAlbum {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  opacity: 0.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 2px;
+  transition: opacity 0.15s ease;
+}
+
+.row:hover .rowAlbum {
+  opacity: 0.5;
+}
+
+/* Tags — appear inline, melt with info */
+.rowTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.rowTagChip {
+  display: inline-block;
+  font-size: 0.5rem;
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 0px 4px;
+  letter-spacing: 0.02em;
+  opacity: 0.65;
+  /* Default — overridden by nth-child */
+  --rh: 150;
+  --rs: 70%;
+  --rl: 58%;
+  color: hsl(var(--rh) var(--rs) var(--rl));
+  background: hsl(var(--rh) var(--rs) var(--rl) / 0.08);
+  border: 1px solid hsl(var(--rh) var(--rs) var(--rl) / 0.18);
+  box-shadow: 0 0 2px hsl(var(--rh) var(--rs) var(--rl) / 0.06);
+}
+
+.rowTagChip:nth-child(8n+1) { --rh: 150; --rs: 70%; --rl: 58%; }
+.rowTagChip:nth-child(8n+2) { --rh: 170; --rs: 65%; --rl: 50%; }
+.rowTagChip:nth-child(8n+3) { --rh: 45; --rs: 75%; --rl: 58%; }
+.rowTagChip:nth-child(8n+4) { --rh: 22; --rs: 75%; --rl: 58%; }
+.rowTagChip:nth-child(8n+5) { --rh: 358; --rs: 65%; --rl: 50%; }
+.rowTagChip:nth-child(8n+6) { --rh: 302; --rs: 65%; --rl: 48%; }
+.rowTagChip:nth-child(8n+7) { --rh: 215; --rs: 72%; --rl: 58%; }
+.rowTagChip:nth-child(8n) { --rh: 268; --rs: 65%; --rl: 58%; }
+
+.row:hover .rowTagChip {
+  opacity: 1;
+  box-shadow: 0 0 5px hsl(var(--rh) var(--rs) var(--rl) / 0.18);
+}
+
+.rowTagMore {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  padding: 0px 2px;
+}
+
+.rowNoTags {
+  font-size: 0.52rem;
+  color: var(--text-muted);
+  opacity: 0.3;
+  font-style: italic;
+  margin-top: 1px;
+}
+
+.rowTagsLoading {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin-top: 1px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Cover source badge */
+.sourceBadge {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  font-size: 0.38rem;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.5));
+}
+
+.lastfmLink {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  font-size: 0.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--bg-primary);
+  border-radius: 1px;
+  padding: 0 1px;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  line-height: 1.3;
+}
+
+.rowImageWrap:hover .lastfmLink {
+  opacity: 0.85;
+}
+
+.lastfmLink:hover {
+  color: var(--accent-hover);
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   Sticky Filter Header — DJ-grade glass panel, always visible
+   Multi-row: Search bar → Genre quick chips → Tag chips
+   ============================================================ */
+
+.stickyFilter {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+/* Row 1: Search + toggle buttons */
+.filterRow1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.searchWrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 36px 8px 34px;
+  background: rgba(8,4,14,0.5);
+  border: 1px solid rgba(200,100,255,0.08);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.searchInput::placeholder { color: var(--text-muted); opacity: 0.45; }
+
+.searchInput:focus {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 2px var(--accent-glass), 0 0 16px var(--accent-glow);
+}
+
+.searchClear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.55rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.searchClear:hover { color: var(--accent); background: var(--accent-glass); }
+
+/* Chip buttons (Tags toggle, Clear) */
+.filterChip {
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.filterChip:hover { color: var(--text-primary); border-color: var(--accent-glass); }
+
+.filterChipActive {
+  color: var(--accent);
+  border-color: var(--accent-glow);
+  background: var(--accent-glass);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Row 2: Genre quick chips + Tag filter */
+.filterRow2 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.genreLabel {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 2px;
+  opacity: 0.55;
+}
+
+.genreChip {
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(200,100,255,0.08);
+  background: rgba(30,18,50,0.3);
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.genreChip:hover {
+  border-color: var(--accent-glass);
+  color: var(--text-primary);
+  background: var(--accent-glass);
+}
+
+.genreChipActive {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Keyboard hints — subtle bottom bar */
+.kbHints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  margin-top: 8px;
+  font-size: 0.54rem;
+  color: var(--text-muted);
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+
+.kbHints:hover { opacity: 0.6; }
+
+.kbHints kbd {
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.5rem;
+}
+
+/* Remove old filter bar, bottom sheets, top sections */
+.filterBar, .filterTrigger, .filterTriggerLabel, .filterTriggerBadge,
+.filterTagToggle, .filterTagToggleActive,
+.topSheetBackdrop, .topSheet, .topSheetHandle,
+.topSheetHeader, .topSheetTitle, .topSheetClose, .topSheetBody,
+.topSections, .topTabs, .topTab, .topTabActive,
+.topGrid, .topRow, .topRank, .topName, .topArtist, .topCount,
+.searchCount {
+  display: none;
+}
+
+/* ── Bulk Tag Bar — selection mode ── */
+
+.rowSelected {
+  background: var(--accent-glass) !important;
+}
+
+.rowSelectMode {
+  cursor: default;
+}
+
+.rowCheckbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 2px solid var(--glass-border);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: #fff;
+  transition: all 0.15s ease;
+}
+
+.checkboxChecked {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.bulkTagBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--accent-glow);
+  border-radius: 10px;
+  margin-top: 4px;
+  animation: fadeSlideUp 0.2s ease;
+}
+
+.bulkTagCount {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.bulkTagInput {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.bulkTagInput:focus {
+  border-color: var(--accent-glow);
+}
+
+.bulkTagBtn {
+  font-size: 0.7rem !important;
+  padding: 5px 12px !important;
+  white-space: nowrap;
+}
+
+.bulkTagMsg {
+  font-size: 0.62rem;
+  color: var(--toxic-green);
+  white-space: nowrap;
+}
+
+/* ── End Bulk Tag Bar ── */
+
+/* ============================================================
+   Top Artists / Tracks — Bottom sheet, slides up from below
+   ============================================================ */
+
+.topSections {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.topTabs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.topTab {
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.topTab:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-glass);
+}
+
+.topTabActive {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Bottom sheet backdrop ── */
+
+.topSheetBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.topSheetBackdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Bottom sheet panel ── */
+
+.topSheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 50vh;
+  background: var(--bg-base);
+  border-top: 1px solid rgba(180,130,50,0.12);
+  border-radius: 16px 16px 0 0;
+  box-shadow:
+    0 -4px 24px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.02);
+  z-index: 91;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.topSheet.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.topSheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px 8px;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.topSheetTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+.topSheetClose {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.topSheetClose:hover {
+  color: var(--accent);
+  border-color: var(--accent-glow);
+}
+
+/* Drag handle */
+.topSheetHandle {
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-muted);
+  opacity: 0.25;
+  margin: 6px auto 0;
+  flex-shrink: 0;
+}
+
+.topSheetBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 18px 20px;
+}
+
+.topGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+}
+
+/* Top rows — transparent, compact */
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px !important;
+  min-height: 30px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  box-shadow: none;
+  transition: background 0.12s ease;
+}
+
+.topRow:nth-child(even) {
+  background: rgba(128, 128, 128, 0.01);
+}
+
+.topRow:hover {
+  background: var(--accent-glass);
+  transform: none;
+  box-shadow: none;
+}
+
+.topRank {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 20px;
+  flex-shrink: 0;
+  opacity: 0.65;
+}
+
+.topRow:hover .topRank {
+  opacity: 1;
+}
+
+.topName {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.12s ease;
+}
+
+.topRow:hover .topName {
+  color: var(--accent);
+}
+
+.topArtist {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.topRow:hover .topArtist {
+  opacity: 0.8;
+}
+
+.topCount {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  opacity: 0.45;
+}
+
+.topRow:hover .topCount {
+  opacity: 0.7;
+}

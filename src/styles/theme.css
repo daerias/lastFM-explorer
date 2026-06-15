@@ -1,0 +1,1970 @@
+/* ============================================================
+   Neuromorphic Design System — Last.fm Explorer
+   Dark-by-default • Multi-layer 3D depth • Neon glow • Glass
+   ============================================================ */
+
+:root {
+  /* --- Dark Theme (default) --- */
+  --bg-base: #0e0f13;
+  --bg-primary: #15161b;
+  --bg-secondary: #1a1b22;
+  --bg-surface: #1f2028;
+
+  --text-primary: #e4e4e8;
+  --text-secondary: #a0a0ad;
+  --text-muted: #60606e;
+
+  /* Primary accent — toxic red */
+  --accent: #e31b23;
+  --accent-hover: #f02d35;
+  --accent-glow: rgba(227, 27, 35, 0.45);
+  --accent-glow-strong: rgba(227, 27, 35, 0.7);
+  --accent-glass: rgba(227, 27, 35, 0.08);
+
+  /* Toxic cyberpunk palette — green, yellow, teal, orange */
+  --toxic-green: #3bf07a;
+  --toxic-green-glow: rgba(59, 240, 122, 0.45);
+  --toxic-teal: #2ae0c8;
+  --toxic-teal-glow: rgba(42, 224, 200, 0.4);
+  --toxic-yellow: #f0c83b;
+  --toxic-yellow-glow: rgba(240, 200, 59, 0.4);
+  --toxic-orange: #f0783b;
+  --toxic-orange-glow: rgba(240, 120, 59, 0.4);
+
+  --shadow-dark: #090a0d;
+
+  --glass-bg: rgba(26, 27, 34, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(16px);
+
+  --border-radius: 18px;
+  --border-radius-sm: 12px;
+  --border-radius-lg: 26px;
+
+  --sidebar-width: 72px;
+
+  --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Customizable via Theme Studio */
+  --anim-speed-mult: 1;
+  --anim-duration-slow: 6s;
+  --anim-duration-atmos: 18s;
+  --anim-duration-particles: 22s;
+  --glass-bg-alpha: 0.55;
+
+  /* Atmospheric effect toggles — controlled by Theme Studio */
+  --noise-opacity: 0.03;
+  --scanlines-opacity: 0;
+  --chromatic-shift: 0px;
+  --vignette-opacity: 0;
+  --particle-opacity: 0.7;
+  --particle-scale: 1;
+  --glow-multiplier: 1;
+  --glow-anim: neon-pulse;
+  --border-pulse-opacity: 0;
+}
+
+/* ============================================================
+   Light Theme — warm, soft, gentle, pulsing glow
+   Creamy backgrounds • warm coral/peach accent • golden sparkles
+   ============================================================ */
+
+[data-theme='light'] {
+  /* Warm creamy backgrounds */
+  --bg-base: #f5f0e8;
+  --bg-primary: #efe9e0;
+  --bg-secondary: #e8e2d8;
+  --bg-surface: #faf7f0;
+
+  /* Warm dark text */
+  --text-primary: #2d2418;
+  --text-secondary: #6b5d4f;
+  --text-muted: #a09484;
+
+  /* Warm coral/peach accent — pulsing warmly */
+  --accent: #e87850;
+  --accent-hover: #f0906a;
+  --accent-glow: rgba(232, 120, 80, 0.4);
+  --accent-glow-strong: rgba(232, 120, 80, 0.6);
+  --accent-glass: rgba(232, 120, 80, 0.08);
+
+  /* Warm nature palette — soft sage, warm teal, golden, peach */
+  --toxic-green: #7bc86c;
+  --toxic-green-glow: rgba(123, 200, 108, 0.4);
+  --toxic-teal: #5cb8a8;
+  --toxic-teal-glow: rgba(92, 184, 168, 0.4);
+  --toxic-yellow: #d4a843;
+  --toxic-yellow-glow: rgba(212, 168, 67, 0.4);
+  --toxic-orange: #e89860;
+  --toxic-orange-glow: rgba(232, 152, 96, 0.4);
+
+  /* Soft warm shadows — gentle depth */
+  --shadow-dark: #d9d0c0;
+
+  /* Warm translucent glass */
+  --glass-bg: rgba(250, 247, 240, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================================
+   Psychedelic EDM Theme — neon rainbow, deep purple, toxic green
+   ============================================================ */
+
+[data-theme='edm'] {
+  --bg-base: #0a0410;
+  --bg-primary: #0f0818;
+  --bg-secondary: #140c20;
+  --bg-surface: #1a1028;
+
+  --text-primary: #f0e8ff;
+  --text-secondary: #c8b8e8;
+  --text-muted: #7868a0;
+
+  /* Hot magenta/pink accent */
+  --accent: #d418d4;
+  --accent-hover: #f030f0;
+  --accent-glow: rgba(212, 24, 212, 0.55);
+  --accent-glow-strong: rgba(240, 48, 240, 0.8);
+  --accent-glass: rgba(212, 24, 212, 0.1);
+
+  --toxic-green: #3bf07a;
+  --toxic-green-glow: rgba(59, 240, 122, 0.5);
+  --toxic-teal: #2ae0c8;
+  --toxic-teal-glow: rgba(42, 224, 200, 0.5);
+  --toxic-yellow: #f0c83b;
+  --toxic-yellow-glow: rgba(240, 200, 59, 0.5);
+  --toxic-orange: #f0783b;
+  --toxic-orange-glow: rgba(240, 120, 59, 0.5);
+
+  --shadow-dark: #06020a;
+
+  --glass-bg: rgba(20, 12, 32, 0.6);
+  --glass-border: rgba(200, 100, 255, 0.12);
+}
+
+/* ============================================================
+   Ocean Theme — deep blue abyss, cool teal/cyan calm
+   ============================================================ */
+
+[data-theme='ocean'] {
+  --bg-base: #060e14;
+  --bg-primary: #0a1620;
+  --bg-secondary: #0e1c28;
+  --bg-surface: #122230;
+
+  --text-primary: #d8e8f0;
+  --text-secondary: #90b8d0;
+  --text-muted: #487090;
+
+  --accent: #0088cc;
+  --accent-hover: #00a0ee;
+  --accent-glow: rgba(0, 136, 204, 0.45);
+  --accent-glow-strong: rgba(0, 160, 238, 0.7);
+  --accent-glass: rgba(0, 136, 204, 0.08);
+
+  --toxic-green: #2ae0c8;
+  --toxic-green-glow: rgba(42, 224, 200, 0.5);
+  --toxic-teal: #00b8d4;
+  --toxic-teal-glow: rgba(0, 184, 212, 0.5);
+  --toxic-yellow: #64d8ff;
+  --toxic-yellow-glow: rgba(100, 216, 255, 0.45);
+  --toxic-orange: #ff8040;
+  --toxic-orange-glow: rgba(255, 128, 64, 0.45);
+
+  --shadow-dark: #02080c;
+
+  --glass-bg: rgba(10, 22, 32, 0.55);
+  --glass-border: rgba(100, 180, 220, 0.08);
+}
+
+/* ============================================================
+   Forest Theme — dark emerald grove, nature depth
+   ============================================================ */
+
+[data-theme='forest'] {
+  --bg-base: #060e08;
+  --bg-primary: #0a160c;
+  --bg-secondary: #0e1c12;
+  --bg-surface: #122418;
+
+  --text-primary: #d8ead8;
+  --text-secondary: #90c098;
+  --text-muted: #488050;
+
+  --accent: #22aa44;
+  --accent-hover: #2acc55;
+  --accent-glow: rgba(34, 170, 68, 0.45);
+  --accent-glow-strong: rgba(42, 204, 85, 0.7);
+  --accent-glass: rgba(34, 170, 68, 0.08);
+
+  --toxic-green: #44dd66;
+  --toxic-green-glow: rgba(68, 221, 102, 0.5);
+  --toxic-teal: #22cc88;
+  --toxic-teal-glow: rgba(34, 204, 136, 0.5);
+  --toxic-yellow: #aadd44;
+  --toxic-yellow-glow: rgba(170, 221, 68, 0.45);
+  --toxic-orange: #dd8844;
+  --toxic-orange-glow: rgba(221, 136, 68, 0.45);
+
+  --shadow-dark: #020804;
+
+  --glass-bg: rgba(10, 22, 12, 0.55);
+  --glass-border: rgba(80, 180, 100, 0.08);
+}
+
+/* ============================================================
+   Sunset Theme — warm orange/golden hour glow
+   ============================================================ */
+
+[data-theme='sunset'] {
+  --bg-base: #100a08;
+  --bg-primary: #18100c;
+  --bg-secondary: #201610;
+  --bg-surface: #281c14;
+
+  --text-primary: #f0e0d0;
+  --text-secondary: #c8a090;
+  --text-muted: #806050;
+
+  --accent: #ee6622;
+  --accent-hover: #ff7733;
+  --accent-glow: rgba(238, 102, 34, 0.45);
+  --accent-glow-strong: rgba(255, 119, 51, 0.7);
+  --accent-glass: rgba(238, 102, 34, 0.08);
+
+  --toxic-green: #ffaa44;
+  --toxic-green-glow: rgba(255, 170, 68, 0.5);
+  --toxic-teal: #ee8844;
+  --toxic-teal-glow: rgba(238, 136, 68, 0.5);
+  --toxic-yellow: #ffcc66;
+  --toxic-yellow-glow: rgba(255, 204, 102, 0.5);
+  --toxic-orange: #ff5522;
+  --toxic-orange-glow: rgba(255, 85, 34, 0.5);
+
+  --shadow-dark: #060402;
+
+  --glass-bg: rgba(24, 16, 12, 0.55);
+  --glass-border: rgba(200, 120, 80, 0.08);
+}
+
+/* ============================================================
+   Midnight Theme — monochrome silver elegance
+   ============================================================ */
+
+[data-theme='midnight'] {
+  --bg-base: #080808;
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #161616;
+  --bg-surface: #1e1e1e;
+
+  --text-primary: #e8e8e8;
+  --text-secondary: #a0a0a0;
+  --text-muted: #585858;
+
+  --accent: #c0c0c0;
+  --accent-hover: #e0e0e0;
+  --accent-glow: rgba(192, 192, 192, 0.3);
+  --accent-glow-strong: rgba(224, 224, 224, 0.5);
+  --accent-glass: rgba(192, 192, 192, 0.06);
+
+  --toxic-green: #888888;
+  --toxic-green-glow: rgba(136, 136, 136, 0.4);
+  --toxic-teal: #999999;
+  --toxic-teal-glow: rgba(153, 153, 153, 0.4);
+  --toxic-yellow: #aaaaaa;
+  --toxic-yellow-glow: rgba(170, 170, 170, 0.4);
+  --toxic-orange: #bbbbbb;
+  --toxic-orange-glow: rgba(187, 187, 187, 0.4);
+
+  --shadow-dark: #020202;
+
+  --glass-bg: rgba(15, 15, 15, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.04);
+}
+
+/* ============================================================
+   Toxic Theme — radioactive neon green wasteland
+   ============================================================ */
+
+[data-theme='toxic'] {
+  --bg-base: #080e04;
+  --bg-primary: #0e1408;
+  --bg-secondary: #121a0c;
+  --bg-surface: #182010;
+
+  --text-primary: #d8f0c0;
+  --text-secondary: #90c060;
+  --text-muted: #488020;
+
+  --accent: #88cc00;
+  --accent-hover: #a0ee00;
+  --accent-glow: rgba(136, 204, 0, 0.5);
+  --accent-glow-strong: rgba(160, 238, 0, 0.8);
+  --accent-glass: rgba(136, 204, 0, 0.1);
+
+  --toxic-green: #66ff22;
+  --toxic-green-glow: rgba(102, 255, 34, 0.55);
+  --toxic-teal: #44ff88;
+  --toxic-teal-glow: rgba(68, 255, 136, 0.5);
+  --toxic-yellow: #ccff00;
+  --toxic-yellow-glow: rgba(204, 255, 0, 0.55);
+  --toxic-orange: #ff8822;
+  --toxic-orange-glow: rgba(255, 136, 34, 0.5);
+
+  --shadow-dark: #040802;
+
+  --glass-bg: rgba(14, 20, 8, 0.55);
+  --glass-border: rgba(136, 204, 0, 0.12);
+}
+
+/* ============================================================
+   Cherry Theme — soft pink blossom aesthetic
+   ============================================================ */
+
+[data-theme='cherry'] {
+  --bg-base: #120a10;
+  --bg-primary: #1a0e16;
+  --bg-secondary: #22121c;
+  --bg-surface: #2a1822;
+
+  --text-primary: #f0d8e8;
+  --text-secondary: #c890b0;
+  --text-muted: #804868;
+
+  --accent: #dd4488;
+  --accent-hover: #ff55aa;
+  --accent-glow: rgba(221, 68, 136, 0.45);
+  --accent-glow-strong: rgba(255, 85, 170, 0.7);
+  --accent-glass: rgba(221, 68, 136, 0.08);
+
+  --toxic-green: #ff88cc;
+  --toxic-green-glow: rgba(255, 136, 204, 0.5);
+  --toxic-teal: #ee6699;
+  --toxic-teal-glow: rgba(238, 102, 153, 0.5);
+  --toxic-yellow: #ffbbdd;
+  --toxic-yellow-glow: rgba(255, 187, 221, 0.5);
+  --toxic-orange: #ff4477;
+  --toxic-orange-glow: rgba(255, 68, 119, 0.5);
+
+  --shadow-dark: #060208;
+
+  --glass-bg: rgba(26, 14, 22, 0.55);
+  --glass-border: rgba(200, 100, 160, 0.08);
+}
+
+/* ============================================================
+   Mono Theme — brutalist grayscale high contrast
+   ============================================================ */
+
+[data-theme='mono'] {
+  --bg-base: #0a0a0a;
+  --bg-primary: #141414;
+  --bg-secondary: #1c1c1c;
+  --bg-surface: #242424;
+
+  --text-primary: #f0f0f0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #606060;
+
+  --accent: #ffffff;
+  --accent-hover: #ffffff;
+  --accent-glow: rgba(255, 255, 255, 0.3);
+  --accent-glow-strong: rgba(255, 255, 255, 0.5);
+  --accent-glass: rgba(255, 255, 255, 0.06);
+
+  --toxic-green: #808080;
+  --toxic-green-glow: rgba(128, 128, 128, 0.4);
+  --toxic-teal: #909090;
+  --toxic-teal-glow: rgba(144, 144, 144, 0.4);
+  --toxic-yellow: #a0a0a0;
+  --toxic-yellow-glow: rgba(160, 160, 160, 0.4);
+  --toxic-orange: #b0b0b0;
+  --toxic-orange-glow: rgba(176, 176, 176, 0.4);
+
+  --shadow-dark: #000000;
+
+  --glass-bg: rgba(20, 20, 20, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   Ocean Theme — Body Background
+   ============================================================ */
+
+[data-theme='ocean'] body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0, 136, 204, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 20% 80%, rgba(42, 224, 200, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 80% 30%, rgba(0, 184, 212, 0.04) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Forest Theme — Body Background
+   ============================================================ */
+
+[data-theme='forest'] body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34, 170, 68, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(68, 221, 102, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 20% 40%, rgba(34, 204, 136, 0.03) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Sunset Theme — Body Background
+   ============================================================ */
+
+[data-theme='sunset'] body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 5%, rgba(238, 102, 34, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 30% 70%, rgba(255, 170, 68, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 80% 40%, rgba(255, 85, 34, 0.04) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Midnight Theme — Body Background
+   ============================================================ */
+
+[data-theme='midnight'] body {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% -5%, rgba(192, 192, 192, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 30% 70%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Toxic Theme — Body Background
+   ============================================================ */
+
+[data-theme='toxic'] body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(136, 204, 0, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(102, 255, 34, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 20% 30%, rgba(204, 255, 0, 0.04) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Cherry Theme — Body Background
+   ============================================================ */
+
+[data-theme='cherry'] body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(221, 68, 136, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255, 136, 204, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 20% 30%, rgba(238, 102, 153, 0.03) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Mono Theme — Body Background
+   ============================================================ */
+
+[data-theme='mono'] body {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% -5%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+    var(--bg-base);
+}
+
+/* ============================================================
+   Reset & Base
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(227, 27, 35, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(227, 27, 35, 0.03) 0%, transparent 50%),
+    var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color var(--transition), color var(--transition);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* GPU acceleration hints for smooth animations */
+.neuro-raised,
+.neuro-raised-sm,
+.neuro-raised-deep,
+.neuro-pressed,
+.neuro-btn,
+.neuro-btn-accent {
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+}
+
+/* Atmospheric noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--noise-opacity, 0.03);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  animation: noise-shift 0.8s steps(3) infinite;
+}
+
+/* CRT Scanlines + Vignette overlay (#root::before) */
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,var(--scanlines-opacity, 0)) 2px,
+      rgba(0,0,0,var(--scanlines-opacity, 0)) 4px
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 55%,
+      rgba(0,0,0,var(--vignette-opacity, 0)) 100%
+    );
+}
+
+@keyframes noise-shift {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-1px, 1px); }
+  66% { transform: translate(1px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Slow-cycling ambient color atmosphere — green→teal→orange→red→purple→yellow */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body::after { animation: color-atmosphere var(--anim-duration-atmos, 18s) ease-in-out infinite; }
+  #root::after { animation: particles-float var(--anim-duration-particles, 22s) ease-in-out infinite; animation-delay: -5s; }
+  body::before { animation: noise-shift 0.8s steps(3) infinite; }
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   Floating Dust Particles — living light motes
+   ============================================================ */
+
+#root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  opacity: var(--particle-opacity, 0.7);
+  scale: var(--particle-scale, 1);
+  box-shadow:
+    60px 100px 2px 1px rgba(180,255,120,0.45),
+    180px 50px 1px 1px rgba(255,200,80,0.35),
+    340px 160px 2px 1px rgba(100,230,255,0.40),
+    500px 80px 1px 1px rgba(255,130,60,0.35),
+    660px 220px 2px 1px rgba(140,255,200,0.40),
+    830px 110px 1px 1px rgba(255,220,100,0.30),
+    1010px 280px 2px 1px rgba(80,200,255,0.40),
+    1190px 150px 1px 1px rgba(255,150,80,0.35),
+    1380px 330px 2px 1px rgba(200,255,130,0.40),
+    1560px 190px 1px 1px rgba(255,180,100,0.30),
+    1740px 380px 2px 1px rgba(100,240,220,0.35),
+    1920px 240px 1px 1px rgba(255,200,90,0.30),
+    80px 360px 2px 1px rgba(150,255,180,0.35),
+    260px 420px 1px 1px rgba(255,160,70,0.30),
+    450px 500px 2px 1px rgba(80,220,255,0.35),
+    630px 450px 1px 1px rgba(220,255,120,0.30),
+    820px 530px 2px 1px rgba(255,140,80,0.35),
+    1000px 490px 1px 1px rgba(120,255,200,0.30),
+    1200px 550px 2px 1px rgba(255,210,100,0.35),
+    1400px 600px 1px 1px rgba(90,230,255,0.30),
+    1610px 520px 2px 1px rgba(200,255,150,0.35),
+    1800px 650px 1px 1px rgba(255,180,60,0.30),
+    1960px 480px 2px 1px rgba(100,220,255,0.35);
+  animation: particles-float 22s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+@keyframes particles-float {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.65; }
+  15% { transform: translate(15px, -25px) scale(0.8); opacity: 0.85; }
+  30% { transform: translate(-10px, -15px) scale(1.2); opacity: 0.5; }
+  45% { transform: translate(-20px, -35px) scale(0.9); opacity: 0.75; }
+  60% { transform: translate(8px, -20px) scale(1.1); opacity: 0.6; }
+  75% { transform: translate(18px, -30px) scale(0.7); opacity: 0.9; }
+  90% { transform: translate(-12px, -10px) scale(1.0); opacity: 0.7; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.65; }
+}
+
+@keyframes color-atmosphere {
+  0% {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 15%, rgba(130,255,140,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 75% 65%, rgba(255,160,60,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 85%, rgba(60,210,240,0.035) 0%, transparent 50%);
+  }
+  25% {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 15%, rgba(255,210,60,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 75% 65%, rgba(60,255,160,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 85%, rgba(255,110,50,0.035) 0%, transparent 50%);
+  }
+  50% {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 15%, rgba(255,100,50,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 75% 65%, rgba(100,210,255,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 85%, rgba(220,255,100,0.035) 0%, transparent 50%);
+  }
+  75% {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 15%, rgba(210,100,255,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 75% 65%, rgba(255,210,110,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 85%, rgba(110,255,200,0.035) 0%, transparent 50%);
+  }
+  100% {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 15%, rgba(130,255,140,0.045) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 75% 65%, rgba(255,160,60,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 50% 85%, rgba(60,210,240,0.035) 0%, transparent 50%);
+  }
+}
+
+/* ============================================================
+   Light Theme — Ambient Atmosphere
+   Warm cream body, golden pulse, peach glow, soft sparkles
+   ============================================================ */
+
+/* Warm cream body background with soft coral/peach/golden ambient glows */
+[data-theme='light'] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -5%, rgba(232, 120, 80, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 40% at 20% 60%, rgba(212, 168, 67, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 35% at 80% 30%, rgba(232, 152, 96, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 45% at 50% 90%, rgba(123, 200, 108, 0.05) 0%, transparent 50%),
+    var(--bg-base);
+}
+
+/* Warm color atmosphere — cycles through coral → golden → peach → sage */
+@keyframes color-atmosphere-light {
+  0% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(232, 120, 80, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 75% 60%, rgba(212, 168, 67, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 25% at 50% 80%, rgba(92, 184, 168, 0.05) 0%, transparent 50%);
+  }
+  25% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(212, 168, 67, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 75% 60%, rgba(232, 152, 96, 0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 25% at 50% 80%, rgba(123, 200, 108, 0.05) 0%, transparent 50%);
+  }
+  50% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(232, 152, 96, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 75% 60%, rgba(123, 200, 108, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 25% at 50% 80%, rgba(232, 120, 80, 0.05) 0%, transparent 50%);
+  }
+  75% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(123, 200, 108, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 75% 60%, rgba(232, 120, 80, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 25% at 50% 80%, rgba(212, 168, 67, 0.06) 0%, transparent 50%);
+  }
+  100% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(232, 120, 80, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 30% at 75% 60%, rgba(212, 168, 67, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 25% at 50% 80%, rgba(92, 184, 168, 0.05) 0%, transparent 50%);
+  }
+}
+
+/* Light mode: use warm atmosphere animation */
+[data-theme='light'] body::after {
+  animation-name: color-atmosphere-light;
+}
+
+/* Light mode: boosted specular highlights (visible on cream backgrounds) */
+[data-theme='light'] .neuro-raised::after,
+[data-theme='light'] .neuro-raised-sm::after {
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(0,0,0,0.06) 50%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'] .neuro-glass::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0,0,0,0.05),
+    transparent
+  );
+}
+
+/* Light mode: warm golden sparkle dust particles */
+[data-theme='light'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(255, 200, 120, 0.45),
+    180px 50px 1px 1px rgba(232, 160, 100, 0.38),
+    340px 160px 2px 1px rgba(255, 180, 90, 0.42),
+    500px 80px 1px 1px rgba(212, 168, 67, 0.40),
+    660px 220px 2px 1px rgba(232, 152, 96, 0.38),
+    830px 110px 1px 1px rgba(255, 220, 140, 0.35),
+    1010px 280px 2px 1px rgba(212, 140, 70, 0.40),
+    1190px 150px 1px 1px rgba(255, 190, 110, 0.35),
+    1380px 330px 2px 1px rgba(232, 160, 100, 0.38),
+    1560px 190px 1px 1px rgba(220, 180, 90, 0.35),
+    1740px 380px 2px 1px rgba(255, 170, 80, 0.36),
+    1920px 240px 1px 1px rgba(232, 150, 95, 0.35),
+    80px 360px 2px 1px rgba(212, 168, 67, 0.40),
+    260px 420px 1px 1px rgba(255, 200, 130, 0.35),
+    450px 500px 2px 1px rgba(232, 140, 80, 0.38),
+    630px 450px 1px 1px rgba(220, 190, 100, 0.35),
+    820px 530px 2px 1px rgba(255, 180, 95, 0.38),
+    1000px 490px 1px 1px rgba(212, 160, 75, 0.35),
+    1200px 550px 2px 1px rgba(232, 170, 110, 0.36),
+    1400px 600px 1px 1px rgba(255, 195, 115, 0.35),
+    1610px 520px 2px 1px rgba(220, 175, 85, 0.38),
+    1800px 650px 1px 1px rgba(232, 150, 90, 0.35),
+    1960px 480px 2px 1px rgba(255, 185, 105, 0.36);
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+
+@keyframes neon-pulse {
+  0% {
+    box-shadow:
+      0 0 8px var(--accent-glow),
+      0 0 20px var(--accent-glow),
+      0 0 40px var(--accent-glow);
+  }
+  100% {
+    box-shadow:
+      0 0 14px var(--accent-glow-strong),
+      0 0 30px var(--accent-glow),
+      0 0 60px var(--accent-glow);
+  }
+}
+
+@keyframes neon-pulse-boosted {
+  0% {
+    box-shadow:
+      0 0 13px var(--accent-glow),
+      0 0 32px var(--accent-glow),
+      0 0 64px var(--accent-glow);
+  }
+  100% {
+    box-shadow:
+      0 0 22px var(--accent-glow-strong),
+      0 0 48px var(--accent-glow),
+      0 0 96px var(--accent-glow);
+  }
+}
+
+@keyframes neon-pulse-max {
+  0% {
+    box-shadow:
+      0 0 20px var(--accent-glow),
+      0 0 50px var(--accent-glow),
+      0 0 100px var(--accent-glow);
+  }
+  100% {
+    box-shadow:
+      0 0 35px var(--accent-glow-strong),
+      0 0 75px var(--accent-glow),
+      0 0 150px var(--accent-glow);
+  }
+}
+
+/* Border pulse keyframe — activated via .bpulse class on <html> */
+@keyframes border-pulse-anim {
+  0%, 100% { border-color: var(--glass-border); }
+  50% { border-color: var(--accent-glow); }
+}
+
+.bpulse .neuro-glass,
+.bpulse .neuro-raised,
+.bpulse .neuro-raised-sm,
+.bpulse .neuro-raised-deep {
+  animation: border-pulse-anim 3s ease-in-out infinite;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shadow-breathe {
+  0%, 100% {
+    box-shadow:
+      8px 8px 20px var(--shadow-dark),
+      -8px -8px 20px rgba(0,0,0,0.2),
+      16px 16px 32px var(--shadow-dark),
+      -16px -16px 32px rgba(0,0,0,0.2),
+      inset 1px 1px 2px transparent;
+  }
+  50% {
+    box-shadow:
+      12px 12px 28px var(--shadow-dark),
+      -12px -12px 28px rgba(0,0,0,0.2),
+      24px 24px 44px var(--shadow-dark),
+      -24px -24px 44px rgba(0,0,0,0.2),
+      inset 1px 1px 3px transparent;
+  }
+}
+
+@keyframes shadow-breathe-sm {
+  0%, 100% {
+    box-shadow:
+      2px 2px 6px rgba(0,0,0,0.1),
+      0 3px 8px rgba(0,0,0,0.06);
+  }
+  50% {
+    box-shadow:
+      3px 3px 10px rgba(0,0,0,0.16),
+      0 5px 14px rgba(0,0,0,0.1);
+  }
+}
+
+@keyframes ambient-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes glow-pulse-subtle {
+  0%, 100% { text-shadow: 0 0 8px var(--accent-glow); }
+  50% { text-shadow: 0 0 18px var(--accent-glow-strong); }
+}
+
+@keyframes border-glow-breathe {
+  0%, 100% { border-color: var(--accent-glow); box-shadow: 0 0 6px var(--accent-glow); }
+  50% { border-color: var(--accent-glow-strong); box-shadow: 0 0 14px var(--accent-glow-strong); }
+}
+
+/* ============================================================
+   WOW Keyframes — optical depth, prismatic, caustic, iridescent
+   ============================================================ */
+
+/* Prismatic border — rainbow edge glow cycling through hues (uses theme-adaptive variables) */
+@keyframes prismatic-border {
+  0% { box-shadow: 0 0 8px var(--accent-glow), 0 0 20px var(--accent-glow), inset 0 0 0 2px var(--accent-glass); }
+  20% { box-shadow: 0 0 8px var(--toxic-yellow-glow), 0 0 20px var(--toxic-yellow-glow), inset 0 0 0 2px rgba(240,200,59,0.12); }
+  40% { box-shadow: 0 0 8px var(--toxic-green-glow), 0 0 20px var(--toxic-green-glow), inset 0 0 0 2px rgba(59,240,122,0.12); }
+  60% { box-shadow: 0 0 8px var(--toxic-teal-glow), 0 0 20px var(--toxic-teal-glow), inset 0 0 0 2px rgba(42,224,200,0.12); }
+  80% { box-shadow: 0 0 8px var(--toxic-orange-glow), 0 0 20px var(--toxic-orange-glow), inset 0 0 0 2px rgba(240,120,59,0.12); }
+  100% { box-shadow: 0 0 8px var(--accent-glow), 0 0 20px var(--accent-glow), inset 0 0 0 2px var(--accent-glass); }
+}
+
+/* Deep parallax shadow — multi-layer 3D depth breathing wider */
+@keyframes parallax-depth {
+  0%, 100% {
+    box-shadow:
+      6px 6px 16px var(--shadow-dark),
+      -6px -6px 16px rgba(0,0,0,0.2),
+      14px 14px 32px var(--shadow-dark),
+      -14px -14px 32px rgba(0,0,0,0.2),
+      inset 1px 1px 2px transparent;
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow:
+      10px 10px 24px var(--shadow-dark),
+      -10px -10px 24px rgba(0,0,0,0.2),
+      22px 22px 44px var(--shadow-dark),
+      -22px -22px 44px rgba(0,0,0,0.2),
+      inset 1px 1px 3px transparent;
+    transform: translateY(-3px);
+  }
+}
+
+/* Iridescent sweep — color-shifting gradient that moves across */
+@keyframes iridescent-sweep {
+  0% { background-position: -200% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Ripple pulse — expanding ring from center on click */
+@keyframes ripple-pulse {
+  0% { box-shadow: 0 0 0 0 var(--accent-glow-strong); transform: scale(1); }
+  50% { box-shadow: 0 0 0 18px transparent; transform: scale(1.02); }
+  100% { box-shadow: 0 0 0 0 transparent; transform: scale(1); }
+}
+
+/* Chromatic fringe — holographic offset text glow (theme-adaptive) */
+@keyframes chromatic-fringe {
+  0%, 100% {
+    text-shadow:
+      0 0 12px var(--accent-glow),
+      1px 0 2px var(--accent-glow-strong),
+      -1px 0 2px var(--toxic-teal-glow);
+  }
+  50% {
+    text-shadow:
+      0 0 24px var(--accent-glow-strong),
+      2px 0 4px var(--accent-glow),
+      -2px 0 4px var(--toxic-yellow-glow);
+  }
+}
+
+/* Gradient morph — slowly shifting background gradient */
+@keyframes gradient-morph {
+  0% { background: linear-gradient(145deg, var(--bg-surface) 0%, var(--accent-glass) 30%, var(--bg-primary) 100%); }
+  33% { background: linear-gradient(145deg, var(--bg-surface) 0%, rgba(240,200,59,0.06) 40%, var(--bg-primary) 100%); }
+  66% { background: linear-gradient(145deg, var(--bg-surface) 0%, rgba(42,224,200,0.06) 35%, var(--bg-primary) 100%); }
+  100% { background: linear-gradient(145deg, var(--bg-surface) 0%, var(--accent-glass) 30%, var(--bg-primary) 100%); }
+}
+
+/* Inner glow pulse — soft light radiating from within pressed elements */
+@keyframes inner-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      inset 8px 8px 20px var(--shadow-dark),
+      inset -8px -8px 20px rgba(0,0,0,0.2),
+      inset 0 0 18px var(--accent-glow),
+      1px 1px 2px transparent;
+  }
+  50% {
+    box-shadow:
+      inset 8px 8px 20px var(--shadow-dark),
+      inset -8px -8px 20px rgba(0,0,0,0.2),
+      inset 0 0 30px var(--accent-glow-strong),
+      1px 1px 3px transparent;
+  }
+}
+
+/* Volumetric light rays — sweeping diagonal beams */
+@keyframes volumetric-rays {
+  0% { transform: translateX(-30%) rotate(-35deg); opacity: 0.15; }
+  25% { transform: translateX(20%) rotate(-35deg); opacity: 0.25; }
+  50% { transform: translateX(70%) rotate(-35deg); opacity: 0.12; }
+  75% { transform: translateX(120%) rotate(-35deg); opacity: 0.2; }
+  100% { transform: translateX(-30%) rotate(-35deg); opacity: 0.15; }
+}
+
+@keyframes volumetric-rays-2 {
+  0% { transform: translateX(120%) rotate(25deg); opacity: 0.10; }
+  33% { transform: translateX(60%) rotate(25deg); opacity: 0.2; }
+  66% { transform: translateX(-10%) rotate(25deg); opacity: 0.15; }
+  100% { transform: translateX(120%) rotate(25deg); opacity: 0.10; }
+}
+
+/* Dual specular sweep — light + dark passes for deeper reflection */
+@keyframes specular-sweep-dual {
+  0% { background-position: -200% 50%, 300% 50%; }
+  100% { background-position: 300% 50%, -200% 50%; }
+}
+
+/* ============================================================
+   Utility Classes
+   ============================================================ */
+
+.breathing-shadow {
+  animation: shadow-breathe 4s ease-in-out infinite;
+}
+
+.breathing-shadow-sm {
+  animation: shadow-breathe-sm 3.5s ease-in-out infinite;
+}
+
+.ambient-float {
+  animation: ambient-float 5s ease-in-out infinite;
+}
+
+.glow-pulse-subtle {
+  animation: glow-pulse-subtle 3s ease-in-out infinite;
+}
+
+/* WOW utility classes */
+.prismatic-glow {
+  animation: prismatic-border 6s ease-in-out infinite;
+}
+
+.parallax-depth {
+  animation: parallax-depth 6s ease-in-out infinite;
+}
+
+.iridescent-hover {
+  background-size: 200% 200% !important;
+  animation-play-state: paused;
+  transition: background-position 0.6s ease;
+}
+
+.iridescent-hover:hover {
+  background-image: linear-gradient(
+    105deg,
+    transparent 40%,
+    var(--accent-glass) 45%,
+    rgba(240,200,59,0.06) 48%,
+    var(--accent-glass) 51%,
+    transparent 55%
+  );
+  background-size: 200% 100%;
+  animation: iridescent-sweep 2s ease-in-out infinite;
+}
+
+.ripple-click {
+  transition: box-shadow 0s, transform 0s;
+}
+
+.ripple-click:active {
+  animation: ripple-pulse 0.6s ease-out;
+}
+
+.chromatic-text {
+  animation: chromatic-fringe 4s ease-in-out infinite;
+}
+
+.gradient-morph {
+  animation: gradient-morph 12s ease-in-out infinite;
+}
+
+.inner-glow-pulse {
+  animation: inner-glow-pulse 4s ease-in-out infinite;
+}
+
+/* Dual specular sweep on glass — deeper reflection */
+.specular-dual {
+  background-image:
+    linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.03) 40%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.03) 60%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.04) 45%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.04) 55%, transparent 100%);
+  background-size: 60% 100%, 50% 100%;
+  background-repeat: no-repeat;
+  animation: specular-sweep-dual 10s ease-in-out infinite;
+}
+
+/* ============================================================
+   Volumetric Light Rays — sweeping diagonal beams on body
+   ============================================================ */
+
+html {
+  position: relative;
+}
+
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  width: 200%;
+  height: 120%;
+  top: -20%;
+  left: -50%;
+  background: linear-gradient(
+    -35deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.015) 38%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(255, 255, 255, 0.015) 42%,
+    transparent 45%
+  );
+  transform-origin: center center;
+  animation: volumetric-rays 20s ease-in-out infinite;
+}
+
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  width: 180%;
+  height: 130%;
+  top: -10%;
+  left: -40%;
+  background: linear-gradient(
+    25deg,
+    transparent 48%,
+    rgba(255, 255, 255, 0.01) 50%,
+    rgba(255, 255, 255, 0.025) 51%,
+    rgba(255, 255, 255, 0.01) 52%,
+    transparent 55%
+  );
+  transform-origin: center center;
+  animation: volumetric-rays-2 24s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+/* ============================================================
+
+/* Raised — multi-layer 3D depth with specular highlight + breathing */
+.neuro-raised {
+  background: linear-gradient(
+    145deg,
+    var(--bg-surface) 0%,
+    var(--bg-primary) 100%
+  );
+  border-radius: var(--border-radius);
+  position: relative;
+  box-shadow:
+    10px 10px 24px var(--shadow-dark),
+    -10px -10px 24px rgba(0,0,0,0.2),
+    0 20px 40px rgba(0,0,0,0.25),
+    inset 1px 1px 2px transparent;
+  transition: box-shadow var(--transition), transform var(--transition);
+  animation: shadow-breathe 5s ease-in-out infinite;
+}
+
+.neuro-raised::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    transparent 25%,
+    rgba(0,0,0,0.03) 48%,
+    rgba(0,0,0,0.05) 50%,
+    rgba(0,0,0,0.03) 52%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+  animation: specular-sweep 8s ease-in-out infinite;
+}
+
+@keyframes specular-sweep {
+  0% { background-position: -200% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.neuro-raised:hover {
+  animation-play-state: paused;
+  box-shadow:
+    14px 14px 32px var(--shadow-dark),
+    -14px -14px 32px rgba(0,0,0,0.2),
+    0 24px 48px rgba(0,0,0,0.3),
+    inset 1px 1px 2px transparent;
+  transform: translateY(-2px);
+}
+
+.neuro-raised:hover::after {
+  animation-play-state: paused;
+  opacity: 0.7;
+}
+
+/* Pressed/inset — deep recession with breathing + inner glow */
+.neuro-pressed {
+  background: linear-gradient(
+    145deg,
+    var(--bg-primary) 0%,
+    var(--bg-base) 100%
+  );
+  border-radius: var(--border-radius);
+  box-shadow:
+    inset 8px 8px 20px var(--shadow-dark),
+    inset -8px -8px 20px rgba(0,0,0,0.2),
+    inset 0 0 28px var(--accent-glass),
+    1px 1px 3px transparent;
+  position: relative;
+  animation: inner-glow-pulse 4s ease-in-out infinite;
+}
+
+.neuro-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  position: relative;
+  overflow: hidden;
+}
+
+.neuro-glass::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 60%;
+  height: 200%;
+  background:
+    linear-gradient(90deg, transparent, rgba(0,0,0,0.04) 40%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.04) 60%, transparent),
+    linear-gradient(90deg, transparent, rgba(0,0,0,0.03) 48%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.03) 52%, transparent);
+  background-size: 60% 100%, 50% 100%;
+  background-repeat: no-repeat;
+  transform: skewX(-20deg);
+  animation: specular-sweep-dual 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Standard button */
+.neuro-btn {
+  background: linear-gradient(
+    145deg,
+    var(--bg-surface),
+    var(--bg-primary)
+  );
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 13px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-primary);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow:
+    8px 8px 18px var(--shadow-dark),
+    -8px -8px 18px rgba(0,0,0,0.2),
+    inset 1px 1px 2px transparent;
+}
+
+.neuro-btn:hover {
+  box-shadow:
+    5px 5px 12px var(--shadow-dark),
+    -5px -5px 12px rgba(0,0,0,0.2),
+    inset 1px 1px 2px transparent;
+  transform: translateY(-1px);
+}
+
+.neuro-btn:active {
+  box-shadow:
+    inset 5px 5px 12px var(--shadow-dark),
+    inset -5px -5px 12px rgba(0,0,0,0.2);
+  transform: scale(0.98);
+}
+
+/* Neon accent button — glowing pulse + light beam */
+.neuro-btn-accent {
+  background: linear-gradient(
+    145deg,
+    var(--accent-hover),
+    var(--accent)
+  );
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 10px var(--accent-glow),
+    0 0 25px var(--accent-glow),
+    8px 8px 18px var(--shadow-dark);
+  animation: var(--glow-anim, neon-pulse) 2.5s ease-in-out infinite alternate;
+  position: relative;
+  overflow: hidden;
+  padding: 13px 28px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.neuro-btn-accent::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.neuro-btn-accent:hover {
+  animation-play-state: paused;
+  box-shadow:
+    0 0 15px var(--accent-glow-strong),
+    0 0 35px var(--accent-glow),
+    0 0 55px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.neuro-btn-accent:hover::after {
+  left: 125%;
+}
+
+.neuro-btn-accent:active {
+  animation-play-state: paused;
+  box-shadow:
+    inset 4px 4px 10px rgba(0, 0, 0, 0.4),
+    0 0 10px var(--accent-glow);
+  transform: scale(0.97);
+}
+
+/* --- Shared keyframe for panel close buttons --- */
+@keyframes close-breathe {
+  0%, 100% { box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px rgba(0,0,0,0.2); }
+  50% { box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px rgba(0,0,0,0.2); }
+}
+
+/* Subtle raised — lighter elevation with breathing */
+/* Organic flow: cards melt into each other with soft depth, not hard boundaries */
+.neuro-raised-sm {
+  background: linear-gradient(
+    145deg,
+    var(--bg-surface),
+    var(--bg-primary)
+  );
+  border-radius: var(--border-radius-sm);
+  position: relative;
+  box-shadow:
+    2px 2px 6px rgba(0,0,0,0.12),
+    0 3px 8px rgba(0,0,0,0.08);
+  transition: box-shadow 0.5s ease, transform 0.5s ease, background 0.5s ease;
+  animation: shadow-breathe-sm 5s ease-in-out infinite;
+}
+
+.neuro-raised-sm::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(0,0,0,0.015) 48%,
+    rgba(0,0,0,0.025) 50%,
+    rgba(0,0,0,0.015) 52%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.35;
+  transition: opacity 0.6s ease;
+  animation: specular-sweep 12s ease-in-out infinite;
+}
+
+.neuro-raised-sm:hover {
+  animation-play-state: paused;
+  box-shadow:
+    2px 2px 8px rgba(0,0,0,0.18),
+    0 5px 14px rgba(0,0,0,0.1);
+  background: linear-gradient(
+    145deg,
+    var(--bg-surface),
+    color-mix(in srgb, var(--bg-primary) 94%, var(--accent) 6%)
+  );
+  transform: translateY(-1px);
+}
+
+.neuro-raised-sm:hover::after {
+  animation-play-state: paused;
+  opacity: 0.5;
+}
+
+/* Deep raised — dramatic parallax depth with wider breathing */
+.neuro-raised-deep {
+  background: linear-gradient(
+    145deg,
+    var(--bg-surface) 0%,
+    var(--bg-primary) 100%
+  );
+  border-radius: var(--border-radius);
+  position: relative;
+  box-shadow:
+    8px 8px 20px var(--shadow-dark),
+    -8px -8px 20px rgba(0,0,0,0.2),
+    16px 16px 36px var(--shadow-dark),
+    -16px -16px 36px rgba(0,0,0,0.2),
+    inset 1px 1px 2px transparent;
+  transition: box-shadow var(--transition), transform var(--transition);
+  animation: parallax-depth 6s ease-in-out infinite;
+}
+
+.neuro-raised-deep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 75%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.neuro-raised-deep:hover {
+  animation-play-state: paused;
+  box-shadow:
+    12px 12px 28px var(--shadow-dark),
+    -12px -12px 28px rgba(0,0,0,0.2),
+    24px 24px 48px var(--shadow-dark),
+    -24px -24px 48px rgba(0,0,0,0.2),
+    inset 1px 1px 2px transparent;
+  transform: translateY(-3px);
+}
+
+.neuro-raised-deep:hover::after {
+  opacity: 1;
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+
+/* Chromatic Aberration — red/cyan offset text-shadow, toggled by --chromatic-shift */
+h1, h2, h3, h4, button, a, label, .neuro-btn-accent, .neuro-btn, span {
+  text-shadow:
+    var(--chromatic-shift, 0px) 0 1px rgba(255,30,30,0.25),
+    calc(var(--chromatic-shift, 0px) * -1) 0 1px rgba(30,200,255,0.25);
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  animation: fadeSlideUp 0.6s ease-out, chromatic-fringe 5s ease-in-out infinite;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+a {
+  color: var(--accent-hover);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* ============================================================
+   Themed Dust Particles — per-theme sparkle colors
+   ============================================================ */
+
+[data-theme='ocean'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(100,200,255,0.5), 180px 50px 1px 1px rgba(42,224,200,0.4),
+    340px 160px 2px 1px rgba(0,184,212,0.45), 500px 80px 1px 1px rgba(120,220,255,0.4),
+    660px 220px 2px 1px rgba(80,200,240,0.45), 830px 110px 1px 1px rgba(160,240,255,0.35),
+    1010px 280px 2px 1px rgba(0,160,220,0.4), 1190px 150px 1px 1px rgba(60,210,255,0.35),
+    1380px 330px 2px 1px rgba(100,220,245,0.4), 1560px 190px 1px 1px rgba(140,230,255,0.3),
+    1740px 380px 2px 1px rgba(0,136,204,0.35), 1920px 240px 1px 1px rgba(80,200,230,0.3),
+    80px 360px 2px 1px rgba(120,230,255,0.35), 260px 420px 1px 1px rgba(42,210,200,0.3),
+    450px 500px 2px 1px rgba(0,170,220,0.35), 630px 450px 1px 1px rgba(90,215,245,0.3),
+    820px 530px 2px 1px rgba(50,195,225,0.35), 1000px 490px 1px 1px rgba(110,225,250,0.3),
+    1200px 550px 2px 1px rgba(0,150,210,0.35), 1400px 600px 1px 1px rgba(70,205,235,0.3),
+    1610px 520px 2px 1px rgba(30,185,215,0.35), 1800px 650px 1px 1px rgba(130,235,255,0.3),
+    1960px 480px 2px 1px rgba(0,140,200,0.35);
+}
+
+[data-theme='forest'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(68,221,102,0.5), 180px 50px 1px 1px rgba(34,204,136,0.4),
+    340px 160px 2px 1px rgba(100,230,80,0.45), 500px 80px 1px 1px rgba(44,210,100,0.4),
+    660px 220px 2px 1px rgba(80,220,90,0.45), 830px 110px 1px 1px rgba(120,240,70,0.35),
+    1010px 280px 2px 1px rgba(34,190,110,0.4), 1190px 150px 1px 1px rgba(60,215,95,0.35),
+    1380px 330px 2px 1px rgba(75,225,105,0.4), 1560px 190px 1px 1px rgba(100,235,80,0.3),
+    1740px 380px 2px 1px rgba(34,170,68,0.35), 1920px 240px 1px 1px rgba(55,200,90,0.3),
+    80px 360px 2px 1px rgba(90,230,110,0.35), 260px 420px 1px 1px rgba(34,185,88,0.3),
+    450px 500px 2px 1px rgba(44,210,75,0.35), 630px 450px 1px 1px rgba(70,220,100,0.3),
+    820px 530px 2px 1px rgba(50,195,85,0.35), 1000px 490px 1px 1px rgba(85,225,105,0.3),
+    1200px 550px 2px 1px rgba(34,175,78,0.35), 1400px 600px 1px 1px rgba(65,215,95,0.3),
+    1610px 520px 2px 1px rgba(30,180,70,0.35), 1800px 650px 1px 1px rgba(95,230,115,0.3),
+    1960px 480px 2px 1px rgba(34,165,65,0.35);
+}
+
+[data-theme='sunset'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(255,170,68,0.5), 180px 50px 1px 1px rgba(255,85,34,0.4),
+    340px 160px 2px 1px rgba(255,204,102,0.5), 500px 80px 1px 1px rgba(255,136,40,0.4),
+    660px 220px 2px 1px rgba(255,180,70,0.45), 830px 110px 1px 1px rgba(255,210,90,0.4),
+    1010px 280px 2px 1px rgba(255,120,50,0.4), 1190px 150px 1px 1px rgba(255,190,80,0.35),
+    1380px 330px 2px 1px rgba(255,160,60,0.42), 1560px 190px 1px 1px rgba(255,220,100,0.35),
+    1740px 380px 2px 1px rgba(238,102,34,0.4), 1920px 240px 1px 1px rgba(255,150,55,0.35),
+    80px 360px 2px 1px rgba(255,195,85,0.38), 260px 420px 1px 1px rgba(255,110,45,0.35),
+    450px 500px 2px 1px rgba(255,175,65,0.38), 630px 450px 1px 1px rgba(255,200,95,0.35),
+    820px 530px 2px 1px rgba(255,130,50,0.38), 1000px 490px 1px 1px rgba(255,185,75,0.35),
+    1200px 550px 2px 1px rgba(255,215,105,0.38), 1400px 600px 1px 1px rgba(255,145,55,0.35),
+    1610px 520px 2px 1px rgba(255,165,70,0.38), 1800px 650px 1px 1px rgba(255,210,95,0.35),
+    1960px 480px 2px 1px rgba(255,140,50,0.38);
+}
+
+[data-theme='midnight'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(200,200,200,0.35), 180px 50px 1px 1px rgba(180,180,180,0.3),
+    340px 160px 2px 1px rgba(220,220,220,0.35), 500px 80px 1px 1px rgba(190,190,190,0.3),
+    660px 220px 2px 1px rgba(210,210,210,0.32), 830px 110px 1px 1px rgba(170,170,170,0.28),
+    1010px 280px 2px 1px rgba(230,230,230,0.3), 1190px 150px 1px 1px rgba(185,185,185,0.28),
+    1380px 330px 2px 1px rgba(205,205,205,0.32), 1560px 190px 1px 1px rgba(195,195,195,0.25),
+    1740px 380px 2px 1px rgba(215,215,215,0.28), 1920px 240px 1px 1px rgba(175,175,175,0.25),
+    80px 360px 2px 1px rgba(225,225,225,0.28), 260px 420px 1px 1px rgba(165,165,165,0.25),
+    450px 500px 2px 1px rgba(200,200,200,0.3), 630px 450px 1px 1px rgba(188,188,188,0.25),
+    820px 530px 2px 1px rgba(210,210,210,0.28), 1000px 490px 1px 1px rgba(178,178,178,0.25),
+    1200px 550px 2px 1px rgba(222,222,222,0.3), 1400px 600px 1px 1px rgba(192,192,192,0.25),
+    1610px 520px 2px 1px rgba(218,218,218,0.28), 1800px 650px 1px 1px rgba(182,182,182,0.25),
+    1960px 480px 2px 1px rgba(208,208,208,0.28);
+}
+
+[data-theme='toxic'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(136,255,34,0.55), 180px 50px 1px 1px rgba(204,255,0,0.5),
+    340px 160px 2px 1px rgba(102,255,34,0.52), 500px 80px 1px 1px rgba(170,255,0,0.45),
+    660px 220px 2px 1px rgba(68,255,136,0.5), 830px 110px 1px 1px rgba(136,240,20,0.42),
+    1010px 280px 2px 1px rgba(204,255,10,0.48), 1190px 150px 1px 1px rgba(85,255,80,0.4),
+    1380px 330px 2px 1px rgba(153,255,20,0.48), 1560px 190px 1px 1px rgba(220,255,5,0.38),
+    1740px 380px 2px 1px rgba(88,204,0,0.42), 1920px 240px 1px 1px rgba(187,255,10,0.38),
+    80px 360px 2px 1px rgba(119,255,45,0.42), 260px 420px 1px 1px rgba(136,230,15,0.38),
+    450px 500px 2px 1px rgba(68,255,100,0.42), 630px 450px 1px 1px rgba(170,255,25,0.38),
+    820px 530px 2px 1px rgba(102,240,40,0.42), 1000px 490px 1px 1px rgba(153,255,15,0.38),
+    1200px 550px 2px 1px rgba(80,255,120,0.42), 1400px 600px 1px 1px rgba(204,240,10,0.38),
+    1610px 520px 2px 1px rgba(95,230,50,0.42), 1800px 650px 1px 1px rgba(187,255,0,0.38),
+    1960px 480px 2px 1px rgba(75,210,35,0.42);
+}
+
+[data-theme='cherry'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(255,136,204,0.5), 180px 50px 1px 1px rgba(255,68,119,0.42),
+    340px 160px 2px 1px rgba(238,102,153,0.48), 500px 80px 1px 1px rgba(255,187,221,0.4),
+    660px 220px 2px 1px rgba(255,85,170,0.48), 830px 110px 1px 1px rgba(221,68,136,0.38),
+    1010px 280px 2px 1px rgba(255,150,210,0.45), 1190px 150px 1px 1px rgba(238,90,155,0.38),
+    1380px 330px 2px 1px rgba(255,120,190,0.45), 1560px 190px 1px 1px rgba(255,170,215,0.35),
+    1740px 380px 2px 1px rgba(221,68,140,0.42), 1920px 240px 1px 1px rgba(255,140,200,0.35),
+    80px 360px 2px 1px rgba(255,160,215,0.4), 260px 420px 1px 1px rgba(238,80,145,0.35),
+    450px 500px 2px 1px rgba(255,75,160,0.4), 630px 450px 1px 1px rgba(255,180,220,0.35),
+    820px 530px 2px 1px rgba(240,95,170,0.4), 1000px 490px 1px 1px rgba(255,130,195,0.35),
+    1200px 550px 2px 1px rgba(255,165,210,0.4), 1400px 600px 1px 1px rgba(238,105,150,0.35),
+    1610px 520px 2px 1px rgba(255,145,205,0.4), 1800px 650px 1px 1px rgba(221,70,138,0.35),
+    1960px 480px 2px 1px rgba(255,155,215,0.4);
+}
+
+[data-theme='mono'] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(180,180,180,0.3), 180px 50px 1px 1px rgba(150,150,150,0.25),
+    340px 160px 2px 1px rgba(200,200,200,0.3), 500px 80px 1px 1px rgba(160,160,160,0.25),
+    660px 220px 2px 1px rgba(190,190,190,0.28), 830px 110px 1px 1px rgba(140,140,140,0.22),
+    1010px 280px 2px 1px rgba(210,210,210,0.25), 1190px 150px 1px 1px rgba(170,170,170,0.22),
+    1380px 330px 2px 1px rgba(185,185,185,0.28), 1560px 190px 1px 1px rgba(155,155,155,0.2),
+    1740px 380px 2px 1px rgba(195,195,195,0.25), 1920px 240px 1px 1px rgba(165,165,165,0.2),
+    80px 360px 2px 1px rgba(205,205,205,0.25), 260px 420px 1px 1px rgba(145,145,145,0.2),
+    450px 500px 2px 1px rgba(180,180,180,0.28), 630px 450px 1px 1px rgba(158,158,158,0.2),
+    820px 530px 2px 1px rgba(190,190,190,0.25), 1000px 490px 1px 1px rgba(168,168,168,0.2),
+    1200px 550px 2px 1px rgba(200,200,200,0.27), 1400px 600px 1px 1px rgba(172,172,172,0.2),
+    1610px 520px 2px 1px rgba(195,195,195,0.25), 1800px 650px 1px 1px rgba(162,162,162,0.2),
+    1960px 480px 2px 1px rgba(188,188,188,0.25);
+}
+
+/* ============================================================
+   Themed Color-Atmosphere — per-theme ambient cycling
+   ============================================================ */
+
+[data-theme='ocean'] body::after {
+  animation-name: color-atmosphere-ocean;
+}
+
+@keyframes color-atmosphere-ocean {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(0,136,204,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(42,224,200,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(0,184,212,0.03) 0%, transparent 50%); }
+  25% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(42,224,200,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(0,184,212,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(0,136,204,0.04) 0%, transparent 50%); }
+  50% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(0,184,212,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(0,136,204,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(42,224,200,0.04) 0%, transparent 50%); }
+  75% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(64,200,240,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(0,160,220,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(0,200,230,0.03) 0%, transparent 50%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(0,136,204,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(42,224,200,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(0,184,212,0.03) 0%, transparent 50%); }
+}
+
+[data-theme='forest'] body::after {
+  animation-name: color-atmosphere-forest;
+}
+
+@keyframes color-atmosphere-forest {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(34,170,68,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(68,221,102,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(34,204,136,0.03) 0%, transparent 50%); }
+  25% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(68,221,102,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(34,204,136,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(34,170,68,0.04) 0%, transparent 50%); }
+  50% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(34,204,136,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(34,170,68,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(68,221,102,0.04) 0%, transparent 50%); }
+  75% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(50,190,80,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(44,200,100,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(40,210,120,0.03) 0%, transparent 50%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(34,170,68,0.05) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(68,221,102,0.04) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(34,204,136,0.03) 0%, transparent 50%); }
+}
+
+[data-theme='sunset'] body::after {
+  animation-name: color-atmosphere-sunset;
+}
+
+@keyframes color-atmosphere-sunset {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(238,102,34,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,170,68,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(255,204,102,0.04) 0%, transparent 50%); }
+  25% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,170,68,0.07) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,204,102,0.06) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(238,102,34,0.05) 0%, transparent 50%); }
+  50% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,204,102,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(238,102,34,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(255,85,34,0.04) 0%, transparent 50%); }
+  75% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,130,50,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,190,80,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(255,160,60,0.04) 0%, transparent 50%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(238,102,34,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,170,68,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(255,204,102,0.04) 0%, transparent 50%); }
+}
+
+[data-theme='toxic'] body::after {
+  animation-name: color-atmosphere-toxic;
+}
+
+@keyframes color-atmosphere-toxic {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(136,204,0,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(102,255,34,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(204,255,0,0.04) 0%, transparent 50%); }
+  25% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(102,255,34,0.07) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(204,255,0,0.06) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(68,255,136,0.05) 0%, transparent 50%); }
+  50% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(204,255,0,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(68,255,136,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(136,204,0,0.04) 0%, transparent 50%); }
+  75% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(80,240,20,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(140,240,10,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(100,255,50,0.04) 0%, transparent 50%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(136,204,0,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(102,255,34,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(204,255,0,0.04) 0%, transparent 50%); }
+}
+
+[data-theme='cherry'] body::after {
+  animation-name: color-atmosphere-cherry;
+}
+
+@keyframes color-atmosphere-cherry {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(221,68,136,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,136,204,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(238,102,153,0.04) 0%, transparent 50%); }
+  25% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,136,204,0.07) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(238,102,153,0.06) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(255,85,170,0.05) 0%, transparent 50%); }
+  50% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(238,102,153,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,85,170,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(221,68,136,0.04) 0%, transparent 50%); }
+  75% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,100,180,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,150,210,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(240,80,160,0.04) 0%, transparent 50%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(221,68,136,0.06) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(255,136,204,0.05) 0%, transparent 55%), radial-gradient(ellipse 35% 25% at 50% 80%, rgba(238,102,153,0.04) 0%, transparent 50%); }
+}
+
+[data-theme='midnight'] body::after {
+  animation-name: color-atmosphere-midnight;
+}
+
+@keyframes color-atmosphere-midnight {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(180,180,180,0.03) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(200,200,200,0.02) 0%, transparent 55%); }
+  33% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(200,200,200,0.025) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(160,160,160,0.025) 0%, transparent 55%); }
+  66% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(160,160,160,0.03) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(190,190,190,0.02) 0%, transparent 55%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(180,180,180,0.03) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(200,200,200,0.02) 0%, transparent 55%); }
+}
+
+[data-theme='mono'] body::after {
+  animation-name: color-atmosphere-mono;
+}
+
+@keyframes color-atmosphere-mono {
+  0% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,255,255,0.015) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(200,200,200,0.012) 0%, transparent 55%); }
+  33% { background: radial-gradient(ellipse 55% 30% at 25% 15%, rgba(220,220,220,0.018) 0%, transparent 60%), radial-gradient(ellipse 40% 25% at 70% 65%, rgba(180,180,180,0.012) 0%, transparent 55%); }
+  66% { background: radial-gradient(ellipse 58% 32% at 35% 10%, rgba(190,190,190,0.016) 0%, transparent 60%), radial-gradient(ellipse 42% 28% at 65% 55%, rgba(210,210,210,0.013) 0%, transparent 55%); }
+  100% { background: radial-gradient(ellipse 60% 35% at 30% 12%, rgba(255,255,255,0.015) 0%, transparent 60%), radial-gradient(ellipse 45% 28% at 75% 60%, rgba(200,200,200,0.012) 0%, transparent 55%); }
+}
+
+/* ============================================================
+   3D Depth Boost — realistic spatial depth (optional toggle)
+   Subtle: 1.4x shadows + light translateZ
+   Strong: 2x shadows + perspective 800px + deeper translateZ
+   ============================================================ */
+
+.depth3d-subtle #root,
+.depth3d-strong #root {
+  perspective: 800px;
+}
+
+/* Subtle depth — moderate shadow amplification */
+.depth3d-subtle .neuro-raised {
+  box-shadow:
+    14px 14px 32px var(--shadow-dark),
+    -14px -14px 32px rgba(0,0,0,0.2),
+    0 28px 56px rgba(0,0,0,0.3);
+  transform: translateZ(3px);
+}
+
+.depth3d-subtle .neuro-raised-sm {
+  box-shadow:
+    3px 3px 10px rgba(0,0,0,0.18),
+    0 6px 16px rgba(0,0,0,0.12);
+  transform: translateZ(1.5px);
+}
+
+.depth3d-subtle .neuro-raised-deep {
+  box-shadow:
+    11px 11px 28px var(--shadow-dark),
+    -11px -11px 28px rgba(0,0,0,0.2),
+    22px 22px 50px var(--shadow-dark),
+    -22px -22px 50px rgba(0,0,0,0.2);
+  transform: translateZ(5px);
+}
+
+.depth3d-subtle .neuro-glass {
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.25),
+    0 0 0 1px var(--glass-border);
+  transform: translateZ(2px);
+}
+
+.depth3d-subtle .neuro-btn {
+  box-shadow:
+    10px 10px 22px var(--shadow-dark),
+    -10px -10px 22px rgba(0,0,0,0.2);
+  transform: translateZ(1px);
+}
+
+.depth3d-subtle .neuro-btn:hover {
+  transform: translateY(-2px) translateZ(1px);
+}
+
+.depth3d-subtle .neuro-pressed {
+  box-shadow:
+    inset 10px 10px 24px var(--shadow-dark),
+    inset -10px -10px 24px rgba(0,0,0,0.2);
+}
+
+/* Strong depth — dramatic shadow amplification */
+.depth3d-strong .neuro-raised {
+  box-shadow:
+    18px 18px 40px var(--shadow-dark),
+    -18px -18px 40px rgba(0,0,0,0.2),
+    0 36px 72px rgba(0,0,0,0.4),
+    0 0 80px rgba(0,0,0,0.1);
+  transform: translateZ(6px);
+}
+
+.depth3d-strong .neuro-raised-sm {
+  box-shadow:
+    4px 4px 14px rgba(0,0,0,0.22),
+    0 8px 22px rgba(0,0,0,0.16);
+  transform: translateZ(3px);
+}
+
+.depth3d-strong .neuro-raised-deep {
+  box-shadow:
+    14px 14px 36px var(--shadow-dark),
+    -14px -14px 36px rgba(0,0,0,0.2),
+    28px 28px 64px var(--shadow-dark),
+    -28px -28px 64px rgba(0,0,0,0.2),
+    0 0 100px rgba(0,0,0,0.15);
+  transform: translateZ(10px);
+}
+
+.depth3d-strong .neuro-glass {
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.35),
+    0 0 0 1px var(--glass-border);
+  transform: translateZ(4px);
+}
+
+.depth3d-strong .neuro-btn {
+  box-shadow:
+    12px 12px 28px var(--shadow-dark),
+    -12px -12px 28px rgba(0,0,0,0.2),
+    0 4px 16px rgba(0,0,0,0.25);
+  transform: translateZ(2px);
+}
+
+.depth3d-strong .neuro-btn:hover {
+  transform: translateY(-2px) translateZ(2px);
+}
+
+.depth3d-strong .neuro-pressed {
+  box-shadow:
+    inset 14px 14px 32px var(--shadow-dark),
+    inset -14px -14px 32px rgba(0,0,0,0.2),
+    inset 0 0 40px var(--accent-glass);
+}
+
+/* ============================================================
+   Cinematic LUTs — 8 famous color grading presets
+   Applied via data-lut attribute on <html>
+   Filter chains + optional mix-blend-mode overlays
+   ============================================================ */
+
+/* LUT overlay on #root — gradient + blend mode */
+#root {
+  position: relative;
+}
+
+[data-lut] #root::after {
+  z-index: 0;
+}
+
+/* Each LUT gets its own CSS filter + optional overlay */
+[data-lut='teal-orange'] #root {
+  filter: contrast(1.1) saturate(1.15);
+}
+[data-lut='matrix'] #root {
+  filter: contrast(1.25) saturate(0.7) brightness(0.9);
+}
+[data-lut='wes-anderson'] #root {
+  filter: saturate(0.75) brightness(1.05) contrast(0.95);
+}
+[data-lut='noir'] #root {
+  filter: grayscale(1) contrast(1.3) brightness(0.85);
+}
+[data-lut='vintage-70s'] #root {
+  filter: sepia(0.3) saturate(0.7) contrast(0.9) brightness(1.05);
+}
+[data-lut='cyberpunk'] #root {
+  filter: contrast(1.2) saturate(1.3) brightness(0.9);
+}
+[data-lut='bleach-bypass'] #root {
+  filter: saturate(0.3) contrast(1.35) brightness(0.95);
+}
+[data-lut='copper'] #root {
+  filter: sepia(0.25) saturate(0.9) contrast(1.05) brightness(1.02) hue-rotate(-5deg);
+}
+
+/* ── LUT Gradient Overlays (mix-blend-mode) ── */
+[data-lut] html::after {
+  display: none; /* hide volumetric rays when LUT overlay is active */
+}
+
+/* Teal & Orange overlay */
+[data-lut='teal-orange'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(0,180,200,0.08) 0%, rgba(200,120,40,0.06) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Matrix overlay */
+[data-lut='matrix'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(0,255,100,0.1) 0%, rgba(0,60,20,0.05) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Wes Anderson overlay */
+[data-lut='wes-anderson'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(255,200,150,0.06) 0%, rgba(255,180,120,0.04) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Noir — no overlay needed (pure grayscale) */
+[data-lut='noir'] body::after {
+  animation: none;
+  background: none;
+}
+
+/* Vintage 70s overlay */
+[data-lut='vintage-70s'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(255,200,100,0.05) 0%, rgba(200,150,80,0.04) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Cyberpunk overlay */
+[data-lut='cyberpunk'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(80,20,180,0.1) 0%, rgba(0,180,220,0.06) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Bleach Bypass overlay */
+[data-lut='bleach-bypass'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(180,180,180,0.05) 0%, rgba(100,100,100,0.04) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Copper overlay */
+[data-lut='copper'] body::after {
+  animation: none;
+  background: linear-gradient(180deg, rgba(200,140,60,0.06) 0%, rgba(140,80,30,0.04) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* ============================================================
+   Cinematic Depth of Field — blur vignette (radial)
+   Sharp center, progressively blurry edges
+   Controlled via data-dof attribute + CSS custom properties:
+     --dof-intensity (0–100)  --dof-focus (0–100)  --dof-blur (px)
+   ============================================================ */
+
+[data-dof] #root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  backdrop-filter: blur(var(--dof-blur, 2.4px));
+  -webkit-backdrop-filter: blur(var(--dof-blur, 2.4px));
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 50% calc(var(--dof-focus, 50) * 1%),
+    transparent 30%,
+    rgba(0,0,0,1) 75%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% calc(var(--dof-focus, 50) * 1%),
+    transparent 30%,
+    rgba(0,0,0,1) 75%
+  );
+}
+
+/* Reduced motion: disable DOF blur animation */
+@media (prefers-reduced-motion: reduce) {
+  [data-dof] #root::after {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Pause animations on hover when depth is active (keeps 3D stable) */
+.depth3d-subtle .neuro-raised:hover,
+.depth3d-subtle .neuro-raised-sm:hover,
+.depth3d-strong .neuro-raised:hover,
+.depth3d-strong .neuro-raised-sm:hover {
+  animation-play-state: paused;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .depth3d-subtle #root,
+  .depth3d-strong #root {
+    perspective: none;
+  }
+  .depth3d-subtle .neuro-raised,
+  .depth3d-subtle .neuro-raised-sm,
+  .depth3d-subtle .neuro-raised-deep,
+  .depth3d-subtle .neuro-glass,
+  .depth3d-subtle .neuro-btn,
+  .depth3d-subtle .neuro-pressed,
+  .depth3d-strong .neuro-raised,
+  .depth3d-strong .neuro-raised-sm,
+  .depth3d-strong .neuro-raised-deep,
+  .depth3d-strong .neuro-glass,
+  .depth3d-strong .neuro-btn,
+  .depth3d-strong .neuro-pressed {
+    transform: none !important;
+  }
+}
