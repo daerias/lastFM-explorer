@@ -42,6 +42,11 @@
   box-shadow: 0 0 0 1px var(--accent-glow), 0 0 12px var(--accent-glow);
 }
 
+.searchInputFuzzy {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 .searchInput::placeholder { color: var(--text-muted); }
 
 /* Sort mode buttons */
@@ -520,10 +525,128 @@
   gap: 6px;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Floating Fuzzy-Search Pill — keyboard-triggered overlay
+   Spring-entrance: scale+opacity+blur in, scale-out exit
+   ═══════════════════════════════════════════════════════════════ */
+
+.fuzzyPill {
+  position: sticky;
+  top: 8px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--accent-glow);
+  border-radius: 14px;
+  box-shadow:
+    0 0 20px var(--accent-glow),
+    0 0 40px var(--accent-glass),
+    0 8px 32px var(--shadow-deep);
+  animation: fuzzyEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  margin-bottom: 8px;
+}
+
+@keyframes fuzzyEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(-12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+.fuzzyPillExit {
+  animation: fuzzyExit 0.18s ease-in forwards;
+}
+
+@keyframes fuzzyExit {
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(-8px);
+    filter: blur(3px);
+  }
+}
+
+.fuzzyIcon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+  animation: fuzzyIconPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes fuzzyIconPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+.fuzzyInput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  padding: 4px 0;
+}
+
+.fuzzyInput::placeholder {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.fuzzyHint {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.fuzzyClose {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.55rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.fuzzyClose:hover {
+  color: var(--accent);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tagCard,
   .showMoreBtn {
     transition: none;
+  }
+  .fuzzyPill {
+    animation: none !important;
+  }
+  .fuzzyIcon {
+    animation: none !important;
   }
 }
 

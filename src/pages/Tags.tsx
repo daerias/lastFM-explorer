@@ -57,6 +57,113 @@ export default function Tags() {
   // Ref for auto-scroll to expanded detail
   const detailRef = useRef<HTMLDivElement>(null)
 
+  // ── Floating Fuzzy-Search Pill ──
+  const [fuzzyActive, setFuzzyActive] = useState(false)
+  const [fuzzyQuery, setFuzzyQuery] = useState('')
+  const [fuzzyExiting, setFuzzyExiting] = useState(false)
+  const fuzzyRef = useRef<HTMLInputElement>(null)
+  const fuzzyDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tagsAreaRef = useRef<HTMLDivElement>(null)
+
+  // Dismiss fuzzy search — with exit animation
+  const dismissFuzzy = useCallback(() => {
+    if (!fuzzyActive) return
+    setFuzzyExiting(true)
+    setTimeout(() => {
+      setFuzzyActive(false)
+      setFuzzyExiting(false)
+      setFuzzyQuery('')
+    }, 200) // match CSS exit animation duration
+  }, [fuzzyActive])
+
+  // Keyboard listener — letter keys trigger fuzzy search when no input focused
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      // Don't trigger when input/textarea is focused
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+      // Only trigger for single letter keys (a-z)
+      if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return
+      // Don't trigger if meta/ctrl/alt held
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      // Don't repeat on key hold
+      if (e.repeat) return
+
+      e.preventDefault()
+
+      if (fuzzyActive) {
+        // Already active — append the letter to the query
+        setFuzzyQuery((prev) => prev + e.key.toLowerCase())
+        fuzzyRef.current?.focus()
+      } else {
+        // Activate with this letter
+        setFuzzyActive(true)
+        setFuzzyQuery(e.key.toLowerCase())
+        // Focus after render
+        setTimeout(() => fuzzyRef.current?.focus(), 50)
+      }
+
+      // Reset dismiss timer on new keystroke
+      if (fuzzyDismissTimer.current) {
+        clearTimeout(fuzzyDismissTimer.current)
+        fuzzyDismissTimer.current = null
+      }
+    }
+
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [fuzzyActive])
+
+  // Dismiss on Escape
+  useEffect(() => {
+    if (!fuzzyActive) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') dismissFuzzy()
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [fuzzyActive, dismissFuzzy])
+
+  // Dismiss on click outside the fuzzy pill
+  useEffect(() => {
+    if (!fuzzyActive) return
+    const handler = (e: MouseEvent) => {
+      if (fuzzyRef.current && !fuzzyRef.current.contains(e.target as Node)) {
+        dismissFuzzy()
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [fuzzyActive, dismissFuzzy])
+
+  // Dismiss on mouse leaving the tags area (with delay)
+  useEffect(() => {
+    if (!fuzzyActive) return
+    const area = tagsAreaRef.current
+    if (!area) return
+
+    const onLeave = () => {
+      fuzzyDismissTimer.current = setTimeout(dismissFuzzy, 800)
+    }
+    const onEnter = () => {
+      if (fuzzyDismissTimer.current) {
+        clearTimeout(fuzzyDismissTimer.current)
+        fuzzyDismissTimer.current = null
+      }
+    }
+
+    area.addEventListener('mouseleave', onLeave)
+    area.addEventListener('mouseenter', onEnter)
+    return () => {
+      area.removeEventListener('mouseleave', onLeave)
+      area.removeEventListener('mouseenter', onEnter)
+      if (fuzzyDismissTimer.current) clearTimeout(fuzzyDismissTimer.current)
+    }
+  }, [fuzzyActive, dismissFuzzy])
+
+  // Sync fuzzy query to main search
+  const activeQuery = fuzzyActive ? fuzzyQuery : query
+
   const isDemo = !isAuthenticated
 
   // Load demo tags when not authenticated
@@ -83,7 +190,7 @@ export default function Tags() {
 
   // Filter and sort tags — supports substring, regex, alpha, and count sorting
   const filteredTags = useMemo(() => {
-    const q = query.trim()
+    const q = activeQuery.trim()
     let filtered = allTags
 
     if (q) {
@@ -106,7 +213,7 @@ export default function Tags() {
       : [...filtered].sort((a, b) => a.name.localeCompare(b.name))
 
     return sorted
-  }, [allTags, query, sortMode])
+  }, [allTags, activeQuery, sortMode])
 
   // Group tags by first letter for scannable layout
   const letterGroups = useMemo(() => {
@@ -130,6 +237,9 @@ export default function Tags() {
 
     return { groups: sorted, totalVisible: visible.length, total: filteredTags.length }
   }, [filteredTags, showAll])
+
+  // ── Derived: which query is actually shown in the search input ──
+  const displayQuery = fuzzyActive ? fuzzyQuery : query
 
   // Sentinel ref to cancel in-flight expands (avoids race conditions)
   const activeExpandTagRef = useRef<string | null>(null)
@@ -263,21 +373,43 @@ export default function Tags() {
   }
 
   return (
-    <div className={styles.tags}>
+    <div className={styles.tags} ref={tagsAreaRef}>
       <div className={styles.header}>
         <h1>Tag Management</h1>
         <p className={styles.subtitle}>{allTags.length} tags in your library</p>
       </div>
 
+      {/* ── Floating Fuzzy-Search Pill ── */}
+      {fuzzyActive && (
+        <div className={`${styles.fuzzyPill} ${fuzzyExiting ? styles.fuzzyPillExit : ''}`}>
+          <span className={styles.fuzzyIcon}>⌨️</span>
+          <input
+            ref={fuzzyRef}
+            className={styles.fuzzyInput}
+            type="text"
+            value={fuzzyQuery}
+            onChange={(e) => setFuzzyQuery(e.target.value)}
+            placeholder="Type to filter tags…"
+            autoFocus
+          />
+          <span className={styles.fuzzyHint}>
+            {filteredTags.length} tag{filteredTags.length !== 1 ? 's' : ''}
+          </span>
+          <button className={styles.fuzzyClose} onClick={dismissFuzzy} aria-label="Close">
+            <span className="neuro-icon neuro-icon-close" />
+          </button>
+        </div>
+      )}
+
       {/* Search + Sort bar */}
       <div className={styles.searchWrap}>
         <input
           id="tags-search"
-          className={styles.searchInput}
           type="text"
           placeholder={sortMode === 'regex' ? 'Regex filter (e.g. ^rock|^pop)...' : 'Search tags...'}
-          value={query}
+          value={displayQuery}
           onChange={(e) => setQuery(e.target.value)}
+          className={`${styles.searchInput} ${fuzzyActive ? styles.searchInputFuzzy : ''}`}
         />
         <div className={styles.sortGroup}>
           <button
