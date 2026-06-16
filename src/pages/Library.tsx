@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useMusicPlayer } from '../context/MusicPlayerContext'
-import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, type Track } from '../services/lastfm'
+import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, getRecentTracks, type Track } from '../services/lastfm'
 import { getCachedAllTracks, getCachedTrackCount, startFullSync, incrementalSync, getSyncMeta, clearTrackCache, processRetryQueue, queueRetryTask, type SyncProgress } from '../services/indexedDB'
 import { DEMO_TOP_TAGS, generateDemoTimeline } from '../services/demoData'
 import { useCoverFallback } from '../hooks/useCoverFallback'
@@ -278,44 +278,29 @@ export default function Library() {
     setActiveGenre((prev) => prev === tag ? null : tag)
   }, [])
 
-  // ── Full Cache Load + Background Sync ──
+  // ── Smart Load: recent tracks first (fast), full sync in background ──
   const loadFromCache = useCallback(async () => {
     if (!isAuthenticated || !username) { setLoading(false); return }
-    setLoading(true); setError(null)
+    setLoading(true); setError(null); setSyncWarning(null)
 
+    let didShowTracks = false
     let syncType: 'full' | 'incremental' | null = null
 
     try {
-      // 1. Load all cached tracks instantly
+      // 1. Try cached data first (instant if available)
       const cached = await getCachedAllTracks(username)
-      if (!abortRef.current) {
-        setTracks(cached)
-        const count = await getCachedTrackCount(username)
-        setCachedCount(count)
-        setLoading(false)
-      }
-
-      // 2. Check if we need incremental sync
       const meta = await getSyncMeta(username)
-      syncType = null
-      if (!meta || !meta.syncComplete) {
-        // First time or incomplete — start full sync in background
-        syncType = 'full'
-        if (!abortRef.current) setSyncActive(true)
-        await startFullSync(username, (prog) => {
-          if (!abortRef.current) setSyncProgress(prog)
-        })
+
+      if (cached.length > 0) {
+        // We have cached data — show immediately
         if (!abortRef.current) {
-          setSyncActive(false)
-          setSyncProgress(null)
-          // Reload from cache to get fresh data
-          const fresh = await getCachedAllTracks(username)
-          setTracks(fresh)
-          const count = await getCachedTrackCount(username)
-          setCachedCount(count)
+          setTracks(cached)
+          setCachedCount(meta?.totalTracks ?? cached.length)
+          setLoading(false)
+          didShowTracks = true
         }
-      } else {
-        // Incremental sync in background
+
+        // 2. Incremental sync in background (only fetch new tracks since last sync)
         syncType = 'incremental'
         if (!abortRef.current) setSyncActive(true)
         const incResult = await incrementalSync(username, (prog) => {
@@ -325,13 +310,47 @@ export default function Library() {
           setSyncActive(false)
           setSyncProgress(null)
           if (incResult.failedPages > 0) {
-            setSyncWarning(`${incResult.failedPages} page(s) failed — some tracks may be missing. Full sync recommended.`)
+            setSyncWarning(`${incResult.failedPages} page(s) failed — some tracks may be missing.`)
           }
-          if (meta.totalTracks > 0) {
+          if (incResult.newTracks > 0 || incResult.failedPages > 0) {
             const fresh = await getCachedAllTracks(username)
             setTracks(fresh)
             const count = await getCachedTrackCount(username)
             setCachedCount(count)
+          }
+          if (!meta?.syncComplete) {
+            setSyncWarning((prev) => prev ? `${prev} Full sync recommended.` : 'Full sync recommended to cache your entire history.')
+          }
+        }
+      } else {
+        // No cache — fetch recent tracks immediately (1 fast API call)
+        const recent = await getRecentTracks(username, 200, 1)
+        if (!abortRef.current) {
+          setTracks(recent.tracks)
+          setCachedCount(recent.tracks.length)
+          setLoading(false)
+          didShowTracks = true
+        }
+
+        // Start full sync silently in background (don't block UI)
+        syncType = 'full'
+        if (!abortRef.current) {
+          setSyncActive(true)
+        }
+        await startFullSync(username, (prog) => {
+          if (!abortRef.current) setSyncProgress(prog)
+        })
+        if (!abortRef.current) {
+          setSyncActive(false)
+          setSyncProgress(null)
+          // Reload from cache to get the full dataset
+          const fresh = await getCachedAllTracks(username)
+          setTracks(fresh)
+          const count = await getCachedTrackCount(username)
+          setCachedCount(count)
+          const updatedMeta = await getSyncMeta(username)
+          if (updatedMeta && !updatedMeta.syncComplete) {
+            setSyncWarning('Some pages failed during sync — not all tracks cached. Full Sync to retry.')
           }
         }
       }
@@ -344,14 +363,20 @@ export default function Library() {
       if (!abortRef.current) {
         syncActiveRef.current = false
         setSyncActive(false)
-        setError(err.message || 'Failed to load')
-        // Queue the failed sync for offline retry, then process pending queue
+        // Queue the failed sync for offline retry
         if (syncType) {
           queueRetryTask(username, syncType)
         }
+        // If we already have tracks showing, don't replace with error
+        if (!didShowTracks) {
+          setError(err.message || 'Failed to load')
+        } else {
+          setSyncWarning(`Background sync failed: ${err.message || 'Unknown error'}. Will retry later.`)
+        }
+        // Process any other queued retry tasks
         processRetry()
+        setLoading(false)
       }
-      setLoading(false)
     }
   }, [username, isAuthenticated])
 
@@ -661,8 +686,8 @@ export default function Library() {
           </span>
           <p style={{ color: 'var(--text-muted)' }}>
             {hasActiveFilters ? 'No tracks match.'
-              : syncActive ? 'Syncing your full history…'
-              : isDemo ? 'Demo mode — no real tracks.' : 'No tracks cached. Click "Full Sync" to load your history.'}
+              : syncActive ? 'Loading your tracks…'
+              : isDemo ? 'Demo mode — no real tracks.' : 'No tracks found. Try Full Sync.'}
           </p>
           {hasActiveFilters && (
             <button className="neuro-btn" onClick={() => { setSearch(''); setFilterTags([]); setActiveGenre(null) }} style={{ marginTop: 12 }}>
