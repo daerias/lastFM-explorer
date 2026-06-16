@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useMusicPlayer } from '../context/MusicPlayerContext'
 import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, type Track } from '../services/lastfm'
-import { getCachedAllTracks, getCachedTrackCount, startFullSync, incrementalSync, getSyncMeta, clearTrackCache, type SyncProgress } from '../services/indexedDB'
+import { getCachedAllTracks, getCachedTrackCount, startFullSync, incrementalSync, getSyncMeta, clearTrackCache, processRetryQueue, queueRetryTask, type SyncProgress } from '../services/indexedDB'
 import { DEMO_TOP_TAGS, generateDemoTimeline } from '../services/demoData'
 import { useCoverFallback } from '../hooks/useCoverFallback'
 import { useVirtualScroll } from '../hooks/useVirtualScroll'
@@ -182,6 +182,7 @@ export default function Library() {
   // Sync state
   const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null)
   const [syncActive, setSyncActive] = useState(false)
+  const syncActiveRef = useRef(false)
   const [cachedCount, setCachedCount] = useState(0)
   const abortRef = useRef(false)
 
@@ -282,6 +283,8 @@ export default function Library() {
     if (!isAuthenticated || !username) { setLoading(false); return }
     setLoading(true); setError(null)
 
+    let syncType: 'full' | 'incremental' | null = null
+
     try {
       // 1. Load all cached tracks instantly
       const cached = await getCachedAllTracks(username)
@@ -294,8 +297,10 @@ export default function Library() {
 
       // 2. Check if we need incremental sync
       const meta = await getSyncMeta(username)
+      syncType = null
       if (!meta || !meta.syncComplete) {
         // First time or incomplete — start full sync in background
+        syncType = 'full'
         if (!abortRef.current) setSyncActive(true)
         await startFullSync(username, (prog) => {
           if (!abortRef.current) setSyncProgress(prog)
@@ -311,6 +316,7 @@ export default function Library() {
         }
       } else {
         // Incremental sync in background
+        syncType = 'incremental'
         if (!abortRef.current) setSyncActive(true)
         const incResult = await incrementalSync(username, (prog) => {
           if (!abortRef.current && prog.tracksSoFar > 0) setSyncProgress(prog)
@@ -329,8 +335,22 @@ export default function Library() {
           }
         }
       }
+
+      // Process any queued retry tasks after sync settles
+      if (!abortRef.current) {
+        processRetry()
+      }
     } catch (err: any) {
-      if (!abortRef.current) setError(err.message || 'Failed to load')
+      if (!abortRef.current) {
+        syncActiveRef.current = false
+        setSyncActive(false)
+        setError(err.message || 'Failed to load')
+        // Queue the failed sync for offline retry, then process pending queue
+        if (syncType) {
+          queueRetryTask(username, syncType)
+        }
+        processRetry()
+      }
       setLoading(false)
     }
   }, [username, isAuthenticated])
@@ -362,6 +382,9 @@ export default function Library() {
         }
       }
     } catch (err: any) {
+      if (!abortRef.current) {
+        queueRetryTask(username, 'full')
+      }
       setError(err.message || 'Sync failed')
     } finally {
       if (!abortRef.current) { setSyncActive(false); setSyncProgress(null) }
@@ -387,6 +410,46 @@ export default function Library() {
   const isDemo = !isAuthenticated
   useEffect(() => { if (!isDemo) return; setTracks(generateDemoTimeline() as unknown as Track[]); setLoading(false); setCachedCount(20) }, [isDemo])
   useEffect(() => { if (!isDemo) return; setSuggestions(DEMO_TOP_TAGS) }, [isDemo])
+
+  // Keep ref in sync with state
+  useEffect(() => { syncActiveRef.current = syncActive }, [syncActive])
+
+  // ── Offline Retry Queue — process after sync + when coming back online ──
+  const processRetry = useCallback(async () => {
+    if (!username || isDemo || syncActiveRef.current) return
+
+    const result = await processRetryQueue(username, (msg) => {
+      console.log(`[retry-queue] ${msg}`)
+    })
+    if (result.processed > 0) {
+      console.log(
+        `[retry-queue] Processed ${result.processed} task(s): ${result.succeeded} succeeded, ${result.failed} failed`,
+      )
+      // Reload tracks if any retry succeeded
+      if (result.succeeded > 0) {
+        const fresh = await getCachedAllTracks(username)
+        setTracks(fresh)
+        const count = await getCachedTrackCount(username)
+        setCachedCount(count)
+        // Only clear warning if sync is actually complete
+        const meta = await getSyncMeta(username)
+        if (meta?.syncComplete) {
+          setSyncWarning(null)
+        }
+      }
+    }
+  }, [username, isDemo])
+
+  // Process retry queue when coming back online
+  useEffect(() => {
+    if (!username || isDemo) return
+    const handleOnline = () => {
+      console.log('[retry-queue] Back online — processing pending sync tasks…')
+      processRetry()
+    }
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [username, isDemo, processRetry])
 
   // ── API Health Indicator ──
   const healthStatus: 'green' | 'yellow' | 'red' | 'idle' = useMemo(() => {

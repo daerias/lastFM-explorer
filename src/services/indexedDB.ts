@@ -4,7 +4,7 @@
 import type { Track, Artist } from './lastfm'
 
 const DB_NAME = 'lastfm_cache'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 interface CacheEntry<T> {
   key: string
@@ -35,6 +35,10 @@ function openDB(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains('syncMeta')) {
         db.createObjectStore('syncMeta', { keyPath: 'user' })
+      }
+      // v3: retry queue for failed sync operations
+      if (!db.objectStoreNames.contains('retryQueue')) {
+        db.createObjectStore('retryQueue', { keyPath: 'id' })
       }
     }
     req.onsuccess = () => resolve(req.result)
@@ -509,4 +513,122 @@ export async function clearTrackCache(user: string): Promise<void> {
   } catch {
     // Best-effort
   }
+}
+
+// ── Offline-First Retry Queue ──
+
+export interface SyncRetryTask {
+  id: string
+  type: 'full' | 'incremental'
+  user: string
+  createdAt: number
+  attempts: number
+  maxAttempts: number
+}
+
+const RETRY_MAX = 5
+
+/** Add a failed sync operation to the retry queue. Deduplicates — won't add
+ *  if an identical pending task already exists for this user+type. */
+export async function queueRetryTask(user: string, type: 'full' | 'incremental'): Promise<void> {
+  try {
+    const db = await openDB()
+    const store = getStore(db, 'retryQueue', 'readwrite')
+
+    // Deduplicate: check if a pending task for same user+type already exists
+    const all = (await promisify(store.getAll())) as CacheEntry<SyncRetryTask>[] | undefined
+    const existing = all?.find((e) => e.data.user === user && e.data.type === type)
+    if (existing) {
+      // Update attempt count and timestamp
+      const updated: SyncRetryTask = {
+        ...existing.data,
+        attempts: existing.data.attempts + 1,
+        createdAt: Date.now(),
+      }
+      await promisify(store.put({ key: existing.data.id, data: updated, updatedAt: Date.now() }))
+      db.close()
+      return
+    }
+
+    const id = `${user}:${type}:${Date.now()}`
+    const task: SyncRetryTask = {
+      id,
+      type,
+      user,
+      createdAt: Date.now(),
+      attempts: 0,
+      maxAttempts: RETRY_MAX,
+    }
+    await promisify(store.put({ key: id, data: task, updatedAt: Date.now() }))
+    db.close()
+  } catch {
+    // Best-effort — queue is optional
+  }
+}
+
+/** Get all pending retry tasks for a user, sorted oldest-first */
+export async function getRetryQueue(user: string): Promise<SyncRetryTask[]> {
+  try {
+    const db = await openDB()
+    const store = getStore(db, 'retryQueue')
+    const all = (await promisify(store.getAll())) as CacheEntry<SyncRetryTask>[] | undefined
+    db.close()
+    if (!all) return []
+    return all
+      .map((e) => e.data)
+      .filter((t) => t.user === user && t.attempts < t.maxAttempts)
+      .sort((a, b) => a.createdAt - b.createdAt)
+  } catch {
+    return []
+  }
+}
+
+/** Remove a task from the retry queue (call after successful retry) */
+async function removeRetryTask(id: string): Promise<void> {
+  try {
+    const db = await openDB()
+    const store = getStore(db, 'retryQueue', 'readwrite')
+    await promisify(store.delete(id))
+    db.close()
+  } catch {
+    // Best-effort
+  }
+}
+
+/** Process all pending retry tasks for a user. Each task is retried once;
+ *  on success it's removed from queue, on failure its attempt count increments.
+ *  Tasks exceeding maxAttempts are automatically dropped by `getRetryQueue` filter. */
+export async function processRetryQueue(
+  user: string,
+  onProgress?: (msg: string) => void,
+): Promise<{ processed: number; succeeded: number; failed: number }> {
+  const tasks = await getRetryQueue(user)
+  if (tasks.length === 0) return { processed: 0, succeeded: 0, failed: 0 }
+
+  let succeeded = 0
+  let failed = 0
+
+  for (const task of tasks) {
+    if (onProgress) {
+      onProgress(`Retrying ${task.type} sync (attempt ${task.attempts + 1}/${task.maxAttempts})…`)
+    }
+
+    try {
+      if (task.type === 'full') {
+        await startFullSync(task.user)
+      } else {
+        await incrementalSync(task.user)
+      }
+      // Success — remove from queue
+      await removeRetryTask(task.id)
+      succeeded++
+    } catch (err: any) {
+      // Failed — increment attempts (or task gets dropped by maxAttempts filter)
+      console.warn(`[retry] ${task.type} sync retry failed: ${err.message}`)
+      await queueRetryTask(task.user, task.type) // updates attempt count via dedup
+      failed++
+    }
+  }
+
+  return { processed: tasks.length, succeeded, failed }
 }
