@@ -403,7 +403,7 @@ export default function Library() {
                   isSelected={selectedKeys.has(key)}
                   onToggleSelect={() => toggleSelect(key)}
                   selectMode={selectMode}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${translateY}px)` }}
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${translateY}px)`, animation: 'none' }}
                 />
               )
             })}
