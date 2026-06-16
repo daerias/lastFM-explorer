@@ -48,8 +48,8 @@ const navItems: NavItem[] = [
 
 export default function Sidebar() {
   const { isAuthenticated, username, login } = useAuth()
-  const { isOpen: musicPlaying, checking, artist: currentArtist, track: currentTrack } = useMusicPlayer()
-  const isMusicActive = musicPlaying && !checking
+  const { isOpen: musicPlaying, resolving, artist: currentArtist, track: currentTrack } = useMusicPlayer()
+  const isMusicActive = musicPlaying && !resolving
   const [audioReactive, setAudioReactive] = useState(getAudioReactive)
   const [audioBpm, setAudioBpm] = useState(getAudioBpm)
   const [micEnabled, setMicEnabled] = useState(getMicEnabled)

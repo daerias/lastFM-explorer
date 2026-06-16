@@ -4,6 +4,17 @@ import { resolveExternalCover, resolveExternalArtistImage } from '../services/co
 import { detectCoverSource, type CoverSource, findBestImage } from '../lib/coverSource'
 
 // Module-level caches survive re-renders and dedupe across all components
+const MAX_CACHE_SIZE = 500
+
+function evictOldest<K, V>(map: Map<K, V>, maxSize: number): void {
+  if (map.size <= maxSize) return
+  const keysToDelete = map.size - maxSize
+  // Copy keys before deleting to avoid iterator invalidation edge cases
+  for (const key of Array.from(map.keys()).slice(0, keysToDelete)) {
+    map.delete(key)
+  }
+}
+
 const artistCoverCache = new Map<string, string | null>()
 const trackCoverCache = new Map<string, string | null>()
 const pendingFetches = new Map<string, Promise<string | null>>()
@@ -32,6 +43,7 @@ async function resolveCover(artist: string, track: string): Promise<string | nul
         const albumImg = findBestImage(info?.album?.image)
         if (albumImg) {
           trackCoverCache.set(key, albumImg)
+          evictOldest(trackCoverCache, MAX_CACHE_SIZE)
           return albumImg
         }
 
@@ -39,6 +51,7 @@ async function resolveCover(artist: string, track: string): Promise<string | nul
         const trackArtistImg = findBestImage(info?.artist?.image)
         if (trackArtistImg) {
           trackCoverCache.set(key, trackArtistImg)
+          evictOldest(trackCoverCache, MAX_CACHE_SIZE)
           return trackArtistImg
         }
       } catch {
@@ -59,7 +72,9 @@ async function resolveCover(artist: string, track: string): Promise<string | nul
       const artistImg = findBestImage(artistInfo?.image)
       if (artistImg) {
         artistCoverCache.set(artistKey, artistImg)
+        evictOldest(artistCoverCache, MAX_CACHE_SIZE)
         trackCoverCache.set(key, artistImg)
+        evictOldest(trackCoverCache, MAX_CACHE_SIZE)
         return artistImg
       }
       // No image in artist info — fall through to external
@@ -78,16 +93,20 @@ async function resolveCover(artist: string, track: string): Promise<string | nul
       // Track-specific covers (album art) must NOT pollute the artist cache.
       if (isArtistOnly) {
         artistCoverCache.set(artistKey, externalUrl)
+        evictOldest(artistCoverCache, MAX_CACHE_SIZE)
       }
       trackCoverCache.set(key, externalUrl)
+      evictOldest(trackCoverCache, MAX_CACHE_SIZE)
       return externalUrl
     }
 
     // Only cache null when all sources failed
     if (isArtistOnly) {
       artistCoverCache.set(artistKey, null)
+      evictOldest(artistCoverCache, MAX_CACHE_SIZE)
     }
     trackCoverCache.set(key, null)
+    evictOldest(trackCoverCache, MAX_CACHE_SIZE)
     return null
   })()
 

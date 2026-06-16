@@ -1,6 +1,8 @@
-export type Theme = 'dark' | 'light' | 'edm' | 'ocean' | 'forest' | 'sunset' | 'midnight' | 'toxic' | 'cherry' | 'mono'
+/* ── Single Premium Theme — Plastic Neumorphism ── */
 
-/* ── Effect types ── */
+export type Theme = 'plastic'
+
+/* ── Effect types (preserved for fine-tuning) ── */
 
 export type AnimSpeed = 0.5 | 1 | 2
 export type GlassLevel = 'low' | 'normal' | 'high'
@@ -41,30 +43,21 @@ export interface ThemeMeta {
   label: string
   icon: string
   desc: string
-  category: 'core' | 'mood' | 'aesthetic'
+  category: 'core'
   defaultEffects: ThemeEffects
 }
 
-/* ── Default effect presets per theme ── */
+/* ── Default effects for the single plastic theme ── */
 
 const FX: ThemeEffects = {
   animSpeed: 1, glassLevel: 'normal',
-  noise: 'subtle', scanlines: 'off', chromatic: 'off',
-  vignette: 'off', particles: 'normal', glow: 'normal', borderPulse: 'off',
-  depth3D: 'off',
+  noise: 'off', scanlines: 'off', chromatic: 'off',
+  vignette: 'off', particles: 'sparse', glow: 'normal', borderPulse: 'off',
+  depth3D: 'subtle',
 }
 
 export const ALL_THEMES: ThemeMeta[] = [
-  { value: 'dark',     label: 'Dark',      icon: '🌙', desc: 'Cyberpunk neuromorphic',         category: 'core',      defaultEffects: { ...FX, noise: 'subtle', glow: 'normal', depth3D: 'subtle' } },
-  { value: 'light',    label: 'Light',     icon: '☀️', desc: 'Clean & bright',                  category: 'core',      defaultEffects: { ...FX, noise: 'off', particles: 'sparse', glassLevel: 'low' } },
-  { value: 'edm',      label: 'EDM',       icon: '🌈', desc: 'Psychedelic neon rave',          category: 'core',      defaultEffects: { ...FX, glow: 'boosted', chromatic: 'on', borderPulse: 'on', particles: 'dense', depth3D: 'strong' } },
-  { value: 'ocean',    label: 'Ocean',     icon: '🌊', desc: 'Deep blue abyss',                category: 'mood',      defaultEffects: { ...FX, vignette: 'subtle', particles: 'sparse', glassLevel: 'high', depth3D: 'subtle' } },
-  { value: 'forest',   label: 'Forest',    icon: '🌲', desc: 'Dark emerald grove',             category: 'mood',      defaultEffects: { ...FX, vignette: 'heavy', noise: 'heavy', particles: 'dense', depth3D: 'strong' } },
-  { value: 'sunset',   label: 'Sunset',    icon: '🌅', desc: 'Warm golden hour',               category: 'mood',      defaultEffects: { ...FX, glow: 'boosted', chromatic: 'on', vignette: 'subtle', depth3D: 'subtle' } },
-  { value: 'midnight', label: 'Midnight',  icon: '🕶️', desc: 'Monochrome elegance',            category: 'aesthetic', defaultEffects: { ...FX, vignette: 'subtle', particles: 'sparse', noise: 'off', depth3D: 'strong' } },
-  { value: 'toxic',    label: 'Toxic',     icon: '☢️', desc: 'Radioactive neon waste',         category: 'aesthetic', defaultEffects: { ...FX, glow: 'max', scanlines: 'on', particles: 'dense', noise: 'heavy', chromatic: 'on', depth3D: 'strong' } },
-  { value: 'cherry',   label: 'Cherry',    icon: '🌸', desc: 'Soft pink blossom',              category: 'aesthetic', defaultEffects: { ...FX, glow: 'boosted', glassLevel: 'high', particles: 'sparse', depth3D: 'subtle' } },
-  { value: 'mono',     label: 'Mono',      icon: '⬜', desc: 'Brutalist grayscale',            category: 'aesthetic', defaultEffects: { ...FX, noise: 'off', vignette: 'subtle', particles: 'sparse', depth3D: 'strong' } },
+  { value: 'plastic', label: 'Plastic', icon: '🫧', desc: 'Soft premium neumorphism — tactile, organic, aus einem Guss', category: 'core', defaultEffects: { ...FX } },
 ]
 
 /* ── localStorage keys ── */
@@ -72,7 +65,7 @@ export const ALL_THEMES: ThemeMeta[] = [
 const STORAGE_KEY = 'lastfm_theme'
 const ACTIVE_PROFILE_KEY = 'lastfm_active_profile'
 const CUSTOM_PROFILES_KEY = 'lastfm_custom_profiles'
-const DEFAULT: Theme = 'dark'
+const DEFAULT: Theme = 'plastic'
 const CHANGE_EVENT = 'theme-changed'
 
 /* ── Profile management ── */
@@ -119,7 +112,6 @@ export function getCustomProfiles(): ThemeProfile[] {
 
 export function saveProfile(profile: ThemeProfile): void {
   const profiles = getCustomProfiles().filter(p => p.id !== profile.id)
-  // Resolve name conflicts
   let name = profile.name
   let counter = 1
   while (profiles.some(p => p.name === name)) {
@@ -133,10 +125,9 @@ export function saveProfile(profile: ThemeProfile): void {
 export function deleteProfile(id: string): void {
   const profiles = getCustomProfiles().filter(p => p.id !== id)
   try { localStorage.setItem(CUSTOM_PROFILES_KEY, JSON.stringify(profiles)) } catch {}
-  // If deleted profile was active, fallback to dark
   const active = getActiveProfile()
   if (active.id === id) {
-    loadProfile(buildProfile('dark'))
+    loadProfile(buildProfile('plastic'))
   }
 }
 
@@ -182,7 +173,6 @@ export function downloadProfileFile(profile: ThemeProfile): void {
 
 export function parseProfileFile(json: string): ThemeProfile {
   const obj = JSON.parse(json)
-  // Validate
   if (!obj.baseTheme || !obj.effects || !obj.name) {
     throw new Error('Invalid theme profile file')
   }
@@ -190,7 +180,6 @@ export function parseProfileFile(json: string): ThemeProfile {
     throw new Error(`Unknown theme: ${obj.baseTheme}`)
   }
   const fx = obj.effects as ThemeEffects
-  // Sanitize effects to valid values
   const base = defaultEffectsFor(obj.baseTheme as Theme)
   return {
     id: `import-${Date.now()}`,
@@ -229,12 +218,12 @@ export function getCurrentEffects(): ThemeEffects {
   }
 }
 
-/* ── Core theme functions (preserved) ── */
+/* ── Core theme functions ── */
 
 export function getTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored && ALL_THEMES.some(t => t.value === stored)) return stored as Theme
+    if (stored === 'plastic') return stored
   } catch {}
   return DEFAULT
 }
@@ -242,7 +231,6 @@ export function getTheme(): Theme {
 export function setTheme(theme: Theme): void {
   try { localStorage.setItem(STORAGE_KEY, theme) } catch {}
   applyTheme(theme)
-  // Also apply this theme's default effects
   const profile = buildProfile(theme)
   applyEffects(profile.effects)
   setActiveProfile(profile)
@@ -259,7 +247,7 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.setAttribute('data-theme', theme)
 }
 
-/* ── Individual effect getters/setters (preserved) ── */
+/* ── Individual effect getters/setters ── */
 
 export function getAnimSpeed(): AnimSpeed {
   try { const v = parseFloat(localStorage.getItem('lastfm_anim_speed') || '1'); if (v === 0.5 || v === 1 || v === 2) return v } catch {}
@@ -269,10 +257,10 @@ export function setAnimSpeed(speed: AnimSpeed): void {
   try { localStorage.setItem('lastfm_anim_speed', String(speed)) } catch {}
   const mult = 1 / speed
   document.documentElement.style.setProperty('--anim-speed-mult', String(mult))
-  document.documentElement.style.setProperty('--transition', `calc(250ms * ${mult}) cubic-bezier(0.4, 0, 0.2, 1)`)
-  document.documentElement.style.setProperty('--anim-duration-slow', `calc(6s * ${mult})`)
-  document.documentElement.style.setProperty('--anim-duration-atmos', `calc(18s * ${mult})`)
-  document.documentElement.style.setProperty('--anim-duration-particles', `calc(22s * ${mult})`)
+  document.documentElement.style.setProperty('--transition', `calc(280ms * ${mult}) cubic-bezier(0.4, 0, 0.2, 1)`)
+  document.documentElement.style.setProperty('--anim-duration-slow', `calc(8s * ${mult})`)
+  document.documentElement.style.setProperty('--anim-duration-atmos', `calc(22s * ${mult})`)
+  document.documentElement.style.setProperty('--anim-duration-particles', `calc(26s * ${mult})`)
 }
 
 export function getGlassLevel(): GlassLevel {
@@ -281,19 +269,19 @@ export function getGlassLevel(): GlassLevel {
 }
 export function setGlassLevel(level: GlassLevel): void {
   try { localStorage.setItem('lastfm_glass_level', level) } catch {}
-  const blurMap: Record<GlassLevel, string> = { low: 'blur(6px)', normal: 'blur(16px)', high: 'blur(32px)' }
+  const blurMap: Record<GlassLevel, string> = { low: 'blur(8px)', normal: 'blur(18px)', high: 'blur(36px)' }
   document.documentElement.style.setProperty('--glass-blur', blurMap[level])
-  const bgMap: Record<GlassLevel, string> = { low: '0.25', normal: '0.55', high: '0.82' }
+  const bgMap: Record<GlassLevel, string> = { low: '0.35', normal: '0.65', high: '0.85' }
   document.documentElement.style.setProperty('--glass-bg-alpha', bgMap[level])
 }
 
 export function getNoiseLevel(): NoiseLevel {
   try { const v = localStorage.getItem('lastfm_noise'); if (v === 'off' || v === 'subtle' || v === 'heavy') return v } catch {}
-  return 'subtle'
+  return 'off'
 }
 export function setNoiseLevel(level: NoiseLevel): void {
   try { localStorage.setItem('lastfm_noise', level) } catch {}
-  const map: Record<NoiseLevel, string> = { off: '0', subtle: '0.03', heavy: '0.08' }
+  const map: Record<NoiseLevel, string> = { off: '0', subtle: '0.02', heavy: '0.05' }
   document.documentElement.style.setProperty('--noise-opacity', map[level])
 }
 
@@ -303,7 +291,7 @@ export function getScanlines(): ScanlineMode {
 }
 export function setScanlines(mode: ScanlineMode): void {
   try { localStorage.setItem('lastfm_scanlines', mode) } catch {}
-  document.documentElement.style.setProperty('--scanlines-opacity', mode === 'on' ? '0.04' : '0')
+  document.documentElement.style.setProperty('--scanlines-opacity', mode === 'on' ? '0.03' : '0')
 }
 
 export function getChromatic(): ChromaticMode {
@@ -312,7 +300,7 @@ export function getChromatic(): ChromaticMode {
 }
 export function setChromatic(mode: ChromaticMode): void {
   try { localStorage.setItem('lastfm_chromatic', mode) } catch {}
-  document.documentElement.style.setProperty('--chromatic-shift', mode === 'on' ? '1.5px' : '0px')
+  document.documentElement.style.setProperty('--chromatic-shift', mode === 'on' ? '1px' : '0px')
 }
 
 export function getVignette(): VignetteLevel {
@@ -321,19 +309,19 @@ export function getVignette(): VignetteLevel {
 }
 export function setVignette(level: VignetteLevel): void {
   try { localStorage.setItem('lastfm_vignette', level) } catch {}
-  const map: Record<VignetteLevel, string> = { off: '0', subtle: '0.3', heavy: '0.6' }
+  const map: Record<VignetteLevel, string> = { off: '0', subtle: '0.2', heavy: '0.45' }
   document.documentElement.style.setProperty('--vignette-opacity', map[level])
 }
 
 export function getParticles(): ParticleDensity {
   try { const v = localStorage.getItem('lastfm_particles'); if (v === 'sparse' || v === 'normal' || v === 'dense') return v } catch {}
-  return 'normal'
+  return 'sparse'
 }
 export function setParticles(density: ParticleDensity): void {
   try { localStorage.setItem('lastfm_particles', density) } catch {}
-  const map: Record<ParticleDensity, string> = { sparse: '0.3', normal: '0.7', dense: '1' }
+  const map: Record<ParticleDensity, string> = { sparse: '0.2', normal: '0.4', dense: '0.7' }
   document.documentElement.style.setProperty('--particle-opacity', map[density])
-  const scaleMap: Record<ParticleDensity, string> = { sparse: '0.6', normal: '1', dense: '1.4' }
+  const scaleMap: Record<ParticleDensity, string> = { sparse: '0.5', normal: '0.7', dense: '1' }
   document.documentElement.style.setProperty('--particle-scale', scaleMap[density])
 }
 
@@ -343,8 +331,8 @@ export function getGlowBoost(): GlowBoost {
 }
 export function setGlowBoost(boost: GlowBoost): void {
   try { localStorage.setItem('lastfm_glow', boost) } catch {}
-  const animMap: Record<GlowBoost, string> = { normal: 'neon-pulse', boosted: 'neon-pulse-boosted', max: 'neon-pulse-max' }
-  document.documentElement.style.setProperty('--glow-anim', animMap[boost])
+  const multMap: Record<GlowBoost, string> = { normal: '0.6', boosted: '1', max: '1.5' }
+  document.documentElement.style.setProperty('--glow-multiplier', multMap[boost])
 }
 
 export function getBorderPulse(): BorderPulseMode {
@@ -363,7 +351,7 @@ export function setBorderPulse(mode: BorderPulseMode): void {
 
 export function getDepth3D(): Depth3D {
   try { const v = localStorage.getItem('lastfm_depth3d'); if (v === 'off' || v === 'subtle' || v === 'strong') return v } catch {}
-  return 'off'
+  return 'subtle'
 }
 export function setDepth3D(level: Depth3D): void {
   try { localStorage.setItem('lastfm_depth3d', level) } catch {}

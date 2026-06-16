@@ -47,11 +47,19 @@ export default function DayDetail() {
       return
     }
 
+    // Validate date param before making API calls
+    const parsed = new Date(date + 'T00:00:00')
+    if (isNaN(parsed.getTime())) {
+      setLoading(false)
+      setError('Invalid date.')
+      return
+    }
+
     let cancelled = false
     setLoading(true)
     setError(null)
 
-    const dayStart = new Date(date + 'T00:00:00')
+    const dayStart = parsed
     const dayEnd = new Date(date + 'T23:59:59')
     const from = toUnix(dayStart)
     const to = toUnix(dayEnd)

@@ -131,10 +131,16 @@ export default function Tags() {
     return { groups: sorted, totalVisible: visible.length, total: filteredTags.length }
   }, [filteredTags, showAll])
 
+  // Sentinel ref to cancel in-flight expands (avoids race conditions)
+  const activeExpandTagRef = useRef<string | null>(null)
+
   // Expand tag — load ALL its tracks + compute leader artist stats
   const expandTag = useCallback(async (tag: string) => {
     if (expandedTag === tag) { setExpandedTag(null); return }
     if (!username) return
+
+    // Cancel any in-flight expand for a different tag
+    activeExpandTagRef.current = tag
 
     setExpandedTag(tag)
     setTagTracks([])
@@ -142,11 +148,11 @@ export default function Tags() {
     setTracksLoading(true)
     setTracksError(null)
 
-    let cancelled = false
+    const thisTag = tag
 
     try {
       const page1 = await getPersonalTracks(username, tag, 200, 1)
-      if (cancelled) return
+      if (activeExpandTagRef.current !== thisTag) return
 
       const allTracks = [...page1.tracks]
       const totalPages = page1.totalPages
@@ -159,14 +165,14 @@ export default function Tags() {
       if (totalPages > 1) {
         const BATCH = 5
         for (let start = 2; start <= totalPages; start += BATCH) {
-          if (cancelled) return
+          if (activeExpandTagRef.current !== thisTag) return
           const end = Math.min(start + BATCH - 1, totalPages)
           const batch = await Promise.allSettled(
             Array.from({ length: end - start + 1 }, (_, i) =>
               getPersonalTracks(username, tag, 200, start + i),
             ),
           )
-          if (cancelled) return
+          if (activeExpandTagRef.current !== thisTag) return
           for (const r of batch) {
             if (r.status === 'fulfilled') {
               allTracks.push(...r.value.tracks)
@@ -179,16 +185,18 @@ export default function Tags() {
         }
       }
 
+      if (activeExpandTagRef.current !== thisTag) return
       if (failedPages > 0) {
         setTracksError(`${failedPages} page(s) failed to load — showing ${allTracks.length} of ${page1.total} tracks`)
       }
     } catch (err: any) {
-      if (!cancelled) setTracksError(err.message || 'Failed to load tracks')
+      if (activeExpandTagRef.current !== thisTag) return
+      setTracksError(err.message || 'Failed to load tracks')
     } finally {
-      if (!cancelled) setTracksLoading(false)
+      if (activeExpandTagRef.current === thisTag) {
+        setTracksLoading(false)
+      }
     }
-
-    return () => { cancelled = true }
   }, [expandedTag, username])
 
   // Compute leader artists from tag tracks (only when a tag is expanded)

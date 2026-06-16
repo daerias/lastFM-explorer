@@ -18,29 +18,33 @@ const STORAGE_KEY = 'lastfm_session'
 const STORAGE_USER = 'lastfm_username'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [sessionKey, setSessionKey] = useState<string | null>(() =>
-    localStorage.getItem(STORAGE_KEY),
-  )
-  const [username, setUsername] = useState<string | null>(() =>
-    localStorage.getItem(STORAGE_USER),
-  )
+  const [sessionKey, setSessionKey] = useState<string | null>(() => {
+    try { return localStorage.getItem(STORAGE_KEY) } catch { return null }
+  })
+  const [username, setUsername] = useState<string | null>(() => {
+    try { return localStorage.getItem(STORAGE_USER) } catch { return null }
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (sessionKey) {
-      localStorage.setItem(STORAGE_KEY, sessionKey)
-    } else {
-      localStorage.removeItem(STORAGE_KEY)
-    }
+    try {
+      if (sessionKey) {
+        localStorage.setItem(STORAGE_KEY, sessionKey)
+      } else {
+        localStorage.removeItem(STORAGE_KEY)
+      }
+    } catch { /* localStorage unavailable */ }
   }, [sessionKey])
 
   useEffect(() => {
-    if (username) {
-      localStorage.setItem(STORAGE_USER, username)
-    } else {
-      localStorage.removeItem(STORAGE_USER)
-    }
+    try {
+      if (username) {
+        localStorage.setItem(STORAGE_USER, username)
+      } else {
+        localStorage.removeItem(STORAGE_USER)
+      }
+    } catch { /* localStorage unavailable */ }
   }, [username])
 
   const login = useCallback(() => {

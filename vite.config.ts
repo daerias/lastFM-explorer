@@ -102,6 +102,69 @@ export default defineConfig(({ mode }) => {
           }
         })
 
+        // YouTube Search Proxy — extracts video IDs from YouTube search results HTML
+        // No API key needed. Parses ytInitialData from the page.
+        server.middlewares.use('/api/youtube-search', async (req, res) => {
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Content-Type', 'application/json')
+          if (req.method === 'OPTIONS') { res.statusCode = 204; res.end(); return }
+
+          const url = new URL(req.url!, `http://${req.headers.host}`)
+          const query = url.searchParams.get('q')
+          if (!query) { res.statusCode = 400; res.end(JSON.stringify({ error: 'Missing q param' })); return }
+
+          try {
+            const controller = new AbortController()
+            const timeout = setTimeout(() => controller.abort(), 6000)
+            const response = await fetch(
+              `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
+              {
+                signal: controller.signal,
+                headers: {
+                  'Accept-Language': 'en-US,en;q=0.9',
+                  'User-Agent': 'Mozilla/5.0 (compatible; lastfm-explorer/1.0)',
+                },
+              },
+            )
+            clearTimeout(timeout)
+            const html = await response.text()
+
+            // Extract video IDs from ytInitialData JSON embedded in the page.
+            // Use brace counting to handle deeply nested JSON safely.
+            const videoIds: string[] = []
+            const prefix = 'ytInitialData = '
+            const startIdx = html.indexOf(prefix)
+            if (startIdx !== -1) {
+              const jsonStart = html.indexOf('{', startIdx)
+              if (jsonStart !== -1) {
+                let depth = 0
+                let jsonEnd = -1
+                for (let i = jsonStart; i < html.length; i++) {
+                  if (html[i] === '{') depth++
+                  else if (html[i] === '}') { depth--; if (depth === 0) { jsonEnd = i; break } }
+                }
+                if (jsonEnd !== -1) {
+                  try {
+                    const data = JSON.parse(html.slice(jsonStart, jsonEnd + 1))
+                    const contents = data?.contents?.twoColumnSearchResultsRenderer?.primaryContents
+                      ?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents ?? []
+                    for (const item of contents) {
+                      const vid = item?.videoRenderer?.videoId
+                      if (vid && !videoIds.includes(vid)) videoIds.push(vid)
+                    }
+                  } catch { /* parsing failed — return empty */ }
+                }
+              }
+            }
+
+            res.statusCode = 200
+            res.end(JSON.stringify({ videoIds, query }))
+          } catch (err: any) {
+            res.statusCode = 502
+            res.end(JSON.stringify({ error: `YouTube search failed: ${err.message}`, videoIds: [] }))
+          }
+        })
+
         // Generic Last.fm API proxy — avoids CORS issues
         server.middlewares.use('/api/lastfm', async (req, res) => {
           res.setHeader('Access-Control-Allow-Origin', '*')

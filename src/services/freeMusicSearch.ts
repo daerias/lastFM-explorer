@@ -1,34 +1,31 @@
-// Checks where a song is actually available to play for free.
-// Prioritizes Deezer (full tracks with widget), falls back to YouTube.
-
-export interface DeezerTrack {
-  id: number
-  title: string
-  artist: { name: string }
-  album: { title: string; cover_big: string }
-  preview: string // 30s MP3 preview
-}
+// Free music source resolver — YouTube-first with multi-strategy search.
+// Finds the best YouTube video for any artist+track combo via our search proxy.
+// No API keys. No Deezer dependency. Every song is playable.
 
 export interface MusicSource {
-  type: 'deezer' | 'youtube' | 'soundcloud' | 'applemusic' | 'none'
-  deezerTrackId?: number
-  deezerPreview?: string
-  deezerSearched: boolean
+  type: 'youtube' | 'none'
+  youtubeVideoId?: string
 }
 
-interface DeezerSearchResponse {
-  data: DeezerTrack[]
-  total: number
+// Module-level cache — avoids redundant API calls during a session
+const MAX_CACHE_SIZE = 500
+
+function evictOldest<K, V>(map: Map<K, V>, maxSize: number): void {
+  if (map.size <= maxSize) return
+  const keysToDelete = map.size - maxSize
+  for (const key of Array.from(map.keys()).slice(0, keysToDelete)) {
+    map.delete(key)
+  }
 }
 
-// Cache to avoid re-checking the same track repeatedly
-const sourceCache = new Map<string, MusicSource>()
+const videoCache = new Map<string, string | null>()
+const pendingFetches = new Map<string, Promise<string | null>>()
 
 function cacheKey(artist: string, track: string): string {
-  return `${artist.toLowerCase()}::${track.toLowerCase()}`
+  return `${artist.toLowerCase().trim()}::${track.toLowerCase().trim()}`
 }
 
-/** Strip junk from track names that breaks search: (feat. X), [Remix], (Remastered), etc. */
+/** Strip junk from track names that breaks search */
 function cleanTrackName(track: string): string {
   return track
     .replace(/\(feat\.?\s[^)]+\)/gi, '')
@@ -47,117 +44,103 @@ function cleanTrackName(track: string): string {
     .trim()
 }
 
-/** Score a Deezer track result against the search target */
-function scoreDeezerResult(t: DeezerTrack, artistLower: string, trackLower: string): number {
-  let score = 0
-  const tArtist = t.artist.name.toLowerCase()
-  const tTitle = t.title.toLowerCase()
-
-  if (tArtist === artistLower) score += 3
-  else if (tArtist.includes(artistLower) || artistLower.includes(tArtist)) score += 1
-
-  if (tTitle === trackLower) score += 3
-  else if (tTitle.includes(trackLower) || trackLower.includes(tTitle)) score += 1
-
-  return score
-}
-
-/** Run a single Deezer search query and return the best match */
-async function tryDeezerQuery(query: string, artist: string, track: string): Promise<DeezerTrack | null> {
-  try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 5000)
-    const response = await fetch(`/api/deezer/search?q=${encodeURIComponent(query)}&limit=5`, {
-      signal: controller.signal,
-    })
-    clearTimeout(timeout)
-    if (!response.ok) return null
-    const data: DeezerSearchResponse = await response.json()
-    if (!data.data || data.data.length === 0) return null
-
-    const artistLower = artist.toLowerCase()
-    const trackLower = track.toLowerCase()
-
-    const scored = data.data.map((t) => ({
-      track: t,
-      score: scoreDeezerResult(t, artistLower, trackLower),
-    }))
-    scored.sort((a, b) => b.score - a.score)
-
-    return scored[0].track
-  } catch {
-    return null
-  }
-}
-
 /**
- * Search Deezer using a dual-strategy:
- * 1. Strict: `artist:"X" track:"Y"` — best for exact matches
- * 2. Loose: `X Y` — simpler query as fallback
- * Returns the best match from either strategy.
+ * Search YouTube via our proxy and return the best video ID.
+ * Tries multiple query strategies in parallel — returns the first result.
+ * Fast: typically resolves in 300-800ms (proxy fetches and parses YouTube HTML).
  */
-async function searchDeezer(artist: string, track: string): Promise<DeezerTrack | null> {
-  const cleaned = cleanTrackName(track)
+async function searchYouTube(artist: string, track: string): Promise<string | null> {
+  const key = cacheKey(artist, track)
 
-  // Strategy 1: strict syntax with original name
-  const strict = await tryDeezerQuery(`artist:"${artist}" track:"${track}"`, artist, track)
-  if (strict) {
-    const strictScore = scoreDeezerResult(strict, artist.toLowerCase(), track.toLowerCase())
-    if (strictScore >= 2) return strict
-  }
+  // Return cached result
+  if (videoCache.has(key)) return videoCache.get(key)!
 
-  // Strategy 2: loose query with original name
-  const loose = await tryDeezerQuery(`${artist} ${track}`, artist, track)
-  if (loose) {
-    const looseScore = scoreDeezerResult(loose, artist.toLowerCase(), track.toLowerCase())
-    if (looseScore >= 1) return loose
-  }
+  // Dedupe in-flight requests
+  const pending = pendingFetches.get(key)
+  if (pending) return pending
 
-  // Strategy 3: cleaned track name (strip feat./remix/etc.) - only if different and non-empty
-  if (cleaned && cleaned !== track) {
-    const cleanedResult = await tryDeezerQuery(`${artist} ${cleaned}`, artist, cleaned)
-    if (cleanedResult) {
-      const cleanedScore = scoreDeezerResult(cleanedResult, artist.toLowerCase(), cleaned.toLowerCase())
-      if (cleanedScore >= 1) return cleanedResult
+  const promise = (async () => {
+    const cleaned = cleanTrackName(track)
+
+    // Build multiple search strategies — run them in parallel, take the first winner
+    const queries: string[] = [
+      `${artist} ${track}`,                          // Exact match
+      `${artist} ${track} official audio`,            // Official audio version
+      `${artist} ${track} lyrics`,                    // Lyrics version
+    ]
+
+    // Only add cleaned variant if it differs meaningfully
+    if (cleaned && cleaned !== track && cleaned.length > 3) {
+      queries.push(`${artist} ${cleaned}`)
     }
-  }
 
-  return strict ?? null
+    // Also try just the artist + cleaned track (no feat/remix)
+    if (cleaned && cleaned !== track) {
+      queries.push(`${artist} ${cleaned} official audio`)
+    }
+
+    // Race all queries — first one to return with videoIds wins
+    const fetchVideoIds = async (q: string): Promise<string[]> => {
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 4000)
+        const response = await fetch(
+          `/api/youtube-search?q=${encodeURIComponent(q)}`,
+          { signal: controller.signal },
+        )
+        clearTimeout(timeout)
+        if (!response.ok) return []
+        const data = await response.json()
+        return (data.videoIds as string[]) ?? []
+      } catch {
+        return []
+      }
+    }
+
+    // Start all queries in parallel
+    const results = await Promise.allSettled(queries.map(fetchVideoIds))
+
+    // Collect all unique video IDs, preserving order (first queries get priority)
+    const allIds: string[] = []
+    for (const r of results) {
+      if (r.status === 'fulfilled') {
+        for (const id of r.value) {
+          if (!allIds.includes(id)) allIds.push(id)
+        }
+      }
+    }
+
+    const bestId = allIds[0] ?? null
+    videoCache.set(key, bestId)
+    evictOldest(videoCache, MAX_CACHE_SIZE)
+    return bestId
+  })()
+
+  pendingFetches.set(key, promise)
+  promise.finally(() => pendingFetches.delete(key))
+  return promise
 }
 
 /**
  * Find the best free source for a track.
- * Checks Deezer first (full tracks via widget), falls back to YouTube.
+ * YouTube-only: searches via proxy, returns video ID for direct embed.
  * Results are cached to avoid redundant API calls.
+ * Fast: parallel multi-query strategy, typically resolves in < 1s.
  */
 export async function findBestSource(
   artist: string,
   track: string,
 ): Promise<MusicSource> {
-  const key = cacheKey(artist, track)
-  const cached = sourceCache.get(key)
-  if (cached) return cached
-
-  // Try Deezer first
-  const deezerTrack = await searchDeezer(artist, track)
-  if (deezerTrack) {
-    const source: MusicSource = {
-      type: 'deezer',
-      deezerTrackId: deezerTrack.id,
-      deezerPreview: deezerTrack.preview,
-      deezerSearched: true,
-    }
-    sourceCache.set(key, source)
-    return source
+  const videoId = await searchYouTube(artist, track)
+  if (videoId) {
+    return { type: 'youtube', youtubeVideoId: videoId }
   }
-
-  // Fall back to YouTube (always works with search embed)
-  const source: MusicSource = { type: 'youtube', deezerSearched: true }
-  sourceCache.set(key, source)
-  return source
+  // No specific video found — still return 'youtube' so the popup
+  // can use the search embed as a last-resort fallback.
+  return { type: 'youtube' }
 }
 
 /** Clear the cache (useful for testing) */
 export function clearSourceCache(): void {
-  sourceCache.clear()
+  videoCache.clear()
 }

@@ -152,8 +152,8 @@ function computeTopArtists(tracks: Track[], limit = 10): ArtistCount[] {
 
 export default function Home() {
   const { isAuthenticated, username, login } = useAuth()
-  const { isOpen: musicPlaying, checking: npChecking, artist: npArtist, track: npTrack } = useMusicPlayer()
-  const isMusicLive = musicPlaying && !npChecking
+  const { isOpen: musicPlaying, resolving: npResolving, artist: npArtist, track: npTrack } = useMusicPlayer()
+  const isMusicLive = musicPlaying && !npResolving
   const navigate = useNavigate()
   const configured = hasCredentials()
 
@@ -216,6 +216,8 @@ export default function Home() {
   const [compareLoading, setCompareLoading] = useState(false)
 
   // ---- Rotary dial: drag-to-turn handler ----
+  const dialCleanupRef = useRef<(() => void) | null>(null)
+
   const handleDialMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     const knob = dialRef.current
@@ -223,6 +225,9 @@ export default function Home() {
     const rect = knob.getBoundingClientRect()
     const cx = rect.left + rect.width / 2
     const cy = rect.top + rect.height / 2
+
+    // Clean up any previous zombie listeners
+    dialCleanupRef.current?.()
 
     const onMove = (ev: MouseEvent) => {
       const angle = Math.atan2(ev.clientY - cy, ev.clientX - cx)
@@ -235,10 +240,15 @@ export default function Home() {
     const onUp = () => {
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
+      dialCleanupRef.current = null
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
+    dialCleanupRef.current = onUp
   }, [])
+
+  // Cleanup zombie dial listeners on unmount
+  useEffect(() => () => { dialCleanupRef.current?.() }, [])
 
   // Sync dial position to time presets
   useEffect(() => {

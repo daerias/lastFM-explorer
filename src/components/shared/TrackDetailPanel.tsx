@@ -228,11 +228,12 @@ export default function TrackDetailPanel({ artistName, trackName, onClose }: Pro
     if (toAdd.length > 0) {
       try {
         await addTrackTags(artistName, trackName, toAdd)
-      } catch (err: any) {
-        setSaveMsg(`✕ ${err.message}`)
-        setSaving(false)
-        return
-      }
+    } catch (err: any) {
+      setSaveMsg(`✕ ${err.message}`)
+      setSaving(false)
+      // ⚠️ Don't update local state on error — desyncs UI from Last.fm reality
+      return
+    }
     }
 
     // Refetch to sync with Last.fm's real state
@@ -250,9 +251,11 @@ export default function TrackDetailPanel({ artistName, trackName, onClose }: Pro
         const names = tagList.map((t: any) => t.name)
         setOriginalTags(names)
         setTags(names)
+      } else {
+        setOriginalTags([...tags])
       }
     } catch {
-      // Best-effort fallback: trust local state
+      // Best-effort: if refetch fails, trust our local changes
       setOriginalTags([...tags])
     }
 

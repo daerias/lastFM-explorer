@@ -80,6 +80,9 @@ export function useMicrophoneReactivity({
       return
     }
 
+    // Track whether the effect has been cleaned up (unmounted or disabled)
+    let aborted = false
+
     // Reset previous energy on re-enable
     prevEnergyRef.current = 0
     beatHoldRef.current = 0
@@ -94,6 +97,11 @@ export function useMicrophoneReactivity({
             autoGainControl: false,
           },
         })
+        // Check if aborted while waiting for permission
+        if (aborted) {
+          stream.getTracks().forEach(t => t.stop())
+          return
+        }
         streamRef.current = stream
 
         // Set up Web Audio graph: Mic → Analyser
@@ -178,6 +186,7 @@ export function useMicrophoneReactivity({
     startMic()
 
     return () => {
+      aborted = true
       cleanup()
     }
   }, [enabled, sensitivity, cleanup])

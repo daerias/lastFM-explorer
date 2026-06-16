@@ -2,24 +2,19 @@ import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
 import { getCredentials, saveCredentials, clearCredentials, hasCredentials } from '../store/credentials'
 import { useAuth } from '../context/AuthContext'
 import {
-  onThemeChange, ALL_THEMES,
   setAnimSpeed,
   setGlassLevel,
-  setNoiseLevel,
-  setScanlines,
-  setChromatic,
   setVignette,
   setParticles,
   setGlowBoost,
-  setBorderPulse,
   setDepth3D,
-  buildProfile, loadProfile, getActiveProfile,
+  getActiveProfile, loadProfile,
   getCustomProfiles, saveProfile, deleteProfile,
   downloadProfileFile, parseProfileFile,
-  type Theme, type ThemeMeta, type ThemeProfile,
+  type ThemeProfile,
   type AnimSpeed, type GlassLevel,
-  type NoiseLevel, type ScanlineMode, type ChromaticMode, type VignetteLevel,
-  type ParticleDensity, type GlowBoost, type BorderPulseMode,
+  type VignetteLevel,
+  type ParticleDensity, type GlowBoost,
   type Depth3D,
 } from '../store/theme'
 import {
@@ -118,13 +113,13 @@ export default function Settings() {
         )}
       </div>
 
-      {/* ── Row 2: Appearance (Theme Studio full-width) ── */}
+      {/* ── Row 2: Appearance (Fine-Tune Studio full-width) ── */}
       <div className={styles.card}>
         <div className={styles.sectionHead}>
           <span className={styles.sectionDot} />
           <h2>Appearance</h2>
         </div>
-        <InlineThemeStudio />
+        <InlineFineTuneStudio />
       </div>
 
       {/* ── Row 3: Icon Style + Cinematic Look (2-col) ── */}
@@ -152,57 +147,30 @@ export default function Settings() {
 // Inline Theme Studio
 // ============================================================
 
-const CATEGORIES: { key: ThemeMeta['category']; label: string }[] = [
-  { key: 'core', label: 'Core' },
-  { key: 'mood', label: 'Mood' },
-  { key: 'aesthetic', label: 'Aesthetic' },
-]
-
-function InlineThemeStudio() {
+function InlineFineTuneStudio() {
   const activeProfile = getActiveProfile()
-  const [active, setActive] = useState<Theme>(activeProfile.baseTheme)
-  const [category, setCategory] = useState<ThemeMeta['category']>('core')
   const [animSpeed, setAnimSpeedState] = useState<AnimSpeed>(activeProfile.effects.animSpeed)
   const [glassLevel, setGlassLevelState] = useState<GlassLevel>(activeProfile.effects.glassLevel)
-  const [noise, setNoise] = useState<NoiseLevel>(activeProfile.effects.noise)
-  const [scanlines, setScanlinesState] = useState<ScanlineMode>(activeProfile.effects.scanlines)
-  const [chromatic, setChromaticState] = useState<ChromaticMode>(activeProfile.effects.chromatic)
   const [vignette, setVignetteState] = useState<VignetteLevel>(activeProfile.effects.vignette)
   const [particles, setParticlesState] = useState<ParticleDensity>(activeProfile.effects.particles)
   const [glow, setGlow] = useState<GlowBoost>(activeProfile.effects.glow)
-  const [borderPulse, setBorderPulseState] = useState<BorderPulseMode>(activeProfile.effects.borderPulse)
   const [depth3D, setDepth3DState] = useState<Depth3D>(activeProfile.effects.depth3D)
   const [customProfiles, setCustomProfiles] = useState<ThemeProfile[]>(getCustomProfiles)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [profileName, setProfileName] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => onThemeChange(setActive), [])
-
-  const currentFx = { animSpeed, glassLevel, noise, scanlines, chromatic, vignette, particles, glow, borderPulse, depth3D }
+  const currentFx = {
+    animSpeed, glassLevel, vignette, particles, glow, depth3D,
+    noise: 'off' as const, scanlines: 'off' as const, chromatic: 'off' as const, borderPulse: 'off' as const,
+  }
   const profileFx = activeProfile.effects
   const hasChanges = Object.keys(currentFx).some(k => currentFx[k as keyof typeof currentFx] !== profileFx[k as keyof typeof profileFx])
-
-  const applyThemeWithDefaults = (t: Theme) => {
-    loadProfile(buildProfile(t))
-    setActive(t)
-    const defaults = buildProfile(t).effects
-    setAnimSpeedState(defaults.animSpeed)
-    setGlassLevelState(defaults.glassLevel)
-    setNoise(defaults.noise)
-    setScanlinesState(defaults.scanlines)
-    setChromaticState(defaults.chromatic)
-    setVignetteState(defaults.vignette)
-    setParticlesState(defaults.particles)
-    setGlow(defaults.glow)
-    setBorderPulseState(defaults.borderPulse)
-    setDepth3DState(defaults.depth3D)
-  }
 
   const handleSaveProfile = () => {
     const name = profileName.trim()
     if (!name) return
-    const profile: ThemeProfile = { id: `custom-${Date.now()}`, name, baseTheme: active, effects: currentFx, isCustom: true }
+    const profile: ThemeProfile = { id: `custom-${Date.now()}`, name, baseTheme: 'plastic', effects: currentFx, isCustom: true }
     saveProfile(profile)
     loadProfile(profile)
     setCustomProfiles(getCustomProfiles())
@@ -212,36 +180,17 @@ function InlineThemeStudio() {
 
   const handleLoadCustomProfile = (profile: ThemeProfile) => {
     loadProfile(profile)
-    setActive(profile.baseTheme)
     setAnimSpeedState(profile.effects.animSpeed)
     setGlassLevelState(profile.effects.glassLevel)
-    setNoise(profile.effects.noise)
-    setScanlinesState(profile.effects.scanlines)
-    setChromaticState(profile.effects.chromatic)
     setVignetteState(profile.effects.vignette)
     setParticlesState(profile.effects.particles)
     setGlow(profile.effects.glow)
-    setBorderPulseState(profile.effects.borderPulse)
     setDepth3DState(profile.effects.depth3D)
   }
 
   const handleDeleteProfile = (id: string) => {
     deleteProfile(id)
     setCustomProfiles(getCustomProfiles())
-    const newActive = getActiveProfile()
-    if (newActive.baseTheme !== active) {
-      setActive(newActive.baseTheme)
-      setAnimSpeedState(newActive.effects.animSpeed)
-      setGlassLevelState(newActive.effects.glassLevel)
-      setNoise(newActive.effects.noise)
-      setScanlinesState(newActive.effects.scanlines)
-      setChromaticState(newActive.effects.chromatic)
-      setVignetteState(newActive.effects.vignette)
-      setParticlesState(newActive.effects.particles)
-      setGlow(newActive.effects.glow)
-      setBorderPulseState(newActive.effects.borderPulse)
-      setDepth3DState(newActive.effects.depth3D)
-    }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,20 +211,10 @@ function InlineThemeStudio() {
     e.target.value = ''
   }
 
-  const filtered = ALL_THEMES.filter(t => t.category === category)
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* Category Tabs + Active Indicator */}
+      {/* Active Indicator */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
-        <div className={styles.tabs}>
-          {CATEGORIES.map(c => (
-            <button key={c.key} onClick={() => setCategory(c.key)}
-              className={`${styles.tab} ${category === c.key ? styles.tabActive : ''}`}>
-              {c.label}
-            </button>
-          ))}
-        </div>
         <div className={styles.activeBar}>
           <span className={styles.activeDot} />
           <span className={styles.activeName}>Active: <strong>{activeProfile.name}</strong></span>
@@ -283,25 +222,18 @@ function InlineThemeStudio() {
         </div>
       </div>
 
-      {/* Theme Grid */}
-      <div className={styles.themeGrid}>
-        {filtered.map(meta => {
-          const isActive = active === meta.value
-          return (
-            <button key={meta.value} onClick={() => !isActive && applyThemeWithDefaults(meta.value)}
-              className={`${styles.themeCard} ${isActive ? styles.themeCardActive : ''}`}
-              style={{ '--theme-accent': getAccentForTheme(meta.value) } as React.CSSProperties}>
-              <span className={styles.themeSwatch} style={{ background: getThemeGradient(meta.value) }}>
-                {isActive && <span className={styles.themeCheckGlow}>✓</span>}
-              </span>
-              <div className={styles.themeInfo}>
-                <span className={styles.themeName}>{meta.label}</span>
-                <span className={styles.themeDesc}>{meta.desc}</span>
-              </div>
-              {isActive && <span className={styles.themeIndicator} />}
-            </button>
-          )
-        })}
+      {/* Current Theme Badge */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '12px',
+        padding: '12px 16px', borderRadius: 'var(--border-radius-sm)',
+        background: 'linear-gradient(155deg, var(--bg-surface), var(--bg-primary))',
+        boxShadow: '3px 3px 10px var(--shadow-warm), -3px -3px 10px var(--shadow-light)'
+      }}>
+        <span style={{ fontSize: '1.5rem' }}>🫧</span>
+        <div>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Plastic Neumorphism</span>
+          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Soft premium neumorphism — tactile, organic, aus einem Guss</span>
+        </div>
       </div>
 
       {/* Saved Profiles */}
@@ -327,9 +259,8 @@ function InlineThemeStudio() {
         </div>
       )}
 
-      {/* Effects + Audio Reactivity */}
+      {/* Effects Fine-Tune */}
       <div className={styles.effectsGrid}>
-        {/* Fine-Tune */}
         <div className={styles.effectsCol}>
           <span className={styles.effectsTitle}>Fine-Tune</span>
           <EffectGroup label="Animation Speed" active={animSpeed === 0.5 ? 'Slow' : animSpeed === 1 ? 'Normal' : 'Fast'}>
@@ -344,23 +275,9 @@ function InlineThemeStudio() {
           </EffectGroup>
         </div>
 
-        {/* Atmosphere */}
         <div className={styles.effectsCol}>
           <span className={styles.effectsTitle}>Atmosphere</span>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-            <EffectGroup label="Noise" active={noise}>
-              <PillBtn label="Off" active={noise === 'off'} onClick={() => { setNoiseLevel('off'); setNoise('off') }} />
-              <PillBtn label="Subtle" active={noise === 'subtle'} onClick={() => { setNoiseLevel('subtle'); setNoise('subtle') }} />
-              <PillBtn label="Heavy" active={noise === 'heavy'} onClick={() => { setNoiseLevel('heavy'); setNoise('heavy') }} />
-            </EffectGroup>
-            <EffectGroup label="Scanlines" active={scanlines}>
-              <PillBtn label="Off" active={scanlines === 'off'} onClick={() => { setScanlines('off'); setScanlinesState('off') }} />
-              <PillBtn label="On" active={scanlines === 'on'} onClick={() => { setScanlines('on'); setScanlinesState('on') }} />
-            </EffectGroup>
-            <EffectGroup label="Chromatic" active={chromatic}>
-              <PillBtn label="Off" active={chromatic === 'off'} onClick={() => { setChromatic('off'); setChromaticState('off') }} />
-              <PillBtn label="On" active={chromatic === 'on'} onClick={() => { setChromatic('on'); setChromaticState('on') }} />
-            </EffectGroup>
             <EffectGroup label="Vignette" active={vignette}>
               <PillBtn label="Off" active={vignette === 'off'} onClick={() => { setVignette('off'); setVignetteState('off') }} />
               <PillBtn label="Subtle" active={vignette === 'subtle'} onClick={() => { setVignette('subtle'); setVignetteState('subtle') }} />
@@ -375,10 +292,6 @@ function InlineThemeStudio() {
               <PillBtn label="Normal" active={glow === 'normal'} onClick={() => { setGlowBoost('normal'); setGlow('normal') }} />
               <PillBtn label="Boost" active={glow === 'boosted'} onClick={() => { setGlowBoost('boosted'); setGlow('boosted') }} />
               <PillBtn label="Max" active={glow === 'max'} onClick={() => { setGlowBoost('max'); setGlow('max') }} />
-            </EffectGroup>
-            <EffectGroup label="Border" active={borderPulse}>
-              <PillBtn label="Off" active={borderPulse === 'off'} onClick={() => { setBorderPulse('off'); setBorderPulseState('off') }} />
-              <PillBtn label="On" active={borderPulse === 'on'} onClick={() => { setBorderPulse('on'); setBorderPulseState('on') }} />
             </EffectGroup>
             <EffectGroup label="3D Depth" active={depth3D}>
               <PillBtn label="Off" active={depth3D === 'off'} onClick={() => { setDepth3D('off'); setDepth3DState('off') }} />
@@ -410,51 +323,14 @@ function InlineThemeStudio() {
           )
         )}
         <button className={styles.ghostBtn} onClick={() => {
-          const profile: ThemeProfile = { id: 'export', name: activeProfile.name, baseTheme: active, effects: currentFx, isCustom: true }
+          const profile: ThemeProfile = { id: 'export', name: activeProfile.name, baseTheme: 'plastic', effects: currentFx, isCustom: true }
           downloadProfileFile(profile)
         }} title="Download as .lastfm-theme.json">📥 Export</button>
         <button className={styles.ghostBtn} onClick={() => fileInputRef.current?.click()}>📤 Import</button>
         <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileChange} style={{ display: 'none' }} />
       </div>
-
-      {/* Quick Cycle */}
-      <div className={styles.cycleRow}>
-        <span className={styles.cycleLabel}>Quick cycle:</span>
-        {ALL_THEMES.map(meta => (
-          <button key={meta.value} onClick={() => applyThemeWithDefaults(meta.value)} title={meta.label}
-            className={`${styles.cycleDot} ${active === meta.value ? styles.cycleDotActive : ''}`}
-            style={{ background: getAccentForTheme(meta.value) }}>
-            {meta.icon}
-          </button>
-        ))}
-      </div>
     </div>
   )
-}
-
-function getAccentForTheme(t: Theme): string {
-  const map: Record<Theme, string> = {
-    dark: '#e31b23', light: '#e87850', edm: '#d418d4', ocean: '#0088cc',
-    forest: '#22aa44', sunset: '#ee6622', midnight: '#c0c0c0', toxic: '#88cc00',
-    cherry: '#dd4488', mono: '#ffffff',
-  }
-  return map[t]
-}
-
-function getThemeGradient(t: Theme): string {
-  const map: Record<Theme, string> = {
-    dark: 'linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 40%, #e31b23 200%)',
-    light: 'linear-gradient(135deg, #e8e0d8 0%, #d4c8ba 40%, #e87850 200%)',
-    edm: 'linear-gradient(135deg, #0a0020 0%, #1a0040 40%, #d418d4 200%)',
-    ocean: 'linear-gradient(135deg, #001020 0%, #002040 40%, #0088cc 200%)',
-    forest: 'linear-gradient(135deg, #051005 0%, #0a200a 40%, #22aa44 200%)',
-    sunset: 'linear-gradient(135deg, #1a0a00 0%, #2a1500 40%, #ee6622 200%)',
-    midnight: 'linear-gradient(135deg, #101018 0%, #1a1a2e 40%, #c0c0c0 200%)',
-    toxic: 'linear-gradient(135deg, #051005 0%, #0a1a05 40%, #88cc00 200%)',
-    cherry: 'linear-gradient(135deg, #1a0a14 0%, #2a0a20 40%, #dd4488 200%)',
-    mono: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 40%, #ffffff 200%)',
-  }
-  return map[t]
 }
 
 /* ── Mini Components ── */
