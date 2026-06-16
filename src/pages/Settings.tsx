@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { getCredentials, saveCredentials, clearCredentials, hasCredentials } from '../store/credentials'
 import { useAuth } from '../context/AuthContext'
 import {
@@ -289,9 +289,6 @@ function InlineFineTuneStudio() {
         </div>
       </div>
 
-      {/* Audio Reactivity */}
-      <AudioReactiveSettings />
-
       {/* Footer Bar */}
       <div className={`${styles.footerBar} ${hasChanges ? styles.footerBarUnsaved : ''}`}>
         {hasChanges && (
@@ -514,111 +511,4 @@ function InlineCinematicPicker() {
   )
 }
 
-// ═══════════════════════════════════════════════════════
-// Audio Reactive Settings
-// ═══════════════════════════════════════════════════════
 
-const AUDIO_REACTIVE_KEY = 'lastfm_audio_reactive'
-const AUDIO_BPM_KEY = 'lastfm_audio_bpm'
-const AUDIO_MIC_KEY = 'lastfm_audio_mic'
-const AUDIO_MIC_SENSITIVITY_KEY = 'lastfm_audio_mic_sensitivity'
-
-function getMicEnabled(): boolean {
-  try { return localStorage.getItem(AUDIO_MIC_KEY) === 'true' } catch { return false }
-}
-function getMicSensitivity(): number {
-  try { const v = parseFloat(localStorage.getItem(AUDIO_MIC_SENSITIVITY_KEY) || '1'); return v >= 0.3 && v <= 3 ? v : 1 } catch { return 1 }
-}
-
-function AudioReactiveSettings() {
-  const [enabled, setEnabled] = useState(() => {
-    try { return localStorage.getItem(AUDIO_REACTIVE_KEY) === 'true' } catch { return false }
-  })
-  const [bpm, setBpm] = useState(() => {
-    try { const v = parseInt(localStorage.getItem(AUDIO_BPM_KEY) || '120', 10); return v >= 60 && v <= 200 ? v : 120 } catch { return 120 }
-  })
-  const [micEnabled, setMicEnabled] = useState(getMicEnabled)
-  const [micSensitivity, setMicSensitivity] = useState(getMicSensitivity)
-  const [micDenied, setMicDenied] = useState(false)
-
-  useEffect(() => {
-    const handler = () => setMicDenied(true)
-    window.addEventListener('mic-permission-denied', handler)
-    return () => window.removeEventListener('mic-permission-denied', handler)
-  }, [])
-
-  const toggleEnabled = useCallback(() => {
-    const next = !enabled
-    setEnabled(next)
-    try { localStorage.setItem(AUDIO_REACTIVE_KEY, String(next)) } catch {}
-    window.dispatchEvent(new CustomEvent('audio-reactive-changed'))
-  }, [enabled])
-
-  const toggleMic = useCallback(() => {
-    const next = !micEnabled
-    setMicEnabled(next)
-    setMicDenied(false)
-    try { localStorage.setItem(AUDIO_MIC_KEY, String(next)) } catch {}
-    window.dispatchEvent(new CustomEvent('audio-reactive-changed'))
-  }, [micEnabled])
-
-  const updateBpm = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = parseInt(e.target.value, 10)
-    if (v >= 60 && v <= 200) {
-      setBpm(v)
-      try { localStorage.setItem(AUDIO_BPM_KEY, String(v)) } catch {}
-      window.dispatchEvent(new CustomEvent('audio-reactive-changed'))
-    }
-  }, [])
-
-  const updateMicSens = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = parseFloat(e.target.value)
-    setMicSensitivity(v)
-    try { localStorage.setItem(AUDIO_MIC_SENSITIVITY_KEY, String(v)) } catch {}
-    window.dispatchEvent(new CustomEvent('audio-reactive-changed'))
-  }, [])
-
-  return (
-    <div className={styles.audioPanel}>
-      <span className={styles.audioTitle}>🎵 LavaFM Audio Reactivity</span>
-
-      <div className={styles.audioRow}>
-        <div className={styles.audioInfo}>
-          <span className={styles.audioLabel}>{enabled ? '🔊 Active' : '🔇 Disabled'}</span>
-          <span className={styles.audioDesc}>{enabled ? 'LavaFM button pulses with music' : 'Enable rhythmic pulse'}</span>
-        </div>
-        <button onClick={toggleEnabled} className={`${styles.toggle} ${enabled ? styles.toggleOn : ''}`}>
-          <span className={styles.toggleKnob} />
-        </button>
-      </div>
-
-      {enabled && (
-        <div className={styles.sliderGroup}>
-          <span className={styles.sliderLabel}>BPM <span className={styles.badge}>{bpm}</span></span>
-          <input type="range" min={60} max={200} value={bpm} onChange={updateBpm} className={styles.slider} />
-          <span className={styles.sliderRange}><span>60 · chill</span><span>200 · intense</span></span>
-        </div>
-      )}
-
-      <div className={styles.audioDivider}>
-        <div className={styles.audioRow}>
-          <div className={styles.audioInfo}>
-            <span className={styles.audioLabel}>🎤 Mic Mode</span>
-            <span className={styles.audioDesc}>React to ambient music</span>
-          </div>
-          <button onClick={toggleMic} className={`${styles.toggle} ${micEnabled ? styles.toggleOn : ''}`}>
-            <span className={styles.toggleKnob} />
-          </button>
-        </div>
-        {micDenied && <div className={styles.audioDenied}>🚫 Mic denied. Check browser permissions.</div>}
-        {micEnabled && (
-          <div className={styles.sliderGroup}>
-            <span className={styles.sliderLabel}>Sensitivity <span className={styles.badge}>{micSensitivity.toFixed(1)}×</span></span>
-            <input type="range" min={0.3} max={3} step={0.1} value={micSensitivity} onChange={updateMicSens} className={styles.slider} />
-            <span className={styles.sliderRange}><span>0.3 · subtle</span><span>3.0 · wild</span></span>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}

@@ -2,27 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useMusicPlayer } from '../../context/MusicPlayerContext'
-import { useAudioReactiveLava } from '../../hooks/useAudioReactiveLava'
-import { useMicrophoneReactivity } from '../../hooks/useMicrophoneReactivity'
 import { getUserInfo, getTrackTags, addTrackTags, removeTrackTag, getUserTopTags } from '../../services/lastfm'
 import styles from './Sidebar.module.css'
-
-const AUDIO_REACTIVE_KEY = 'lastfm_audio_reactive'
-function getAudioReactive(): boolean {
-  try { return localStorage.getItem(AUDIO_REACTIVE_KEY) === 'true' } catch { return false }
-}
-const AUDIO_BPM_KEY = 'lastfm_audio_bpm'
-function getAudioBpm(): number {
-  try { const v = parseInt(localStorage.getItem(AUDIO_BPM_KEY) || '120', 10); return v >= 60 && v <= 200 ? v : 120 } catch { return 120 }
-}
-const AUDIO_MIC_KEY = 'lastfm_audio_mic'
-function getMicEnabled(): boolean {
-  try { return localStorage.getItem(AUDIO_MIC_KEY) === 'true' } catch { return false }
-}
-const AUDIO_MIC_SENSITIVITY_KEY = 'lastfm_audio_mic_sensitivity'
-function getMicSensitivity(): number {
-  try { const v = parseFloat(localStorage.getItem(AUDIO_MIC_SENSITIVITY_KEY) || '1'); return v >= 0.3 && v <= 3 ? v : 1 } catch { return 1 }
-}
 
 const PIN_STORAGE_KEY = 'lastfm_sidebar_pinned'
 
@@ -50,27 +31,6 @@ export default function Sidebar() {
   const { isAuthenticated, username, login } = useAuth()
   const { isOpen: musicPlaying, resolving, artist: currentArtist, track: currentTrack } = useMusicPlayer()
   const isMusicActive = musicPlaying && !resolving
-  const [audioReactive, setAudioReactive] = useState(getAudioReactive)
-  const [audioBpm, setAudioBpm] = useState(getAudioBpm)
-  const [micEnabled, setMicEnabled] = useState(getMicEnabled)
-  const [micSensitivity, setMicSensitivity] = useState(getMicSensitivity)
-  // Listen for changes from Settings page
-  useEffect(() => {
-    const handler = () => {
-      setAudioReactive(getAudioReactive())
-      setAudioBpm(getAudioBpm())
-      setMicEnabled(getMicEnabled())
-      setMicSensitivity(getMicSensitivity())
-    }
-    window.addEventListener('audio-reactive-changed', handler)
-    window.addEventListener('storage', handler)
-    return () => {
-      window.removeEventListener('audio-reactive-changed', handler)
-      window.removeEventListener('storage', handler)
-    }
-  }, [])
-  const lavaElRef = useAudioReactiveLava({ enabled: audioReactive && !micEnabled, bpm: audioBpm })
-  const micElRef = useMicrophoneReactivity({ enabled: audioReactive && micEnabled, sensitivity: micSensitivity })
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [avatarFallback, setAvatarFallback] = useState<string | null>(null)
   // Now Playing tag editor
@@ -416,8 +376,8 @@ export default function Sidebar() {
             href={profileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${styles.lavaProfile} ${isMusicActive ? styles.lavaBeating : ''} ${audioReactive && isMusicActive ? styles.lavaAudioReactive : ''}`}
-            ref={(el) => { lavaElRef.current = el; micElRef.current = el }}
+            className={`${styles.lavaProfile} ${isMusicActive ? styles.lavaBeating : ''}`}
+            ref={() => {}}
             title={`Open ${username} on Last.fm`}
           >
             {/* Lava blobs */}
