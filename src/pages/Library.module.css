@@ -52,6 +52,106 @@
   margin-top: 4px;
 }
 
+/* ── API Health Indicator Dot ── */
+
+.healthDot {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: help;
+  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+  position: relative;
+  vertical-align: middle;
+  margin-top: -2px;
+}
+
+.healthDot:hover {
+  transform: scale(1.4);
+}
+
+/* Green — healthy, subtle confident pulse */
+.healthDotGreen {
+  background: var(--toxic-green);
+  box-shadow:
+    0 0 6px var(--toxic-green-glow),
+    0 0 14px var(--toxic-green-glow),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  animation: healthPulseGreen 3s ease-in-out infinite;
+}
+
+@keyframes healthPulseGreen {
+  0%, 100% {
+    box-shadow:
+      0 0 6px var(--toxic-green-glow),
+      0 0 14px var(--toxic-green-glow),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 10px var(--toxic-green-glow),
+      0 0 22px var(--toxic-green-glow),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+}
+
+/* Yellow — warning, slow uneasy pulse */
+.healthDotYellow {
+  background: var(--toxic-yellow);
+  box-shadow:
+    0 0 6px var(--toxic-yellow-glow),
+    0 0 14px var(--toxic-yellow-glow),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  animation: healthPulseYellow 2s ease-in-out infinite;
+}
+
+@keyframes healthPulseYellow {
+  0%, 100% {
+    box-shadow:
+      0 0 6px var(--toxic-yellow-glow),
+      0 0 14px var(--toxic-yellow-glow),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 12px var(--toxic-yellow-glow),
+      0 0 26px var(--toxic-yellow-glow),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+}
+
+/* Red — error, urgent fast pulse */
+.healthDotRed {
+  background: var(--accent);
+  box-shadow:
+    0 0 6px var(--accent-glow),
+    0 0 14px var(--accent-glow),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  animation: healthPulseRed 1.4s ease-in-out infinite;
+}
+
+@keyframes healthPulseRed {
+  0%, 100% {
+    box-shadow:
+      0 0 6px var(--accent-glow),
+      0 0 14px var(--accent-glow),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 14px var(--accent-glow-strong),
+      0 0 30px var(--accent-glow),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+}
+
+/* Idle — gray, very subtle no-pulse */
+.healthDotIdle {
+  background: var(--text-muted);
+  opacity: 0.3;
+  box-shadow: none;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Sticky Filter Header — Glass panel with breathing glow
    ═══════════════════════════════════════════════════════════════ */
@@ -697,6 +797,7 @@
   .stickyFilter { animation: none !important; }
   .nowBadge { animation: none !important; opacity: 1; }
   .rowTagsLoading { animation: none !important; }
+  .healthDotGreen, .healthDotYellow, .healthDotRed { animation: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════

@@ -388,6 +388,26 @@ export default function Library() {
   useEffect(() => { if (!isDemo) return; setTracks(generateDemoTimeline() as unknown as Track[]); setLoading(false); setCachedCount(20) }, [isDemo])
   useEffect(() => { if (!isDemo) return; setSuggestions(DEMO_TOP_TAGS) }, [isDemo])
 
+  // ── API Health Indicator ──
+  const healthStatus: 'green' | 'yellow' | 'red' | 'idle' = useMemo(() => {
+    if (isDemo) return 'idle'
+    if (error) return 'red'
+    if (syncWarning) return 'yellow'
+    if (syncActive) return 'yellow'
+    if (cachedCount === 0 && !loading) return 'idle'
+    if (cachedCount > 0 && !loading && !syncActive) return 'green'
+    return 'idle'
+  }, [error, syncWarning, syncActive, cachedCount, loading, isDemo])
+
+  const healthLabel = useMemo(() => {
+    switch (healthStatus) {
+      case 'green': return `API healthy — ${cachedCount.toLocaleString()} tracks cached`
+      case 'yellow': return syncWarning || (syncActive ? 'Syncing in progress…' : 'API degraded')
+      case 'red': return error || 'API error'
+      case 'idle': return isDemo ? 'Demo mode' : 'Not synced yet'
+    }
+  }, [healthStatus, cachedCount, syncWarning, syncActive, error, isDemo])
+
   // ── Fast in-memory search ──
   const filtered = useMemo(() => {
     let result = tracks
@@ -437,7 +457,16 @@ export default function Library() {
     <div className={styles.library}>
       <div className={styles.header}>
         <div>
-          <h1>Library</h1>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            Library
+            {!isDemo && (
+              <span
+                className={`${styles.healthDot} ${styles[`healthDot${healthStatus.charAt(0).toUpperCase()}${healthStatus.slice(1)}`]}`}
+                title={healthLabel}
+                aria-label={healthLabel}
+              />
+            )}
+          </h1>
           <p className={styles.desc}>
             {cachedCount > 0 ? `${cachedCount.toLocaleString()} tracks cached` : `${tracks.length} recent tracks`}
             {hasActiveFilters ? ` · ${filtered.length} shown` : ''}
