@@ -150,14 +150,14 @@ export default function MusicPlayerPopup() {
 
         {!resolving && source?.type === 'none' && (
           <div className={styles.noSource}>
-            <span className="neuro-icon neuro-icon-note" style={{ fontSize: '2rem', display: 'block', marginBottom: '12px' }} />
+            <span style={{ fontSize: '2.2rem', opacity: 0.25, marginBottom: '4px' }}>🎵</span>
             <p>No video found for this track.</p>
             <a
               href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${artist} ${track}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="neuro-btn neuro-btn-accent"
-              style={{ marginTop: '12px', display: 'inline-block', textDecoration: 'none' }}
+              style={{ marginTop: '8px', display: 'inline-flex', textDecoration: 'none', fontSize: '0.75rem', padding: '10px 22px' }}
             >
               Search YouTube →
             </a>

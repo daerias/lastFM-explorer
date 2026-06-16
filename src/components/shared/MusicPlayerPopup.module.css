@@ -1,155 +1,253 @@
-/* Slide-out player panel — no overlay, slides from right, content stays interactive */
+/* ═══════════════════════════════════════════════════════════════
+   Music Player Popup — Premium Plastic Neumorphism
+   Floating glass panel, warm shadows, coral glow, soft specular sweep.
+   "Nicht noob — premium. Aus einem Guss mit dem Plastic-Theme."
+   ═══════════════════════════════════════════════════════════════ */
 
+/* ── Glass Panel — floating, frosted, warm depth ── */
 .panel {
   position: fixed;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
   z-index: 251;
-  width: 380px;
-  max-width: calc(100vw - 24px);
-  max-height: calc(100vh - 24px);
-  background: var(--bg-secondary);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius);
-  box-shadow:
-    -8px 0 40px rgba(0, 0, 0, 0.5),
-    -4px 0 20px rgba(227, 27, 35, 0.05),
-    -14px 0 30px var(--shadow-dark),
-    0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  background: linear-gradient(
+    170deg,
+    rgba(252, 251, 248, 0.78) 0%,
+    rgba(242, 239, 232, 0.72) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.2);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--border-radius, 24px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation: playerSlideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  box-shadow:
+    0 8px 40px var(--shadow-warm, rgba(180, 160, 140, 0.25)),
+    0 2px 12px var(--shadow-warm, rgba(180, 160, 140, 0.12)),
+    -4px 0 28px var(--shadow-warm, rgba(180, 160, 140, 0.15)),
+    inset 0 1px 0 var(--highlight-glass, rgba(255, 255, 255, 0.65));
 }
 
 .panel.closing {
-  animation: slideOut 0.3s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  animation: playerSlideOut 0.28s cubic-bezier(0.55, 0, 1, 0.45) forwards;
 }
 
+/* ── Specular sweep — premium glass light beam ── */
 .panel::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.02) 50%, transparent 70%);
   z-index: 1;
+  background: linear-gradient(
+    145deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.18) 48%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.18) 52%,
+    transparent 75%
+  );
+  background-size: 220% 220%;
+  background-position: 0% 0%;
+  opacity: 0.2;
 }
 
-@keyframes slideIn {
-  from { transform: translateX(calc(100% + 24px)); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+@keyframes playerSlideIn {
+  from { transform: translateX(calc(100% + 32px)) scale(0.94); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
 }
 
-@keyframes slideOut {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(calc(100% + 24px)); opacity: 0; }
+@keyframes playerSlideOut {
+  from { transform: translateX(0) scale(1); opacity: 1; }
+  to { transform: translateX(calc(100% + 32px)) scale(0.94); opacity: 0; }
 }
 
-/* Header */
+/* ── Header — raised surface with soft bottom edge ── */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  gap: 10px;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--glass-border);
+  padding: 14px 16px;
+  gap: 12px;
   position: relative;
   z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(252, 251, 248, 0.55) 0%,
+    rgba(242, 239, 232, 0.35) 100%
+  );
+  border-bottom: 1px solid rgba(180, 160, 140, 0.1);
 }
 
 .headerInfo {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   min-width: 0;
   flex: 1;
 }
 
 .headerTrack {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary, #2c2822);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .headerArtist {
   font-size: 0.7rem;
-  color: var(--text-muted);
+  color: var(--text-muted, #9e9890);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
 }
 
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
-.externalBtn {
-  background: var(--bg-surface);
-  border: 1px solid var(--glass-border);
-  border-radius: 7px;
-  padding: 4px 8px;
-  font-size: 0.62rem;
-  font-weight: 600;
+/* ── Source Badge — soft inset pill ── */
+.sourceBadge {
+  font-size: 0.56rem;
+  font-weight: 700;
   font-family: inherit;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all var(--transition);
+  padding: 4px 10px;
+  border-radius: 14px;
+  background: linear-gradient(
+    155deg,
+    var(--accent-glass, rgba(212, 121, 94, 0.06)),
+    rgba(212, 121, 94, 0.02)
+  );
+  color: var(--accent, #d4795e);
+  box-shadow:
+    inset 1px 1px 3px rgba(180, 160, 140, 0.1),
+    inset -1px -1px 2px rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
 }
 
+/* ── External YouTube link button ── */
+.externalBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(
+    155deg,
+    var(--bg-surface, #fcfbf8),
+    var(--bg-primary, #f2efe8)
+  );
+  border: none;
+  border-radius: 12px;
+  padding: 6px 11px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-secondary, #6b655d);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow:
+    2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
+    -2px -2px 5px var(--shadow-light, #ffffff),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
 .externalBtn:hover {
-  color: var(--accent);
-  border-color: var(--accent-glow);
-  box-shadow: 0 0 8px var(--accent-glow);
+  color: var(--accent, #d4795e);
+  box-shadow:
+    3px 3px 8px var(--shadow-warm, rgba(180,160,140,0.2)),
+    -3px -3px 8px var(--shadow-light, #ffffff),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+  transform: translateY(-1px);
 }
 
-.externalBtnActive {
-  color: var(--accent);
-  border-color: var(--accent-glow);
-  box-shadow: 0 0 8px var(--accent-glow);
-  background: var(--accent-glass);
+.externalBtn:active {
+  box-shadow:
+    inset 2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
+    inset -2px -2px 5px var(--shadow-light, #ffffff);
+  transform: scale(0.97);
 }
 
+/* ── Close button — warm pressed circle ── */
 .closeBtn {
-  width: 26px;
-  height: 26px;
-  background: var(--bg-surface);
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(
+    155deg,
+    var(--bg-surface, #fcfbf8),
+    var(--bg-primary, #f2efe8)
+  );
   border: none;
   border-radius: 50%;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-muted, #9e9890);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition);
-  box-shadow: 1px 1px 3px var(--shadow-dark), -1px -1px 3px rgba(0,0,0,0.2);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
+    -2px -2px 5px var(--shadow-light, #ffffff),
+    inset 0 1px 0 rgba(255,255,255,0.8);
   flex-shrink: 0;
+  font-family: inherit;
+  padding: 0;
 }
 
 .closeBtn:hover {
-  color: var(--accent);
-  animation-play-state: paused;
+  color: var(--accent, #d4795e);
+  box-shadow:
+    3px 3px 8px var(--shadow-warm, rgba(180,160,140,0.2)),
+    -3px -3px 8px var(--shadow-light, #ffffff);
+  transform: scale(1.05);
 }
 
-/* Player */
+.closeBtn:active {
+  box-shadow:
+    inset 2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
+    inset -2px -2px 5px var(--shadow-light, #ffffff);
+  transform: scale(0.94);
+}
+
+/* ── Player area — soft dark frame, rounded inner recess ── */
 .playerWrap {
   aspect-ratio: 16 / 9;
-  background: #000;
+  background:
+    radial-gradient(ellipse at center, #1a1a1a 0%, #0d0d0d 100%);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   z-index: 2;
+  margin: 12px 14px 14px;
+  border-radius: var(--border-radius-sm, 18px);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 2px 10px rgba(0, 0, 0, 0.4),
+    0 4px 20px var(--shadow-warm, rgba(180, 160, 140, 0.2)),
+    0 1px 3px var(--shadow-warm, rgba(180, 160, 140, 0.1));
 }
 
 .player {
@@ -158,84 +256,78 @@
   border: none;
 }
 
-/* Checking / loading state */
+/* ── Loading state — warm, breathing, premium feeling ── */
 .checkingOverlay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  color: var(--text-muted);
+  gap: 16px;
+  padding: 32px 16px;
 }
 
 .spinner {
-  width: 26px;
-  height: 26px;
-  border: 3px solid rgba(227, 27, 35, 0.2);
-  border-top-color: var(--accent);
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(180, 160, 140, 0.15);
+  border-top-color: var(--accent, #d4795e);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: playerSpin 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow:
+    0 0 16px var(--accent-glow, rgba(212,121,94,0.25)),
+    0 0 32px var(--accent-glow, rgba(212,121,94,0.1));
 }
 
 .spinnerSmall {
-  width: 12px;
-  height: 12px;
-  border: 2px solid rgba(227, 27, 35, 0.2);
-  border-top-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(180, 160, 140, 0.15);
+  border-top-color: var(--accent, #d4795e);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: playerSpin 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   display: inline-block;
   vertical-align: middle;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 
-@keyframes spin {
+@keyframes playerSpin {
   to { transform: rotate(360deg); }
 }
 
 .checkingText {
-  font-size: 0.7rem;
-  font-weight: 500;
-  opacity: 0.7;
-  animation: pulse-text 1.5s ease-in-out infinite;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #9e9890);
+  animation: playerPulse 1.6s ease-in-out infinite;
+  letter-spacing: 0.02em;
 }
 
-@keyframes pulse-text {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.9; }
+@keyframes playerPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
 }
 
-/* Source badge */
-.sourceBadge {
-  font-size: 0.58rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: var(--accent-glass);
-  color: var(--accent);
-  border: 1px solid rgba(227, 27, 35, 0.2);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  flex-shrink: 0;
-}
-
-/* No source fallback */
+/* ── No-source state — warm soft centered with accent CTA ── */
 .noSource {
   text-align: center;
-  padding: 24px 16px;
-  color: var(--text-muted);
+  padding: 36px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .noSource p {
   margin: 0;
   font-size: 0.78rem;
+  color: var(--text-muted, #9e9890);
+  font-weight: 500;
 }
 
-.noSourceBtns {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .panel { animation: none; }
+  .panel.closing { animation: none; }
+  .spinner,
+  .spinnerSmall { animation: none; }
+  .checkingText { animation: none; opacity: 0.6; }
 }
