@@ -1,8 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   Plastic Neumorphism — Dual-Theme Premium Design System
-   Light: warm cream/off-white  ·  Dark: deep warm charcoal
-   Beide bestens lesbar, beide WOW. "Aus einem Guss."
-   Inspired by daerias' Pinterest Neumorphism board.
+   Plastic Neumorphism — 5 Premium Themes
+   Dark · Light · Teal · Crimson · Golden
+   Alle bestens lesbar, alle WOW, alle lebendig.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
@@ -136,6 +135,135 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   🧪 TEAL THEME — neon teal glow + warm amber, deep dark base
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="teal"] {
+  --bg-base: #0d1117;
+  --bg-primary: #131820;
+  --bg-secondary: #1a212a;
+  --bg-surface: #222b36;
+
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+
+  --accent: #3fb950;
+  --accent-hover: #56d364;
+  --accent-glow: rgba(63, 185, 80, 0.35);
+  --accent-glow-strong: rgba(63, 185, 80, 0.55);
+  --accent-glass: rgba(63, 185, 80, 0.08);
+
+  --shadow-dark: #060910;
+  --shadow-light: #2a3545;
+  --shadow-warm: rgba(0, 0, 0, 0.55);
+  --shadow-deep: rgba(0, 0, 0, 0.4);
+  --highlight-glass: rgba(255, 255, 255, 0.05);
+
+  --glass-bg: rgba(19, 24, 32, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(22px);
+  --glass-bg-alpha: 0.72;
+
+  --toxic-green: #3fb950;
+  --toxic-green-glow: rgba(63, 185, 80, 0.35);
+  --toxic-teal: #39d3b4;
+  --toxic-teal-glow: rgba(57, 211, 180, 0.35);
+  --toxic-yellow: #d2991d;
+  --toxic-yellow-glow: rgba(210, 153, 29, 0.35);
+  --toxic-orange: #e36209;
+  --toxic-orange-glow: rgba(227, 98, 9, 0.35);
+
+  --atmos-anim: plastic-atmosphere-teal;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🩸 CRIMSON THEME — velvet crimson + deep aubergine
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="crimson"] {
+  --bg-base: #12080c;
+  --bg-primary: #1a0d13;
+  --bg-secondary: #22141a;
+  --bg-surface: #2d1c23;
+
+  --text-primary: #ede0d4;
+  --text-secondary: #b5a398;
+  --text-muted: #7d6e65;
+
+  --accent: #c0392b;
+  --accent-hover: #e74c3c;
+  --accent-glow: rgba(192, 57, 43, 0.35);
+  --accent-glow-strong: rgba(192, 57, 43, 0.55);
+  --accent-glass: rgba(192, 57, 43, 0.08);
+
+  --shadow-dark: #080306;
+  --shadow-light: #3a2930;
+  --shadow-warm: rgba(0, 0, 0, 0.55);
+  --shadow-deep: rgba(0, 0, 0, 0.4);
+  --highlight-glass: rgba(255, 255, 255, 0.05);
+
+  --glass-bg: rgba(26, 13, 19, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(22px);
+  --glass-bg-alpha: 0.72;
+
+  --toxic-green: #7b2d26;
+  --toxic-green-glow: rgba(123, 45, 38, 0.35);
+  --toxic-teal: #a0524a;
+  --toxic-teal-glow: rgba(160, 82, 74, 0.35);
+  --toxic-yellow: #c9a06c;
+  --toxic-yellow-glow: rgba(201, 160, 108, 0.35);
+  --toxic-orange: #d4534a;
+  --toxic-orange-glow: rgba(212, 83, 74, 0.35);
+
+  --atmos-anim: plastic-atmosphere-crimson;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ✨ GOLDEN THEME — warm euphoric golden hour, MDMA warmth, zero kitsch
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="golden"] {
+  --bg-base: #f5ebe0;
+  --bg-primary: #faf3eb;
+  --bg-secondary: #fdf8f3;
+  --bg-surface: #fffdfa;
+
+  --text-primary: #3d2b1f;
+  --text-secondary: #7a6a5a;
+  --text-muted: #a89885;
+
+  --accent: #b8860b;
+  --accent-hover: #d4a017;
+  --accent-glow: rgba(184, 134, 11, 0.25);
+  --accent-glow-strong: rgba(184, 134, 11, 0.45);
+  --accent-glass: rgba(184, 134, 11, 0.06);
+
+  --shadow-dark: #e0d5c5;
+  --shadow-light: #ffffff;
+  --shadow-warm: rgba(180, 150, 110, 0.35);
+  --shadow-deep: rgba(160, 130, 90, 0.25);
+  --highlight-glass: rgba(255, 255, 255, 0.7);
+
+  --glass-bg: rgba(255, 253, 250, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(18px);
+  --glass-bg-alpha: 0.65;
+
+  --toxic-green: #a0a060;
+  --toxic-green-glow: rgba(160, 160, 96, 0.3);
+  --toxic-teal: #b0a880;
+  --toxic-teal-glow: rgba(176, 168, 128, 0.3);
+  --toxic-yellow: #c8a850;
+  --toxic-yellow-glow: rgba(200, 168, 80, 0.3);
+  --toxic-orange: #d4914a;
+  --toxic-orange-glow: rgba(212, 145, 74, 0.3);
+
+  --atmos-anim: plastic-atmosphere-golden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Reset & Base
    ═══════════════════════════════════════════════════════════════ */
 
@@ -173,6 +301,30 @@ body {
     radial-gradient(ellipse 70% 40% at 50% -10%, rgba(224, 135, 108, 0.08) 0%, transparent 60%),
     radial-gradient(ellipse 45% 35% at 25% 60%, rgba(106, 154, 106, 0.04) 0%, transparent 55%),
     radial-gradient(ellipse 40% 30% at 75% 35%, rgba(184, 152, 110, 0.04) 0%, transparent 55%),
+    var(--bg-base);
+}
+
+[data-theme="teal"] body {
+  background:
+    radial-gradient(ellipse 70% 35% at 50% -8%, rgba(63, 185, 80, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 25% 55%, rgba(57, 211, 180, 0.03) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 30% at 80% 40%, rgba(210, 153, 29, 0.04) 0%, transparent 55%),
+    var(--bg-base);
+}
+
+[data-theme="crimson"] body {
+  background:
+    radial-gradient(ellipse 65% 35% at 50% -8%, rgba(192, 57, 43, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 30% 55%, rgba(160, 82, 74, 0.03) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 28% at 75% 45%, rgba(201, 160, 108, 0.03) 0%, transparent 55%),
+    var(--bg-base);
+}
+
+[data-theme="golden"] body {
+  background:
+    radial-gradient(ellipse 75% 45% at 50% -5%, rgba(184, 134, 11, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 35% at 20% 60%, rgba(212, 145, 74, 0.03) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 75% 35%, rgba(200, 168, 80, 0.03) 0%, transparent 55%),
     var(--bg-base);
 }
 
@@ -265,6 +417,90 @@ body {
   }
 }
 
+/* Teal atmosphere -- electric green breathing + amber warmth */
+@keyframes plastic-atmosphere-teal {
+  0% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(63,185,80,0.05) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(57,211,180,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(210,153,29,0.03) 0%, transparent 55%);
+  }
+  33% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(57,211,180,0.04) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(210,153,29,0.035) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(63,185,80,0.03) 0%, transparent 55%);
+  }
+  66% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(210,153,29,0.04) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(63,185,80,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(57,211,180,0.03) 0%, transparent 55%);
+  }
+  100% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(63,185,80,0.05) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(57,211,180,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(210,153,29,0.03) 0%, transparent 55%);
+  }
+}
+
+/* Crimson atmosphere -- deep velvet red breathing */
+@keyframes plastic-atmosphere-crimson {
+  0% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(192,57,43,0.05) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(160,82,74,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(201,160,108,0.025) 0%, transparent 55%);
+  }
+  33% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(160,82,74,0.04) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(201,160,108,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(192,57,43,0.025) 0%, transparent 55%);
+  }
+  66% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(201,160,108,0.035) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(192,57,43,0.025) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(160,82,74,0.025) 0%, transparent 55%);
+  }
+  100% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 10%, rgba(192,57,43,0.05) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(160,82,74,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 20% at 50% 80%, rgba(201,160,108,0.025) 0%, transparent 55%);
+  }
+}
+
+/* Golden atmosphere -- slow euphoric warmth, organic breathing */
+@keyframes plastic-atmosphere-golden {
+  0% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(184,134,11,0.04) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 65% 55%, rgba(212,145,74,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 22% at 50% 80%, rgba(200,168,80,0.03) 0%, transparent 55%);
+  }
+  33% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(212,145,74,0.035) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 65% 55%, rgba(200,168,80,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 22% at 50% 80%, rgba(184,134,11,0.025) 0%, transparent 55%);
+  }
+  66% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(200,168,80,0.035) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 65% 55%, rgba(184,134,11,0.025) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 22% at 50% 80%, rgba(212,145,74,0.025) 0%, transparent 55%);
+  }
+  100% {
+    background:
+      radial-gradient(ellipse 60% 35% at 30% 12%, rgba(184,134,11,0.04) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 65% 55%, rgba(212,145,74,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 22% at 50% 80%, rgba(200,168,80,0.03) 0%, transparent 55%);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Soft Dust Particles — sparse, warm sparkles
    ═══════════════════════════════════════════════════════════════ */
@@ -321,6 +557,66 @@ body {
     260px 420px 1px 1px rgba(224,135,108,0.22),
     450px 500px 2px 1px rgba(106,154,106,0.25),
     630px 450px 1px 1px rgba(184,152,110,0.22);
+}
+
+/* Teal particles -- neon green sparks on deep dark */
+[data-theme="teal"] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(63,185,80,0.35),
+    180px 50px 1px 1px rgba(57,211,180,0.28),
+    340px 160px 2px 1px rgba(210,153,29,0.3),
+    500px 80px 1px 1px rgba(63,185,80,0.28),
+    660px 220px 2px 1px rgba(57,211,180,0.3),
+    830px 110px 1px 1px rgba(210,153,29,0.25),
+    1010px 280px 2px 1px rgba(63,185,80,0.28),
+    1190px 150px 1px 1px rgba(57,211,180,0.25),
+    1380px 330px 2px 1px rgba(210,153,29,0.28),
+    1560px 190px 1px 1px rgba(63,185,80,0.22),
+    1740px 380px 2px 1px rgba(57,211,180,0.25),
+    80px 360px 2px 1px rgba(210,153,29,0.25),
+    260px 420px 1px 1px rgba(63,185,80,0.22),
+    450px 500px 2px 1px rgba(57,211,180,0.25),
+    630px 450px 1px 1px rgba(210,153,29,0.22);
+}
+
+/* Crimson particles -- deep red velvet dust */
+[data-theme="crimson"] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(192,57,43,0.35),
+    180px 50px 1px 1px rgba(160,82,74,0.28),
+    340px 160px 2px 1px rgba(201,160,108,0.3),
+    500px 80px 1px 1px rgba(192,57,43,0.28),
+    660px 220px 2px 1px rgba(212,83,74,0.3),
+    830px 110px 1px 1px rgba(160,82,74,0.25),
+    1010px 280px 2px 1px rgba(201,160,108,0.28),
+    1190px 150px 1px 1px rgba(192,57,43,0.25),
+    1380px 330px 2px 1px rgba(212,83,74,0.28),
+    1560px 190px 1px 1px rgba(160,82,74,0.22),
+    1740px 380px 2px 1px rgba(201,160,108,0.25),
+    80px 360px 2px 1px rgba(192,57,43,0.25),
+    260px 420px 1px 1px rgba(160,82,74,0.22),
+    450px 500px 2px 1px rgba(201,160,108,0.25),
+    630px 450px 1px 1px rgba(192,57,43,0.22);
+}
+
+/* Golden particles -- warm honey dust on cream */
+[data-theme="golden"] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(184,134,11,0.28),
+    180px 50px 1px 1px rgba(212,145,74,0.22),
+    340px 160px 2px 1px rgba(200,168,80,0.25),
+    500px 80px 1px 1px rgba(184,134,11,0.22),
+    660px 220px 2px 1px rgba(212,145,74,0.24),
+    830px 110px 1px 1px rgba(200,168,80,0.2),
+    1010px 280px 2px 1px rgba(184,134,11,0.22),
+    1190px 150px 1px 1px rgba(212,145,74,0.2),
+    1380px 330px 2px 1px rgba(200,168,80,0.22),
+    1560px 190px 1px 1px rgba(184,134,11,0.18),
+    1740px 380px 2px 1px rgba(212,145,74,0.2),
+    80px 360px 2px 1px rgba(200,168,80,0.2),
+    260px 420px 1px 1px rgba(184,134,11,0.18),
+    450px 500px 2px 1px rgba(212,145,74,0.2),
+    630px 450px 1px 1px rgba(200,168,80,0.18);
 }
 
 @keyframes particles-float {
@@ -473,12 +769,16 @@ body {
   opacity: 0.55;
 }
 
-/* Dark theme: dampen specular sweep */
-[data-theme="dark"] .neuro-raised::after {
+/* Dark themes: dampen specular sweep */
+[data-theme="dark"] .neuro-raised::after,
+[data-theme="teal"] .neuro-raised::after,
+[data-theme="crimson"] .neuro-raised::after {
   opacity: 0.12;
 }
 
-[data-theme="dark"] .neuro-raised:hover::after {
+[data-theme="dark"] .neuro-raised:hover::after,
+[data-theme="teal"] .neuro-raised:hover::after,
+[data-theme="crimson"] .neuro-raised:hover::after {
   opacity: 0.2;
 }
 
@@ -535,11 +835,15 @@ body {
   opacity: 0.4;
 }
 
-[data-theme="dark"] .neuro-raised-sm::after {
+[data-theme="dark"] .neuro-raised-sm::after,
+[data-theme="teal"] .neuro-raised-sm::after,
+[data-theme="crimson"] .neuro-raised-sm::after {
   opacity: 0.08;
 }
 
-[data-theme="dark"] .neuro-raised-sm:hover::after {
+[data-theme="dark"] .neuro-raised-sm:hover::after,
+[data-theme="teal"] .neuro-raised-sm:hover::after,
+[data-theme="crimson"] .neuro-raised-sm:hover::after {
   opacity: 0.14;
 }
 
@@ -624,7 +928,9 @@ body {
   pointer-events: none;
 }
 
-[data-theme="dark"] .neuro-glass::after {
+[data-theme="dark"] .neuro-glass::after,
+[data-theme="teal"] .neuro-glass::after,
+[data-theme="crimson"] .neuro-glass::after {
   background: linear-gradient(
     90deg,
     transparent,

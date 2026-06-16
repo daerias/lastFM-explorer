@@ -89,7 +89,9 @@
   opacity: 0.25;
 }
 
-[data-theme="dark"] .card::after { opacity: 0.1; }
+[data-theme="dark"] .card::after,
+[data-theme="teal"] .card::after,
+[data-theme="crimson"] .card::after { opacity: 0.1; }
 
 .card:hover {
   animation-play-state: paused;
@@ -281,10 +283,10 @@
   animation: badgePulse 2s ease-in-out infinite alternate;
 }
 
-/* Theme grid — 2 cards */
+/* Theme grid — auto-fill, handles 2-5+ cards */
 .themeGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
 }
 

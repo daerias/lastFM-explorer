@@ -1,6 +1,6 @@
-/* ── Dual Premium Theme — Plastic Neumorphism Light & Dark ── */
+/* ── 5 Premium Themes — Plastic Neumorphism ── */
 
-export type Theme = 'light' | 'dark'
+export type Theme = 'dark' | 'light' | 'teal' | 'crimson' | 'golden'
 
 /* ── Effect types (preserved for fine-tuning) ── */
 
@@ -59,6 +59,9 @@ const FX: ThemeEffects = {
 export const ALL_THEMES: ThemeMeta[] = [
   { value: 'dark', label: 'Dark', icon: '🌚', desc: 'Deep warm charcoal — velvet depth, glowing coral', category: 'core', defaultEffects: { ...FX } },
   { value: 'light', label: 'Light', icon: '🌞', desc: 'Warm cream — soft pillowy neumorphism, organic tactile feel', category: 'core', defaultEffects: { ...FX } },
+  { value: 'teal', label: 'Teal', icon: '🧪', desc: 'Neon teal glow + warm amber — deep GitHub-dark base, electric green accents', category: 'core', defaultEffects: { ...FX, glow: 'boosted' } },
+  { value: 'crimson', label: 'Crimson', icon: '🩸', desc: 'Velvet crimson + deep aubergine — dark, rich, premium red neumorphism', category: 'core', defaultEffects: { ...FX } },
+  { value: 'golden', label: 'Golden', icon: '✨', desc: 'Warm euphoric golden hour — soft amber breathing, MDMA warmth without kitsch', category: 'core', defaultEffects: { ...FX, particles: 'normal', glow: 'boosted' } },
 ]
 
 /* ── localStorage keys ── */
@@ -224,7 +227,7 @@ export function getCurrentEffects(): ThemeEffects {
 export function getTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'light' || stored === 'dark') return stored
+    if (stored && ALL_THEMES.some(t => t.value === stored)) return stored as Theme
   } catch {}
   return DEFAULT
 }
