@@ -558,6 +558,7 @@ export default function Library() {
           <p className={styles.desc}>
             {cachedCount > 0 ? `${cachedCount.toLocaleString()} tracks cached` : `${tracks.length} recent tracks`}
             {hasActiveFilters ? ` · ${filtered.length} shown` : ''}
+            {syncActive && !loading && <span className={styles.syncSpinner}><span className={styles.spinDot} /> Syncing…</span>}
           </p>
         </div>
         {isAuthenticated && !isDemo && (

@@ -50,6 +50,41 @@
   color: var(--text-secondary);
   font-size: 0.92rem;
   margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Background Sync Spinner ── */
+
+.syncSpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--toxic-teal);
+  animation: spinnerFadeIn 0.4s ease;
+}
+
+@keyframes spinnerFadeIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.spinDot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  border: 2px solid var(--toxic-teal);
+  border-top-color: transparent;
+  animation: spinRotate 0.7s linear infinite;
+  box-shadow: 0 0 6px var(--toxic-teal-glow);
+}
+
+@keyframes spinRotate {
+  to { transform: rotate(360deg); }
 }
 
 /* ── API Health Indicator Dot ── */
@@ -798,6 +833,8 @@
   .nowBadge { animation: none !important; opacity: 1; }
   .rowTagsLoading { animation: none !important; }
   .healthDotGreen, .healthDotYellow, .healthDotRed { animation: none !important; }
+  .spinDot { animation: none !important; }
+  .syncSpinner { animation: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
