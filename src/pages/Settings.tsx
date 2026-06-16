@@ -2,20 +2,14 @@ import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
 import { getCredentials, saveCredentials, clearCredentials, hasCredentials } from '../store/credentials'
 import { useAuth } from '../context/AuthContext'
 import {
-  setAnimSpeed,
-  setGlassLevel,
-  setVignette,
-  setParticles,
-  setGlowBoost,
-  setDepth3D,
+  setAnimSpeed, setGlassLevel, setVignette, setParticles, setGlowBoost, setDepth3D,
   getActiveProfile, loadProfile,
   getCustomProfiles, saveProfile, deleteProfile,
   downloadProfileFile, parseProfileFile,
-  type ThemeProfile,
-  type AnimSpeed, type GlassLevel,
-  type VignetteLevel,
-  type ParticleDensity, type GlowBoost,
-  type Depth3D,
+  getTheme, setTheme, ALL_THEMES,
+  type ThemeProfile, type Theme,
+  type AnimSpeed, type GlassLevel, type VignetteLevel,
+  type ParticleDensity, type GlowBoost, type Depth3D,
 } from '../store/theme'
 import {
   ICON_STYLES, getIconStyle, setIconStyle, getFineTune, setFineTune,
@@ -56,19 +50,18 @@ export default function Settings() {
         <p className={styles.desc}>Configure your Last.fm Explorer</p>
       </div>
 
-      {/* ── Row 1: API Credentials + Account ── */}
-      <div className={styles.sectionGrid}>
-        {/* API Credentials */}
-        <div className={styles.card}>
-          <div className={styles.sectionHead}>
-            <span className={styles.sectionDot} />
-            <h2>API Credentials</h2>
-          </div>
-          <p className={styles.helpText}>
-            <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener noreferrer">
-              Get your API key here →
-            </a>
-          </p>
+      {/* ── API Credentials + Account ── */}
+      <div className={styles.card}>
+        <div className={styles.sectionHead}>
+          <span className={styles.sectionDot} />
+          <h2>API Credentials</h2>
+        </div>
+        <p className={styles.helpText}>
+          <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener noreferrer">
+            Get your API key here →
+          </a>
+        </p>
+        <div className={styles.fieldRow}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="api-key">API Key</label>
             <input id="api-key" className={styles.input} type="text" value={apiKey}
@@ -86,34 +79,26 @@ export default function Settings() {
               </button>
             </div>
           </div>
-          <div className={styles.actions}>
-            <button className="neuro-btn neuro-btn-accent" onClick={handleSave}>
-              {saved ? '✓ Saved' : 'Save Credentials'}
-            </button>
-            {configured && (
-              <button className="neuro-btn" onClick={() => { clearCredentials(); setApiKey(''); setApiSecret(''); if (isAuthenticated) logout() }}>
-                Clear
-              </button>
-            )}
-          </div>
-          {configured && <p className={styles.statusOk}>✓ Credentials configured — you can now log in</p>}
         </div>
-
-        {/* Account */}
-        {isAuthenticated && (
-          <div className={styles.card}>
-            <div className={styles.sectionHead}>
-              <span className={styles.sectionDot} />
-              <h2>Account</h2>
-            </div>
-            <button className="neuro-btn neuro-btn-accent" onClick={() => logout()} style={{ padding: '10px 20px' }}>
-              🚪 Logout from Last.fm
+        <div className={styles.actions}>
+          <button className="neuro-btn neuro-btn-accent" onClick={handleSave}>
+            {saved ? '✓ Saved' : 'Save Credentials'}
+          </button>
+          {configured && (
+            <button className="neuro-btn" onClick={() => { clearCredentials(); setApiKey(''); setApiSecret(''); if (isAuthenticated) logout() }}>
+              Clear
             </button>
-          </div>
-        )}
+          )}
+          {isAuthenticated && (
+            <button className="neuro-btn" onClick={() => logout()} style={{ background: 'var(--accent-glass)', border: '1px solid var(--accent-glow)' }}>
+              🚪 Logout
+            </button>
+          )}
+        </div>
+        {configured && <p className={styles.statusOk}>✓ Credentials configured — you can now log in</p>}
       </div>
 
-      {/* ── Row 2: Appearance (Fine-Tune Studio full-width) ── */}
+      {/* ── Appearance: Theme + Fine-Tune ── */}
       <div className={styles.card}>
         <div className={styles.sectionHead}>
           <span className={styles.sectionDot} />
@@ -122,18 +107,18 @@ export default function Settings() {
         <InlineFineTuneStudio />
       </div>
 
-      {/* ── Row 3: Icon Style + Cinematic Look (2-col) ── */}
+      {/* ── Icon Style + Cinematic ── */}
       <div className={styles.sectionGrid}>
         <div className={styles.card}>
           <div className={styles.sectionHead}>
-            <span className={styles.sectionDot} />
+            <span className={`${styles.sectionDot} ${styles.sectionDotTeal}`} />
             <h2>Icon Style</h2>
           </div>
           <InlineIconStylePicker />
         </div>
         <div className={styles.card}>
           <div className={styles.sectionHead}>
-            <span className={styles.sectionDot} />
+            <span className={`${styles.sectionDot} ${styles.sectionDotGold}`} />
             <h2>Cinematic Look</h2>
           </div>
           <InlineCinematicPicker />
@@ -143,9 +128,9 @@ export default function Settings() {
   )
 }
 
-// ============================================================
+// ═══════════════════════════════════════════════════════
 // Inline Theme Studio
-// ============================================================
+// ═══════════════════════════════════════════════════════
 
 function InlineFineTuneStudio() {
   const activeProfile = getActiveProfile()
@@ -159,6 +144,7 @@ function InlineFineTuneStudio() {
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [profileName, setProfileName] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [activeTheme, setActiveTheme] = useState<Theme>(getTheme)
 
   const currentFx = {
     animSpeed, glassLevel, vignette, particles, glow, depth3D,
@@ -167,10 +153,15 @@ function InlineFineTuneStudio() {
   const profileFx = activeProfile.effects
   const hasChanges = Object.keys(currentFx).some(k => currentFx[k as keyof typeof currentFx] !== profileFx[k as keyof typeof profileFx])
 
+  const handleThemeToggle = (theme: Theme) => {
+    setTheme(theme)
+    setActiveTheme(theme)
+  }
+
   const handleSaveProfile = () => {
     const name = profileName.trim()
     if (!name) return
-    const profile: ThemeProfile = { id: `custom-${Date.now()}`, name, baseTheme: 'plastic', effects: currentFx, isCustom: true }
+    const profile: ThemeProfile = { id: `custom-${Date.now()}`, name, baseTheme: activeTheme, effects: currentFx, isCustom: true }
     saveProfile(profile)
     loadProfile(profile)
     setCustomProfiles(getCustomProfiles())
@@ -212,37 +203,36 @@ function InlineFineTuneStudio() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* Active Indicator */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
-        <div className={styles.activeBar}>
-          <span className={styles.activeDot} />
-          <span className={styles.activeName}>Active: <strong>{activeProfile.name}</strong></span>
-          {hasChanges && <span className={styles.badgeUnsaved}>✏️ Unsaved</span>}
-        </div>
+    <div className={styles.studio}>
+      {/* Active profile indicator */}
+      <div className={styles.activeBar}>
+        <span className={styles.activeDot} />
+        <span className={styles.activeName}>Active: <strong>{activeProfile.name}</strong></span>
+        {hasChanges && <span className={styles.badgeUnsaved}>✏️ Unsaved</span>}
       </div>
 
-      {/* Current Theme Badge */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        padding: '12px 16px', borderRadius: 'var(--border-radius-sm)',
-        background: 'linear-gradient(155deg, var(--bg-surface), var(--bg-primary))',
-        boxShadow: '3px 3px 10px var(--shadow-warm), -3px -3px 10px var(--shadow-light)'
-      }}>
-        <span style={{ fontSize: '1.5rem' }}>🫧</span>
-        <div>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Plastic Neumorphism</span>
-          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Soft premium neumorphism — tactile, organic, aus einem Guss</span>
-        </div>
+      {/* Theme Toggle */}
+      <div className={styles.themeGrid}>
+        {ALL_THEMES.map(t => {
+          const isActive = activeTheme === t.value
+          return (
+            <button key={t.value} onClick={() => handleThemeToggle(t.value)}
+              className={`${styles.themeCard} ${isActive ? styles.themeCardActive : ''}`}>
+              <span className={styles.themeIcon}>{t.icon}</span>
+              <div className={styles.themeInfo}>
+                <span className={styles.themeName}>{t.label}</span>
+                <span className={styles.themeDesc}>{t.desc}</span>
+              </div>
+              {isActive && <span className={styles.themeCheck}>✓</span>}
+            </button>
+          )
+        })}
       </div>
 
       {/* Saved Profiles */}
       {customProfiles.length > 0 && (
         <div className={styles.profiles}>
-          <div className={styles.profilesHead}>
-            <span className={styles.profilesTitle}>💾 Saved Profiles</span>
-            <span className={styles.profilesCount}>{customProfiles.length} profile{customProfiles.length !== 1 ? 's' : ''}</span>
-          </div>
+          <span className={styles.profilesTitle}>💾 Saved Profiles</span>
           <div className={styles.profilesRow}>
             {customProfiles.map(profile => {
               const isActiveProfile = activeProfile.id === profile.id
@@ -262,7 +252,7 @@ function InlineFineTuneStudio() {
       {/* Effects Fine-Tune */}
       <div className={styles.effectsGrid}>
         <div className={styles.effectsCol}>
-          <span className={styles.effectsTitle}>Fine-Tune</span>
+          <span className={styles.effectsTitle}>🎛️ Visual</span>
           <EffectGroup label="Animation Speed" active={animSpeed === 0.5 ? 'Slow' : animSpeed === 1 ? 'Normal' : 'Fast'}>
             {([0.5, 1, 2] as AnimSpeed[]).map(s => (
               <PillBtn key={s} label={`${s}×`} active={animSpeed === s} onClick={() => { setAnimSpeed(s); setAnimSpeedState(s) }} />
@@ -273,32 +263,29 @@ function InlineFineTuneStudio() {
               <PillBtn key={l} label={l === 'low' ? 'Subtle' : l === 'normal' ? 'Balanced' : 'Heavy'} active={glassLevel === l} onClick={() => { setGlassLevel(l); setGlassLevelState(l) }} />
             ))}
           </EffectGroup>
+          <EffectGroup label="Glow Boost" active={glow}>
+            <PillBtn label="Normal" active={glow === 'normal'} onClick={() => { setGlowBoost('normal'); setGlow('normal') }} />
+            <PillBtn label="Boosted" active={glow === 'boosted'} onClick={() => { setGlowBoost('boosted'); setGlow('boosted') }} />
+            <PillBtn label="Max" active={glow === 'max'} onClick={() => { setGlowBoost('max'); setGlow('max') }} />
+          </EffectGroup>
         </div>
-
         <div className={styles.effectsCol}>
-          <span className={styles.effectsTitle}>Atmosphere</span>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-            <EffectGroup label="Vignette" active={vignette}>
-              <PillBtn label="Off" active={vignette === 'off'} onClick={() => { setVignette('off'); setVignetteState('off') }} />
-              <PillBtn label="Subtle" active={vignette === 'subtle'} onClick={() => { setVignette('subtle'); setVignetteState('subtle') }} />
-              <PillBtn label="Heavy" active={vignette === 'heavy'} onClick={() => { setVignette('heavy'); setVignetteState('heavy') }} />
-            </EffectGroup>
-            <EffectGroup label="Particles" active={particles}>
-              <PillBtn label="Sparse" active={particles === 'sparse'} onClick={() => { setParticles('sparse'); setParticlesState('sparse') }} />
-              <PillBtn label="Normal" active={particles === 'normal'} onClick={() => { setParticles('normal'); setParticlesState('normal') }} />
-              <PillBtn label="Dense" active={particles === 'dense'} onClick={() => { setParticles('dense'); setParticlesState('dense') }} />
-            </EffectGroup>
-            <EffectGroup label="Glow" active={glow}>
-              <PillBtn label="Normal" active={glow === 'normal'} onClick={() => { setGlowBoost('normal'); setGlow('normal') }} />
-              <PillBtn label="Boost" active={glow === 'boosted'} onClick={() => { setGlowBoost('boosted'); setGlow('boosted') }} />
-              <PillBtn label="Max" active={glow === 'max'} onClick={() => { setGlowBoost('max'); setGlow('max') }} />
-            </EffectGroup>
-            <EffectGroup label="3D Depth" active={depth3D}>
-              <PillBtn label="Off" active={depth3D === 'off'} onClick={() => { setDepth3D('off'); setDepth3DState('off') }} />
-              <PillBtn label="Subtle" active={depth3D === 'subtle'} onClick={() => { setDepth3D('subtle'); setDepth3DState('subtle') }} />
-              <PillBtn label="Strong" active={depth3D === 'strong'} onClick={() => { setDepth3D('strong'); setDepth3DState('strong') }} />
-            </EffectGroup>
-          </div>
+          <span className={styles.effectsTitle}>🌫️ Atmosphere</span>
+          <EffectGroup label="Vignette" active={vignette}>
+            <PillBtn label="Off" active={vignette === 'off'} onClick={() => { setVignette('off'); setVignetteState('off') }} />
+            <PillBtn label="Subtle" active={vignette === 'subtle'} onClick={() => { setVignette('subtle'); setVignetteState('subtle') }} />
+            <PillBtn label="Heavy" active={vignette === 'heavy'} onClick={() => { setVignette('heavy'); setVignetteState('heavy') }} />
+          </EffectGroup>
+          <EffectGroup label="Particles" active={particles}>
+            <PillBtn label="Sparse" active={particles === 'sparse'} onClick={() => { setParticles('sparse'); setParticlesState('sparse') }} />
+            <PillBtn label="Normal" active={particles === 'normal'} onClick={() => { setParticles('normal'); setParticlesState('normal') }} />
+            <PillBtn label="Dense" active={particles === 'dense'} onClick={() => { setParticles('dense'); setParticlesState('dense') }} />
+          </EffectGroup>
+          <EffectGroup label="3D Depth" active={depth3D}>
+            <PillBtn label="Off" active={depth3D === 'off'} onClick={() => { setDepth3D('off'); setDepth3DState('off') }} />
+            <PillBtn label="Subtle" active={depth3D === 'subtle'} onClick={() => { setDepth3D('subtle'); setDepth3DState('subtle') }} />
+            <PillBtn label="Strong" active={depth3D === 'strong'} onClick={() => { setDepth3D('strong'); setDepth3DState('strong') }} />
+          </EffectGroup>
         </div>
       </div>
 
@@ -323,7 +310,7 @@ function InlineFineTuneStudio() {
           )
         )}
         <button className={styles.ghostBtn} onClick={() => {
-          const profile: ThemeProfile = { id: 'export', name: activeProfile.name, baseTheme: 'plastic', effects: currentFx, isCustom: true }
+          const profile: ThemeProfile = { id: 'export', name: activeProfile.name, baseTheme: activeTheme, effects: currentFx, isCustom: true }
           downloadProfileFile(profile)
         }} title="Download as .lastfm-theme.json">📥 Export</button>
         <button className={styles.ghostBtn} onClick={() => fileInputRef.current?.click()}>📤 Import</button>
@@ -355,9 +342,9 @@ function EffectGroup({ label, active, children }: { label: string; active: strin
   )
 }
 
-// ============================================================
+// ═══════════════════════════════════════════════════════
 // Icon Style Picker
-// ============================================================
+// ═══════════════════════════════════════════════════════
 
 function InlineIconStylePicker() {
   const [active, setActive] = useState<IconStyle>(getIconStyle)
@@ -385,18 +372,15 @@ function InlineIconStylePicker() {
   const animSpeedLabel = fineTune.animSpeed === 0 ? 'Off' : fineTune.animSpeed === 0.5 ? '½×' : fineTune.animSpeed === 1 ? '1×' : '2×'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* Active indicator */}
+    <div className={styles.pickerWrap}>
       <div className={styles.pickerActive}>
-        <span className={`${styles.pickerSwatch} ${active === 'neon' ? styles.pickerSwatchGlow : ''}`}
-          style={{ background: activeMeta.preview }} />
+        <span className={styles.pickerSwatch} style={{ background: activeMeta.preview }} />
         <div className={styles.pickerInfo}>
           <span className={styles.pickerName}>{activeMeta.icon} {activeMeta.label}</span>
           <span className={styles.pickerDesc}>{activeMeta.desc}</span>
         </div>
       </div>
 
-      {/* Icon grid */}
       <div className={styles.iconGrid}>
         {ICON_STYLES.map(meta => {
           const isActive = active === meta.value
@@ -407,7 +391,6 @@ function InlineIconStylePicker() {
               <span className={styles.iconSwatch} style={{
                 background: meta.preview,
                 borderRadius: meta.value === 'brutal' ? '0' : meta.value === 'minimal' ? '6px' : meta.value === 'sketch' ? '30% 70% 50% 50% / 40% 60% 40% 60%' : '30%',
-                boxShadow: isActive ? `0 0 12px ${getIconAccent(meta.value)}` : 'inset 0 0 0 1px var(--glass-border)',
               }} />
               <span className={styles.iconCardLabel}>{meta.icon} {meta.label}</span>
             </button>
@@ -415,66 +398,37 @@ function InlineIconStylePicker() {
         })}
       </div>
 
-      {/* Fine-Tune Panel */}
       <div className={styles.iconPanel}>
         <div className={styles.iconPanelHead}>
           <span className={styles.iconPanelTitle}>Fine-Tune</span>
           <button className={styles.miniBtn} onClick={() => { resetFineTune(active); setFineTuneState(getFineTune()) }}>Reset</button>
         </div>
-
         <div className={styles.sliderGroup}>
-          <span className={styles.sliderLabel}>
-            ✨ Glow
-            <span className={styles.badge}>{fineTune.glow}%</span>
-          </span>
+          <span className={styles.sliderLabel}>✨ Glow <span className={styles.badge}>{fineTune.glow}%</span></span>
           <input type="range" min={0} max={100} step={5} value={fineTune.glow}
             onChange={e => handleFineTune('glow', Number(e.target.value))} className={styles.slider} />
         </div>
-
         <div className={styles.sliderGroup}>
-          <span className={styles.sliderLabel}>
-            🔍 Size
-            <span className={styles.badge}>{fineTune.size}%</span>
-          </span>
+          <span className={styles.sliderLabel}>🔍 Size <span className={styles.badge}>{fineTune.size}%</span></span>
           <input type="range" min={75} max={150} step={5} value={fineTune.size}
             onChange={e => handleFineTune('size', Number(e.target.value))} className={styles.slider} />
         </div>
-
-        <div className={styles.effectGroup}>
-          <span className={styles.effectLabel}>
-            🎬 Animation
-            <span className={styles.badge}>{animSpeedLabel}</span>
-          </span>
-          <div className={styles.pillRow}>
-            {([0, 0.5, 1, 2] as const).map(speed => (
-              <PillBtn key={speed}
-                label={speed === 0 ? 'Off' : speed === 0.5 ? '½×' : speed === 1 ? '1×' : '2×'}
-                active={fineTune.animSpeed === speed}
-                onClick={() => handleFineTune('animSpeed', speed)} />
-            ))}
-          </div>
-        </div>
+        <EffectGroup label="🎬 Animation" active={animSpeedLabel}>
+          {([0, 0.5, 1, 2] as const).map(speed => (
+            <PillBtn key={speed}
+              label={speed === 0 ? 'Off' : speed === 0.5 ? '½×' : speed === 1 ? '1×' : '2×'}
+              active={fineTune.animSpeed === speed}
+              onClick={() => handleFineTune('animSpeed', speed)} />
+          ))}
+        </EffectGroup>
       </div>
     </div>
   )
 }
 
-function getIconAccent(style: IconStyle): string {
-  switch (style) {
-    case 'neon': return 'var(--accent-glow)'
-    case 'glass': return 'rgba(255,255,255,0.3)'
-    case 'minimal': return 'var(--text-secondary)'
-    case 'brutal': return 'var(--text-primary)'
-    case 'retro': return 'var(--toxic-green-glow)'
-    case 'sketch': return '#c9a96e'
-    case 'chrome': return '#c0c0c0'
-    default: return 'var(--accent-glow)'
-  }
-}
-
-// ============================================================
+// ═══════════════════════════════════════════════════════
 // Cinematic Picker
-// ============================================================
+// ═══════════════════════════════════════════════════════
 
 function InlineCinematicPicker() {
   const [activeLut, setActiveLutState] = useState<string>(getActiveLut)
@@ -503,11 +457,10 @@ function InlineCinematicPicker() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* Active indicator */}
+    <div className={styles.pickerWrap}>
       <div className={styles.pickerActive}>
-        <span className={`${styles.pickerSwatch} ${activeLut !== 'none' ? styles.pickerSwatchGlow : ''}`}
-          style={{ background: activePreset.id === 'none' ? 'var(--bg-surface)' :
+        <span className={styles.pickerSwatch} style={{
+          background: activePreset.id === 'none' ? 'var(--bg-surface)' :
             activePreset.id === 'teal-orange' ? 'linear-gradient(135deg, #0088aa, #cc6622)' :
             activePreset.id === 'matrix' ? 'linear-gradient(135deg, #003300, #00aa00)' :
             activePreset.id === 'wes-anderson' ? 'linear-gradient(135deg, #f4c8a0, #e8b888)' :
@@ -515,14 +468,14 @@ function InlineCinematicPicker() {
             activePreset.id === 'vintage-70s' ? 'linear-gradient(135deg, #c8a060, #886040)' :
             activePreset.id === 'cyberpunk' ? 'linear-gradient(135deg, #3010a0, #00aadd)' :
             activePreset.id === 'bleach-bypass' ? 'linear-gradient(135deg, #999, #555)' :
-            'linear-gradient(135deg, #b87840, #6e3a1a)' }} />
+            'linear-gradient(135deg, #b87840, #6e3a1a)',
+        }} />
         <div className={styles.pickerInfo}>
           <span className={styles.pickerName}>{activePreset.icon} {activePreset.label}</span>
           <span className={styles.pickerDesc}>{activePreset.desc}</span>
         </div>
       </div>
 
-      {/* LUT grid */}
       <div className={styles.cineGrid}>
         {LUT_PRESETS.map(preset => {
           const isActive = activeLut === preset.id
@@ -537,35 +490,23 @@ function InlineCinematicPicker() {
         })}
       </div>
 
-      {/* DOF Panel */}
       <div className={styles.dofPanel}>
         <div className={styles.dofRow}>
           <div className={styles.dofInfo}>
             <span className={styles.dofLabel}>🔍 Depth of Field</span>
-            <span className={styles.dofDesc}>Cinematic blur vignette — sharp center, soft edges</span>
+            <span className={styles.dofDesc}>Cinematic blur vignette</span>
           </div>
           <button onClick={() => { const next = { ...dof, enabled: !dof.enabled }; setDof(next); setDofSettings(next) }}
             className={`${styles.toggle} ${dof.enabled ? styles.toggleOn : ''}`}>
             <span className={styles.toggleKnob} />
           </button>
         </div>
-
         {dof.enabled && (
           <div className={styles.sliderGroup}>
-            <span className={styles.sliderLabel}>
-              Blur Intensity
-              <span className={styles.badge}>{dof.intensity}%</span>
-            </span>
+            <span className={styles.sliderLabel}>Blur <span className={styles.badge}>{dof.intensity}%</span></span>
             <input type="range" min={0} max={100} step={5} value={dof.intensity}
               onChange={e => { const next = { ...dof, intensity: Number(e.target.value) }; setDof(next); setDofSettings(next) }}
               className={styles.slider} />
-          </div>
-        )}
-
-        {dof.enabled && (
-          <div className={styles.dofHint}>
-            🔍 DOF blurs the edges of the screen while keeping the center sharp — like a camera lens.
-            Works best with LUTs for a true cinematic look.
           </div>
         )}
       </div>
@@ -573,9 +514,9 @@ function InlineCinematicPicker() {
   )
 }
 
-// ============================================================
+// ═══════════════════════════════════════════════════════
 // Audio Reactive Settings
-// ============================================================
+// ═══════════════════════════════════════════════════════
 
 const AUDIO_REACTIVE_KEY = 'lastfm_audio_reactive'
 const AUDIO_BPM_KEY = 'lastfm_audio_bpm'
@@ -641,79 +582,40 @@ function AudioReactiveSettings() {
     <div className={styles.audioPanel}>
       <span className={styles.audioTitle}>🎵 LavaFM Audio Reactivity</span>
 
-      {/* Master toggle */}
       <div className={styles.audioRow}>
         <div className={styles.audioInfo}>
           <span className={styles.audioLabel}>{enabled ? '🔊 Active' : '🔇 Disabled'}</span>
-          <span className={styles.audioDesc}>
-            {enabled ? 'LavaFM button reacts to music rhythm' : 'Enable to let the LavaFM button pulse with music'}
-          </span>
+          <span className={styles.audioDesc}>{enabled ? 'LavaFM button pulses with music' : 'Enable rhythmic pulse'}</span>
         </div>
         <button onClick={toggleEnabled} className={`${styles.toggle} ${enabled ? styles.toggleOn : ''}`}>
           <span className={styles.toggleKnob} />
         </button>
       </div>
 
-      {/* BPM slider */}
       {enabled && (
-        <div className={styles.audioSlider}>
-          <span className={styles.audioSliderLabel}>
-            BPM
-            <span className={styles.badge}>{bpm}</span>
-          </span>
+        <div className={styles.sliderGroup}>
+          <span className={styles.sliderLabel}>BPM <span className={styles.badge}>{bpm}</span></span>
           <input type="range" min={60} max={200} value={bpm} onChange={updateBpm} className={styles.slider} />
-          <span className={styles.audioRange}>
-            <span>60 — chill</span>
-            <span>200 — intense</span>
-          </span>
+          <span className={styles.sliderRange}><span>60 · chill</span><span>200 · intense</span></span>
         </div>
       )}
 
-      {enabled && (
-        <div className={styles.infoBox}>
-          💡 BPM = Beats Per Minute — controls the lava pulse speed.
-          Match to your music: 60–90 chill, 120–140 house/dnb, 160–200 hardcore.
-        </div>
-      )}
-
-      {/* Mic Mode */}
       <div className={styles.audioDivider}>
         <div className={styles.audioRow}>
           <div className={styles.audioInfo}>
-            <span className={styles.audioLabel}>🎤 Microphone Mode</span>
-            <span className={styles.audioDesc}>React to real ambient music via your mic</span>
+            <span className={styles.audioLabel}>🎤 Mic Mode</span>
+            <span className={styles.audioDesc}>React to ambient music</span>
           </div>
           <button onClick={toggleMic} className={`${styles.toggle} ${micEnabled ? styles.toggleOn : ''}`}>
             <span className={styles.toggleKnob} />
           </button>
         </div>
-
-        {micDenied && (
-          <div className={styles.audioDenied}>
-            🚫 Microphone access denied. Check your browser's site permissions and allow microphone access.
-          </div>
-        )}
-
+        {micDenied && <div className={styles.audioDenied}>🚫 Mic denied. Check browser permissions.</div>}
         {micEnabled && (
-          <div className={styles.audioSlider}>
-            <span className={styles.audioSliderLabel}>
-              Sensitivity
-              <span className={styles.badge}>{micSensitivity.toFixed(1)}×</span>
-            </span>
+          <div className={styles.sliderGroup}>
+            <span className={styles.sliderLabel}>Sensitivity <span className={styles.badge}>{micSensitivity.toFixed(1)}×</span></span>
             <input type="range" min={0.3} max={3} step={0.1} value={micSensitivity} onChange={updateMicSens} className={styles.slider} />
-            <span className={styles.audioRange}>
-              <span>0.3 — subtle</span>
-              <span>1.0 — normal</span>
-              <span>3.0 — wild</span>
-            </span>
-          </div>
-        )}
-
-        {micEnabled && (
-          <div className={styles.infoBox}>
-            🎤 Mic mode captures real audio to drive the LavaFM lava effects.
-            Audio is processed 100% locally — nothing is recorded or sent anywhere.
-            Works best with speakers (not headphones) so the mic hears your music.
+            <span className={styles.sliderRange}><span>0.3 · subtle</span><span>3.0 · wild</span></span>
           </div>
         )}
       </div>

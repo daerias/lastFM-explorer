@@ -1,52 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════
-   Plastic Neumorphism — Premium Design System
-   "Aus einem Guss" — soft, tactile, organic. One theme to rule them all.
+   Plastic Neumorphism — Dual-Theme Premium Design System
+   Light: warm cream/off-white  ·  Dark: deep warm charcoal
+   Beide bestens lesbar, beide WOW. "Aus einem Guss."
    Inspired by daerias' Pinterest Neumorphism board.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Surface Palette — warm cream → pure white gradient ── */
-  --bg-base: #ebe6dd;
-  --bg-primary: #f2efe8;
-  --bg-secondary: #f7f5f0;
-  --bg-surface: #fcfbf8;
-
-  /* ── Text — warm dark grays, never pure black ── */
-  --text-primary: #2c2822;
-  --text-secondary: #6b655d;
-  --text-muted: #9e9890;
-
-  /* ── Accent — soft coral/terracotta, warm and inviting ── */
-  --accent: #d4795e;
-  --accent-hover: #e89070;
-  --accent-glow: rgba(212, 121, 94, 0.25);
-  --accent-glow-strong: rgba(212, 121, 94, 0.45);
-  --accent-glass: rgba(212, 121, 94, 0.06);
-
-  /* ── Secondary palette — muted naturals ── */
-  --toxic-green: #8fbc8f;
-  --toxic-green-glow: rgba(143, 188, 143, 0.3);
-  --toxic-teal: #7db8b0;
-  --toxic-teal-glow: rgba(125, 184, 176, 0.3);
-  --toxic-yellow: #d4b896;
-  --toxic-yellow-glow: rgba(212, 184, 150, 0.3);
-  --toxic-orange: #d4916a;
-  --toxic-orange-glow: rgba(212, 145, 106, 0.3);
-
-  /* ── Shadow System — warm, multi-layer, colored, never harsh ── */
-  --shadow-dark: #d5cfc4;
-  --shadow-light: #ffffff;
-  --shadow-warm: rgba(180, 160, 140, 0.35);
-  --shadow-deep: rgba(160, 140, 120, 0.25);
-  --highlight-glass: rgba(255, 255, 255, 0.7);
-
-  /* ── Glass — subtle frost, barely there ── */
-  --glass-bg: rgba(252, 251, 248, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-blur: blur(18px);
-  --glass-bg-alpha: 0.65;
-
-  /* ── Shape — pillowy, organic, generous radii ── */
+  /* ── Shape — theme-independent ── */
   --border-radius: 24px;
   --border-radius-sm: 18px;
   --border-radius-lg: 32px;
@@ -55,7 +15,7 @@
   --sidebar-width: 72px;
   --transition: 280ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ── Effect toggles (preserved for fine-tuning, off by default) ── */
+  /* ── Effect toggles ── */
   --anim-speed-mult: 1;
   --anim-duration-slow: 8s;
   --anim-duration-atmos: 22s;
@@ -67,8 +27,112 @@
   --particle-opacity: 0.4;
   --particle-scale: 0.7;
   --glow-multiplier: 0.6;
-  --glow-anim: soft-glow;
   --border-pulse-opacity: 0;
+  --depth3d-level: 'subtle';
+
+  /* ── Animation names (swapped per theme) ── */
+  --atmos-anim: plastic-atmosphere-light;
+  --particle-anim: particles-float;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🌞 LIGHT THEME — warm cream, soft coral, pillowy neumorphism
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="light"] {
+  /* Surface Palette */
+  --bg-base: #ebe6dd;
+  --bg-primary: #f2efe8;
+  --bg-secondary: #f7f5f0;
+  --bg-surface: #fcfbf8;
+
+  /* Text */
+  --text-primary: #2c2822;
+  --text-secondary: #6b655d;
+  --text-muted: #9e9890;
+
+  /* Accent */
+  --accent: #d4795e;
+  --accent-hover: #e89070;
+  --accent-glow: rgba(212, 121, 94, 0.25);
+  --accent-glow-strong: rgba(212, 121, 94, 0.45);
+  --accent-glass: rgba(212, 121, 94, 0.06);
+
+  /* Shadow System */
+  --shadow-dark: #d5cfc4;
+  --shadow-light: #ffffff;
+  --shadow-warm: rgba(180, 160, 140, 0.35);
+  --shadow-deep: rgba(160, 140, 120, 0.25);
+  --highlight-glass: rgba(255, 255, 255, 0.7);
+
+  /* Glass */
+  --glass-bg: rgba(252, 251, 248, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(18px);
+  --glass-bg-alpha: 0.65;
+
+  /* Secondary palette */
+  --toxic-green: #8fbc8f;
+  --toxic-green-glow: rgba(143, 188, 143, 0.3);
+  --toxic-teal: #7db8b0;
+  --toxic-teal-glow: rgba(125, 184, 176, 0.3);
+  --toxic-yellow: #d4b896;
+  --toxic-yellow-glow: rgba(212, 184, 150, 0.3);
+  --toxic-orange: #d4916a;
+  --toxic-orange-glow: rgba(212, 145, 106, 0.3);
+
+  /* Atmosphere */
+  --atmos-anim: plastic-atmosphere-light;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🌚 DARK THEME — deep warm charcoal, glowing coral, velvet depth
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] {
+  /* Surface Palette */
+  --bg-base: #161412;
+  --bg-primary: #1e1b18;
+  --bg-secondary: #25221e;
+  --bg-surface: #2d2a25;
+
+  /* Text — warm whites, never harsh */
+  --text-primary: #e8e4dd;
+  --text-secondary: #b5b0a6;
+  --text-muted: #7d7870;
+
+  /* Accent — coral glows brighter on dark */
+  --accent: #e0876c;
+  --accent-hover: #f0a088;
+  --accent-glow: rgba(224, 135, 108, 0.35);
+  --accent-glow-strong: rgba(224, 135, 108, 0.55);
+  --accent-glass: rgba(224, 135, 108, 0.08);
+
+  /* Shadow System — deep, warm, velvet */
+  --shadow-dark: #0a0908;
+  --shadow-light: #38342e;
+  --shadow-warm: rgba(0, 0, 0, 0.55);
+  --shadow-deep: rgba(0, 0, 0, 0.4);
+  --highlight-glass: rgba(255, 255, 255, 0.05);
+
+  /* Glass — dark frosted */
+  --glass-bg: rgba(30, 27, 24, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(22px);
+  --glass-bg-alpha: 0.72;
+
+  /* Secondary palette — muted jewel tones */
+  --toxic-green: #6a9a6a;
+  --toxic-green-glow: rgba(106, 154, 106, 0.35);
+  --toxic-teal: #5ea09a;
+  --toxic-teal-glow: rgba(94, 160, 154, 0.35);
+  --toxic-yellow: #b8986e;
+  --toxic-yellow-glow: rgba(184, 152, 110, 0.35);
+  --toxic-orange: #c07a56;
+  --toxic-orange-glow: rgba(192, 122, 86, 0.35);
+
+  /* Atmosphere */
+  --atmos-anim: plastic-atmosphere-dark;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -87,16 +151,29 @@ html {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background 0.5s ease, color 0.5s ease;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Theme-specific body gradients */
+[data-theme="light"] body {
   background:
     radial-gradient(ellipse 80% 50% at 50% -5%, rgba(212, 121, 94, 0.06) 0%, transparent 60%),
     radial-gradient(ellipse 45% 40% at 20% 65%, rgba(143, 188, 143, 0.04) 0%, transparent 55%),
     radial-gradient(ellipse 40% 35% at 80% 30%, rgba(212, 184, 150, 0.04) 0%, transparent 55%),
     var(--bg-base);
-  color: var(--text-primary);
-  min-height: 100vh;
-  transition: none;
-  position: relative;
-  overflow-x: hidden;
+}
+
+[data-theme="dark"] body {
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, rgba(224, 135, 108, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 35% at 25% 60%, rgba(106, 154, 106, 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 75% 35%, rgba(184, 152, 110, 0.04) 0%, transparent 55%),
+    var(--bg-base);
 }
 
 #root {
@@ -118,7 +195,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Subtle Ambient Atmosphere — slow, barely-there color breathing
+   Subtle Ambient Atmosphere — slow color breathing
    ═══════════════════════════════════════════════════════════════ */
 
 @media (prefers-reduced-motion: no-preference) {
@@ -128,11 +205,12 @@ body {
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    animation: plastic-atmosphere var(--anim-duration-atmos, 22s) ease-in-out infinite;
+    animation: var(--atmos-anim, plastic-atmosphere-dark) var(--anim-duration-atmos, 22s) ease-in-out infinite;
   }
 }
 
-@keyframes plastic-atmosphere {
+/* Light atmosphere */
+@keyframes plastic-atmosphere-light {
   0% {
     background:
       radial-gradient(ellipse 60% 35% at 30% 12%, rgba(212,121,94,0.04) 0%, transparent 65%),
@@ -159,8 +237,36 @@ body {
   }
 }
 
+/* Dark atmosphere — deeper, warmer glow breathing */
+@keyframes plastic-atmosphere-dark {
+  0% {
+    background:
+      radial-gradient(ellipse 60% 35% at 25% 10%, rgba(224,135,108,0.06) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(106,154,106,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 25% at 45% 80%, rgba(184,152,110,0.04) 0%, transparent 55%);
+  }
+  33% {
+    background:
+      radial-gradient(ellipse 60% 35% at 25% 10%, rgba(106,154,106,0.05) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(184,152,110,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 25% at 45% 80%, rgba(224,135,108,0.03) 0%, transparent 55%);
+  }
+  66% {
+    background:
+      radial-gradient(ellipse 60% 35% at 25% 10%, rgba(184,152,110,0.05) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(224,135,108,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 25% at 45% 80%, rgba(106,154,106,0.03) 0%, transparent 55%);
+  }
+  100% {
+    background:
+      radial-gradient(ellipse 60% 35% at 25% 10%, rgba(224,135,108,0.06) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 25% at 70% 55%, rgba(106,154,106,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 25% at 45% 80%, rgba(184,152,110,0.04) 0%, transparent 55%);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
-   Soft Dust Particles — sparse, warm, barely visible sparkles
+   Soft Dust Particles — sparse, warm sparkles
    ═══════════════════════════════════════════════════════════════ */
 
 #root::after {
@@ -174,6 +280,11 @@ body {
   background: transparent;
   opacity: var(--particle-opacity, 0.4);
   scale: var(--particle-scale, 0.7);
+  animation: particles-float var(--anim-duration-particles, 26s) ease-in-out infinite;
+}
+
+/* Light particles */
+[data-theme="light"] #root::after {
   box-shadow:
     60px 100px 2px 1px rgba(212,121,94,0.28),
     180px 50px 1px 1px rgba(143,188,143,0.22),
@@ -190,7 +301,26 @@ body {
     260px 420px 1px 1px rgba(212,121,94,0.18),
     450px 500px 2px 1px rgba(143,188,143,0.2),
     630px 450px 1px 1px rgba(212,184,150,0.18);
-  animation: particles-float var(--anim-duration-particles, 26s) ease-in-out infinite;
+}
+
+/* Dark particles — brighter, more visible on dark bg */
+[data-theme="dark"] #root::after {
+  box-shadow:
+    60px 100px 2px 1px rgba(224,135,108,0.35),
+    180px 50px 1px 1px rgba(106,154,106,0.28),
+    340px 160px 2px 1px rgba(184,152,110,0.3),
+    500px 80px 1px 1px rgba(94,160,154,0.28),
+    660px 220px 2px 1px rgba(192,122,86,0.3),
+    830px 110px 1px 1px rgba(224,135,108,0.25),
+    1010px 280px 2px 1px rgba(106,154,106,0.28),
+    1190px 150px 1px 1px rgba(184,152,110,0.25),
+    1380px 330px 2px 1px rgba(224,135,108,0.28),
+    1560px 190px 1px 1px rgba(94,160,154,0.22),
+    1740px 380px 2px 1px rgba(192,122,86,0.25),
+    80px 360px 2px 1px rgba(184,152,110,0.25),
+    260px 420px 1px 1px rgba(224,135,108,0.22),
+    450px 500px 2px 1px rgba(106,154,106,0.25),
+    630px 450px 1px 1px rgba(184,152,110,0.22);
 }
 
 @keyframes particles-float {
@@ -286,7 +416,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Utility Classes
+   Utility Classes — driven by CSS variables, adapt per theme
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Raised — pillowy, soft, multi-layer depth ── */
@@ -343,7 +473,16 @@ body {
   opacity: 0.55;
 }
 
-/* ── Subtle raised — lighter elevation ── */
+/* Dark theme: dampen specular sweep */
+[data-theme="dark"] .neuro-raised::after {
+  opacity: 0.12;
+}
+
+[data-theme="dark"] .neuro-raised:hover::after {
+  opacity: 0.2;
+}
+
+/* ── Subtle raised ── */
 .neuro-raised-sm {
   background: linear-gradient(
     155deg,
@@ -396,7 +535,15 @@ body {
   opacity: 0.4;
 }
 
-/* ── Deep raised — dramatic parallax depth ── */
+[data-theme="dark"] .neuro-raised-sm::after {
+  opacity: 0.08;
+}
+
+[data-theme="dark"] .neuro-raised-sm:hover::after {
+  opacity: 0.14;
+}
+
+/* ── Deep raised ── */
 .neuro-raised-deep {
   background: linear-gradient(
     155deg,
@@ -424,7 +571,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* ── Pressed / inset — deep recession, soft inner glow ── */
+/* ── Pressed / inset ── */
 .neuro-pressed {
   background: linear-gradient(
     155deg,
@@ -441,7 +588,7 @@ body {
   animation: inner-glow-pulse 5s ease-in-out infinite;
 }
 
-/* ── Glass — frosted, lightweight, barely-there translucency ── */
+/* ── Glass — frosted translucency ── */
 .neuro-glass {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -451,8 +598,8 @@ body {
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 4px 16px rgba(180, 160, 140, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 4px 16px var(--shadow-warm),
+    inset 0 1px 0 var(--highlight-glass);
 }
 
 .neuro-glass::after {
@@ -477,7 +624,18 @@ body {
   pointer-events: none;
 }
 
-/* ── Standard Button — soft, tactile, pillowy press ── */
+[data-theme="dark"] .neuro-glass::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.06) 40%,
+    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0.06) 60%,
+    transparent
+  );
+}
+
+/* ── Standard Button ── */
 .neuro-btn {
   background: linear-gradient(
     155deg,
@@ -520,7 +678,7 @@ body {
   transform: scale(0.975);
 }
 
-/* ── Accent Button — warm coral glow, soft light beam ── */
+/* ── Accent Button ── */
 .neuro-btn-accent {
   background: linear-gradient(
     155deg,
@@ -624,7 +782,7 @@ a:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   WOW Utility Classes — subtle premium effects
+   WOW Utility Classes
    ═══════════════════════════════════════════════════════════════ */
 
 .breathing-shadow {
@@ -645,8 +803,6 @@ a:hover {
 
 /* ═══════════════════════════════════════════════════════════════
    3D Depth Boost — warm plastic spatial depth
-   Subtle: 1.4× shadows + light translateZ
-   Strong: 2× shadows + perspective 800px + deeper translateZ
    ═══════════════════════════════════════════════════════════════ */
 
 .depth3d-subtle #root,
@@ -759,11 +915,7 @@ a:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Glow Boost — scales accent glow via --glow-multiplier (applied in .neuro-btn-accent above)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════════════════════════
-   Reduced motion — respect user preferences
+   Reduced motion
    ═══════════════════════════════════════════════════════════════ */
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,6 @@
-/* ── Single Premium Theme — Plastic Neumorphism ── */
+/* ── Dual Premium Theme — Plastic Neumorphism Light & Dark ── */
 
-export type Theme = 'plastic'
+export type Theme = 'light' | 'dark'
 
 /* ── Effect types (preserved for fine-tuning) ── */
 
@@ -47,7 +47,7 @@ export interface ThemeMeta {
   defaultEffects: ThemeEffects
 }
 
-/* ── Default effects for the single plastic theme ── */
+/* ── Default effects ── */
 
 const FX: ThemeEffects = {
   animSpeed: 1, glassLevel: 'normal',
@@ -57,7 +57,8 @@ const FX: ThemeEffects = {
 }
 
 export const ALL_THEMES: ThemeMeta[] = [
-  { value: 'plastic', label: 'Plastic', icon: '🫧', desc: 'Soft premium neumorphism — tactile, organic, aus einem Guss', category: 'core', defaultEffects: { ...FX } },
+  { value: 'dark', label: 'Dark', icon: '🌚', desc: 'Deep warm charcoal — velvet depth, glowing coral', category: 'core', defaultEffects: { ...FX } },
+  { value: 'light', label: 'Light', icon: '🌞', desc: 'Warm cream — soft pillowy neumorphism, organic tactile feel', category: 'core', defaultEffects: { ...FX } },
 ]
 
 /* ── localStorage keys ── */
@@ -65,7 +66,7 @@ export const ALL_THEMES: ThemeMeta[] = [
 const STORAGE_KEY = 'lastfm_theme'
 const ACTIVE_PROFILE_KEY = 'lastfm_active_profile'
 const CUSTOM_PROFILES_KEY = 'lastfm_custom_profiles'
-const DEFAULT: Theme = 'plastic'
+const DEFAULT: Theme = 'dark'
 const CHANGE_EVENT = 'theme-changed'
 
 /* ── Profile management ── */
@@ -127,7 +128,7 @@ export function deleteProfile(id: string): void {
   try { localStorage.setItem(CUSTOM_PROFILES_KEY, JSON.stringify(profiles)) } catch {}
   const active = getActiveProfile()
   if (active.id === id) {
-    loadProfile(buildProfile('plastic'))
+    loadProfile(buildProfile('dark'))
   }
 }
 
@@ -223,7 +224,7 @@ export function getCurrentEffects(): ThemeEffects {
 export function getTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'plastic') return stored
+    if (stored === 'light' || stored === 'dark') return stored
   } catch {}
   return DEFAULT
 }
