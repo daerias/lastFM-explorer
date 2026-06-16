@@ -304,6 +304,7 @@ function trackSortKey(t: Track): number {
 }
 
 /** Start a full-history sync: fetches ALL pages, stores individually, reports progress.
+ *  Individual page failures are skipped — the sync continues and reports partial results.
  *  Use `onProgress` callback for UI progress bar.
  *  Returns total number of tracks synced. */
 export async function startFullSync(
@@ -313,12 +314,18 @@ export async function startFullSync(
   const lastfm = await getLastfmModule()
 
   // Get page 1 to discover total pages
-  const page1 = await lastfm.getRecentTracks(user, 200, 1)
+  let page1: { tracks: Track[]; totalPages: number }
+  try {
+    page1 = await lastfm.getRecentTracks(user, 200, 1)
+  } catch (err: any) {
+    throw new Error(`Failed to fetch page 1: ${err.message || 'Unknown error'}`)
+  }
   const totalPages = page1.totalPages
 
   // Store page 1
   await bulkPutTracks(page1.tracks)
   let totalTracks = page1.tracks.length
+  let failedPages = 0
 
   if (onProgress) {
     onProgress({ page: 1, totalPages, tracksSoFar: totalTracks, done: totalPages <= 1 })
@@ -329,19 +336,28 @@ export async function startFullSync(
     return totalTracks
   }
 
-  // Fetch remaining pages in batches of 5
+  // Fetch remaining pages in batches of 5 — individual page failures are non-fatal
   const BATCH = 5
   for (let start = 2; start <= totalPages; start += BATCH) {
     const end = Math.min(start + BATCH - 1, totalPages)
-    const batch = await Promise.all(
-      Array.from({ length: end - start + 1 }, (_, i) =>
-        lastfm.getRecentTracks(user, 200, start + i),
-      ),
-    )
+    const pagePromises = Array.from({ length: end - start + 1 }, (_, i) => {
+      const pageNum = start + i
+      return lastfm.getRecentTracks(user, 200, pageNum)
+        .then((r: { tracks: Track[] }) => ({ page: pageNum, tracks: r.tracks, ok: true as const }))
+        .catch((err: any) => {
+          console.warn(`[sync] Page ${pageNum} failed: ${err.message}, skipping`)
+          return { page: pageNum, tracks: [] as Track[], ok: false as const }
+        })
+    })
+    const batch = await Promise.all(pagePromises)
 
     for (const r of batch) {
-      await bulkPutTracks(r.tracks)
-      totalTracks += r.tracks.length
+      if (r.ok) {
+        await bulkPutTracks(r.tracks)
+        totalTracks += r.tracks.length
+      } else {
+        failedPages++
+      }
     }
 
     const done = end >= totalPages
@@ -352,22 +368,35 @@ export async function startFullSync(
     if (done) break
   }
 
-  await updateSyncMeta(user, totalTracks, true)
+  const syncComplete = failedPages === 0
+  await updateSyncMeta(user, totalTracks, syncComplete)
+
+  if (failedPages > 0) {
+    console.warn(`[sync] Full sync finished with ${failedPages} failed page(s) — ${totalTracks} tracks cached (incomplete)`)
+  }
+
   return totalTracks
 }
 
-/** Incremental sync: fetch only tracks newer than last sync timestamp */
+/** Incremental sync: fetch only tracks newer than last sync timestamp.
+ *  Individual page failures are non-fatal — sync continues and reports partial results. */
 export async function incrementalSync(
   user: string,
   onProgress?: ProgressCallback,
-): Promise<{ newTracks: number; totalCached: number }> {
+): Promise<{ newTracks: number; totalCached: number; failedPages: number }> {
   const meta = await getSyncMeta(user)
   const lastfm = await getLastfmModule()
 
   const from = meta?.lastSyncTimestamp ?? undefined
 
-  const page1 = await lastfm.getRecentTracks(user, 200, 1, from)
+  let page1: { tracks: Track[]; totalPages: number }
+  try {
+    page1 = await lastfm.getRecentTracks(user, 200, 1, from)
+  } catch (err: any) {
+    throw new Error(`Failed to fetch page 1: ${err.message || 'Unknown error'}`)
+  }
   const totalPages = page1.totalPages
+  let failedPages = 0
 
   // Only store tracks newer than our last sync (defensive)
   const newTracks = from
@@ -385,17 +414,27 @@ export async function incrementalSync(
     const BATCH = 5
     for (let start = 2; start <= totalPages; start += BATCH) {
       const end = Math.min(start + BATCH - 1, totalPages)
-      const batch = await Promise.all(
-        Array.from({ length: end - start + 1 }, (_, i) =>
-          lastfm.getRecentTracks(user, 200, start + i, from),
-        ),
-      )
+      const pagePromises = Array.from({ length: end - start + 1 }, (_, i) => {
+        const pageNum = start + i
+        return lastfm.getRecentTracks(user, 200, pageNum, from)
+          .then((r: { tracks: Track[] }) => ({ page: pageNum, tracks: r.tracks, ok: true as const }))
+          .catch((err: any) => {
+            console.warn(`[sync] Page ${pageNum} failed: ${err.message}, skipping`)
+            return { page: pageNum, tracks: [] as Track[], ok: false as const }
+          })
+      })
+      const batch = await Promise.all(pagePromises)
+
       const batchNew: Track[] = []
       for (const r of batch) {
-        const filtered = from
-          ? r.tracks.filter((t: Track) => trackSortKey(t) > from)
-          : r.tracks
-        batchNew.push(...filtered)
+        if (r.ok) {
+          const filtered = from
+            ? r.tracks.filter((t: Track) => trackSortKey(t) > from)
+            : r.tracks
+          batchNew.push(...filtered)
+        } else {
+          failedPages++
+        }
       }
       await bulkPutTracks(batchNew)
       totalNew += batchNew.length
@@ -407,7 +446,7 @@ export async function incrementalSync(
 
   const totalCached = (meta?.totalTracks ?? 0) + totalNew
   await updateSyncMeta(user, totalCached, meta?.syncComplete ?? false)
-  return { newTracks: totalNew, totalCached }
+  return { newTracks: totalNew, totalCached, failedPages }
 }
 
 /** Get sync metadata for a user */

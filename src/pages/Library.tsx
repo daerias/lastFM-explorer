@@ -171,6 +171,7 @@ export default function Library() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [syncWarning, setSyncWarning] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [showTags, setShowTags] = useState(false)
   const [trackTags, setTrackTags] = useState<Map<string, string[]>>(new Map())
@@ -311,12 +312,15 @@ export default function Library() {
       } else {
         // Incremental sync in background
         if (!abortRef.current) setSyncActive(true)
-        await incrementalSync(username, (prog) => {
+        const incResult = await incrementalSync(username, (prog) => {
           if (!abortRef.current && prog.tracksSoFar > 0) setSyncProgress(prog)
         })
         if (!abortRef.current) {
           setSyncActive(false)
           setSyncProgress(null)
+          if (incResult.failedPages > 0) {
+            setSyncWarning(`${incResult.failedPages} page(s) failed — some tracks may be missing. Full sync recommended.`)
+          }
           if (meta.totalTracks > 0) {
             const fresh = await getCachedAllTracks(username)
             setTracks(fresh)
@@ -341,7 +345,7 @@ export default function Library() {
   const handleFullResync = useCallback(async () => {
     if (!username || syncActive) return
     abortRef.current = false
-    setSyncActive(true); setSyncProgress(null)
+    setSyncActive(true); setSyncProgress(null); setError(null); setSyncWarning(null)
     try {
       await startFullSync(username, (prog) => {
         if (!abortRef.current) setSyncProgress(prog)
@@ -351,6 +355,11 @@ export default function Library() {
         setTracks(fresh)
         const count = await getCachedTrackCount(username)
         setCachedCount(count)
+        // Check if sync was incomplete
+        const meta = await getSyncMeta(username)
+        if (meta && !meta.syncComplete) {
+          setSyncWarning('Some pages failed during sync — not all tracks cached. Retry or check connection.')
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Sync failed')
@@ -458,8 +467,33 @@ export default function Library() {
       </div>
 
       {error && (
-        <div className="neuro-pressed" style={{ padding: '24px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--accent)' }}>{error}</p>
+        <div className="neuro-pressed" style={{ padding: '20px 24px', textAlign: 'center', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+          <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+          <p style={{ color: 'var(--accent)', margin: 0 }}>{error}</p>
+          <button className="neuro-btn" onClick={handleFullResync} style={{ fontSize: '0.7rem', padding: '6px 14px' }}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      {syncWarning && !error && (
+        <div style={{
+          padding: '10px 16px', marginBottom: '10px', borderRadius: '10px',
+          background: 'var(--accent-glass)', border: '1px solid var(--accent-glow)',
+          color: 'var(--accent)', fontSize: '0.72rem', fontWeight: 500,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px',
+          boxShadow: '0 0 10px var(--accent-glass)',
+        }}>
+          <span>⚠️ {syncWarning}</span>
+          <button
+            onClick={() => setSyncWarning(null)}
+            style={{
+              background: 'none', border: 'none', color: 'var(--text-muted)',
+              cursor: 'pointer', fontSize: '0.8rem', padding: '2px 6px',
+            }}
+          >
+            ✕
+          </button>
         </div>
       )}
 

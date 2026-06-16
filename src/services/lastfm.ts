@@ -38,7 +38,18 @@ export async function getSession(token: string): Promise<{ sessionKey: string; u
   }
 }
 
-/** Generic Last.fm API call */
+// ── Retry helpers ──
+
+/** Jittered sleep — avoids thundering herd on retry */
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms + Math.random() * 300))
+}
+
+/** Generic Last.fm API call with exponential-backoff retry.
+ *  Retries up to 3 times for 5xx/server errors (1s→2s→4s backoff + jitter).
+ *  Retries once for 429 rate limits (5s wait).
+ *  Retries network errors (fetch failures) with backoff.
+ *  Does NOT retry on 4xx client errors (bad request, not found, etc.). */
 export async function apiCall(
   method: string,
   params: Record<string, string> = {},
@@ -56,13 +67,55 @@ export async function apiCall(
   }
 
   const query = new URLSearchParams(allParams).toString()
-  const res = await fetch(`/api/lastfm?${query}`)
+  const url = `/api/lastfm?${query}`
+  const maxRetries = 3
 
-  if (!res.ok) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    // ── Fetch with network-error-only retry ──
+    let res: Response
+    try {
+      res = await fetch(url)
+    } catch (err: any) {
+      // Network error (DNS, connection refused, timeout) — retry with backoff
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000
+        console.warn(`[lastfm] Network error, retry ${attempt + 1}/${maxRetries} in ${Math.round(delay / 1000)}s…`)
+        await sleep(delay)
+        continue
+      }
+      throw new Error(`Last.fm API unreachable after ${maxRetries + 1} attempts`)
+    }
+
+    // ── HTTP success ──
+    if (res.ok) {
+      return res.json()
+    }
+
+    // ── Rate limit (429) — longer backoff, fewer retries ──
+    if (res.status === 429) {
+      if (attempt < 1) {
+        console.warn(`[lastfm] Rate limited (429), waiting 5s before retry…`)
+        await sleep(5000)
+        continue
+      }
+      throw new Error(`Last.fm rate limit exceeded`)
+    }
+
+    // ── Server error (5xx) — exponential backoff retry ──
+    if (res.status >= 500) {
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
+        console.warn(`[lastfm] Server error ${res.status}, retry ${attempt + 1}/${maxRetries} in ${Math.round(delay / 1000)}s…`)
+        await sleep(delay)
+        continue
+      }
+    }
+
+    // ── 4xx client error (or 5xx exhausted retries) — no retry, throw immediately ──
     throw new Error(`Last.fm API error: ${res.status}`)
   }
 
-  return res.json()
+  throw new Error('Last.fm API call failed after retries')
 }
 
 export interface LastfmUser {
