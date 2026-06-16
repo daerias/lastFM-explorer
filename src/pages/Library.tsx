@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useMusicPlayer } from '../context/MusicPlayerContext'
-import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, getRecentTracks, type Track } from '../services/lastfm'
+import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, getRecentTracks, getPersonalTracks, type Track, type TaggedTrack } from '../services/lastfm'
 import { getCachedAllTracks, getCachedTrackCount, startFullSync, incrementalSync, getSyncMeta, clearTrackCache, processRetryQueue, queueRetryTask, type SyncProgress } from '../services/indexedDB'
 import { DEMO_TOP_TAGS, generateDemoTimeline } from '../services/demoData'
 import { useCoverFallback } from '../hooks/useCoverFallback'
@@ -40,6 +40,16 @@ function formatTime(track: Track): string {
 
 function getArtistName(track: Track): string {
   return track.artist?.['#text'] || 'Unknown'
+}
+
+/** Convert TaggedTrack from LastFM API to Track shape for timeline display */
+function taggedToTrack(tt: TaggedTrack): Track {
+  return {
+    name: tt.name,
+    artist: { '#text': tt.artist.name },
+    url: tt.url,
+    image: [],
+  }
 }
 
 // ── TimelineRow (module-level, pure) ──
@@ -199,6 +209,14 @@ export default function Library() {
   const [tagLoading, setTagLoading] = useState(false)
   const [suggestions, setSuggestions] = useState<{ name: string; count: number }[]>([])
 
+  // Direct tag loading — fetch tagged tracks on-demand from API
+  const [directTagTracks, setDirectTagTracks] = useState<Track[] | null>(null)
+  const [directTagLoading, setDirectTagLoading] = useState(false)
+  const [directTagError, setDirectTagError] = useState<string | null>(null)
+  const [directTagLabel, setDirectTagLabel] = useState<string | null>(null)
+  const directTagAbortRef = useRef(0)
+  const tracksCountRef = useRef(0)
+
   // Genre quick-filter
   const [activeGenre, setActiveGenre] = useState<string | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -274,9 +292,51 @@ export default function Library() {
     return () => { cancelled = true }
   }, [filterTags, activeGenre, username])
 
-  const toggleGenre = useCallback((tag: string) => {
-    setActiveGenre((prev) => prev === tag ? null : tag)
-  }, [])
+  const toggleGenre = useCallback(async (tag: string) => {
+    if (activeGenre === tag) {
+      // Deselect — cancel any in-flight request + clear everything
+      directTagAbortRef.current += 1
+      setActiveGenre(null)
+      setDirectTagTracks(null)
+      setDirectTagLabel(null)
+      setDirectTagError(null)
+      return
+    }
+
+    setActiveGenre(tag)
+
+    // If we have cached tracks, let the existing filter logic handle it
+    if (tracksCountRef.current > 0) {
+      setDirectTagTracks(null)
+      setDirectTagLabel(null)
+      return
+    }
+
+    // No cached tracks — fetch tagged tracks directly from LastFM API
+    if (!username) return
+
+    // Cancel any stale in-flight request
+    directTagAbortRef.current += 1
+    const requestId = directTagAbortRef.current
+
+    setDirectTagLoading(true)
+    setDirectTagError(null)
+    setDirectTagLabel(tag)
+
+    try {
+      const result = await getPersonalTracks(username, tag, 200, 1)
+      // Discard stale results if a newer request was fired
+      if (directTagAbortRef.current !== requestId) return
+      const converted = result.tracks.map(taggedToTrack)
+      setDirectTagTracks(converted)
+    } catch (err: any) {
+      if (directTagAbortRef.current !== requestId) return
+      setDirectTagError(err.message || 'Failed to load tagged tracks')
+    } finally {
+      if (directTagAbortRef.current !== requestId) return
+      setDirectTagLoading(false)
+    }
+  }, [activeGenre, username])
 
   // ── Smart Load: recent tracks first (fast), full sync in background ──
   const loadFromCache = useCallback(async () => {
@@ -436,8 +496,9 @@ export default function Library() {
   useEffect(() => { if (!isDemo) return; setTracks(generateDemoTimeline() as unknown as Track[]); setLoading(false); setCachedCount(20) }, [isDemo])
   useEffect(() => { if (!isDemo) return; setSuggestions(DEMO_TOP_TAGS) }, [isDemo])
 
-  // Keep ref in sync with state
+  // Keep refs in sync with state
   useEffect(() => { syncActiveRef.current = syncActive }, [syncActive])
+  useEffect(() => { tracksCountRef.current = tracks.length }, [tracks.length])
 
   // ── Offline Retry Queue — process after sync + when coming back online ──
   const processRetry = useCallback(async () => {
@@ -498,7 +559,21 @@ export default function Library() {
 
   // ── Fast in-memory search ──
   const filtered = useMemo(() => {
-    let result = tracks
+    // Direct tag mode — show API-fetched tagged tracks
+    let result = directTagTracks ?? tracks
+
+    if (directTagTracks) {
+      // In direct tag mode, only apply search filter (tag filter is the source)
+      if (search.trim()) {
+        const q = search.toLowerCase()
+        result = result.filter((t) =>
+          t.name.toLowerCase().includes(q) || getArtistName(t).toLowerCase().includes(q),
+        )
+      }
+      return result
+    }
+
+    // Normal mode — filter cached tracks by tagged artists
     if (tagFilteredKeys && tagFilteredKeys.size > 0) {
       result = result.filter((t) => tagFilteredKeys.has(getArtistName(t).toLowerCase()))
     }
@@ -509,7 +584,7 @@ export default function Library() {
       )
     }
     return result
-  }, [tracks, search, tagFilteredKeys])
+  }, [tracks, directTagTracks, search, tagFilteredKeys])
 
   // Fetch personal tags for displayed tracks
   useEffect(() => {
@@ -644,8 +719,8 @@ export default function Library() {
           >
             {showTags ? '🏷️ Tags on' : '🏷️ Tags'}
           </button>
-          {hasActiveFilters && (
-            <button className={styles.filterChip} onClick={() => { setSearch(''); setFilterTags([]); setActiveGenre(null) }}>
+          {(hasActiveFilters || directTagTracks) && (
+            <button className={styles.filterChip} onClick={() => { setSearch(''); setFilterTags([]); setActiveGenre(null); setDirectTagTracks(null); setDirectTagLabel(null); setDirectTagError(null) }}>
               Clear
             </button>
           )}
@@ -686,12 +761,14 @@ export default function Library() {
             {hasActiveFilters ? '🔍' : syncActive ? '📡' : '📭'}
           </span>
           <p style={{ color: 'var(--text-muted)' }}>
-            {hasActiveFilters ? 'No tracks match.'
+            {directTagLoading ? `Loading tagged tracks for "${directTagLabel}"…`
+              : directTagError ? directTagError
+              : hasActiveFilters ? 'No tracks match.'
               : syncActive ? 'Loading your tracks…'
               : isDemo ? 'Demo mode — no real tracks.' : 'No tracks found. Try Full Sync.'}
           </p>
-          {hasActiveFilters && (
-            <button className="neuro-btn" onClick={() => { setSearch(''); setFilterTags([]); setActiveGenre(null) }} style={{ marginTop: 12 }}>
+          {(hasActiveFilters || directTagTracks) && (
+            <button className="neuro-btn" onClick={() => { setSearch(''); setFilterTags([]); setActiveGenre(null); setDirectTagTracks(null); setDirectTagLabel(null); setDirectTagError(null) }} style={{ marginTop: 12 }}>
               Clear filters
             </button>
           )}
