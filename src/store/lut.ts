@@ -61,7 +61,7 @@ export const LUT_PRESETS: LutPreset[] = [
     label: 'Vintage 70s',
     icon: '📸',
     desc: 'Warm fade, sepia warmth, slight glow',
-    filter: 'sepia(0.3) saturate(0.7) contrast(0.9) brightness(1.05)',
+    filter: 'sepia(0.2) saturate(0.8) contrast(0.95) brightness(1.05)',
     overlay: 'linear-gradient(180deg, rgba(255,200,100,0.05) 0%, rgba(200,150,80,0.04) 100%)',
     blendMode: 'overlay',
   },
@@ -104,7 +104,7 @@ export interface DofSettings {
 
 export const DOF_DEFAULTS: DofSettings = {
   enabled: false,
-  intensity: 40,
+  intensity: 20,
   focusPoint: 50,
 }
 
@@ -139,7 +139,14 @@ export function getDofSettings(): DofSettings {
         typeof parsed.enabled === 'boolean' &&
         parsed.intensity >= 0 && parsed.intensity <= 100 &&
         parsed.focusPoint >= 0 && parsed.focusPoint <= 100
-      ) return parsed
+      ) {
+        // Cap old high-intensity values to prevent excessive blur
+        if (parsed.intensity > 60) {
+          parsed.intensity = 60
+          try { localStorage.setItem(DOF_KEY, JSON.stringify(parsed)) } catch {}
+        }
+        return parsed
+      }
     }
   } catch {}
   return { ...DOF_DEFAULTS }
@@ -173,7 +180,7 @@ export function applyDof(dof: DofSettings): void {
     document.documentElement.setAttribute('data-dof', 'on')
     document.documentElement.style.setProperty('--dof-intensity', String(dof.intensity))
     document.documentElement.style.setProperty('--dof-focus', String(dof.focusPoint))
-    document.documentElement.style.setProperty('--dof-blur', `${dof.intensity * 0.06}px`)
+    document.documentElement.style.setProperty('--dof-blur', `${dof.intensity * 0.03}px`)
   } else {
     document.documentElement.removeAttribute('data-dof')
   }

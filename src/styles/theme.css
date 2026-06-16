@@ -553,9 +553,9 @@ body {
   animation: particles-float var(--anim-duration-particles, 26s) ease-in-out infinite;
 }
 
-/* Light particles — soft glowing dust, doubled sparkle count */
+/* Light particles — soft glowing dust */
 [data-theme="light"] #root::after {
-  filter: blur(1px);
+  filter: blur(0.5px);
   box-shadow:
     60px 100px 3px 1px rgba(224,135,108,0.30),
     180px 50px 2px 1px rgba(125,184,125,0.24),
@@ -583,9 +583,9 @@ body {
     1090px 560px 2px 1px rgba(212,179,136,0.15);
 }
 
-/* Dark particles — jewel-bright sparks on deep velvet, doubled count */
+/* Dark particles — jewel-bright sparks on deep velvet */
 [data-theme="dark"] #root::after {
-  filter: blur(1.2px);
+  filter: blur(0.6px);
   box-shadow:
     60px 100px 3px 1px rgba(255,114,89,0.40),
     180px 50px 2px 1px rgba(0,223,137,0.32),
@@ -1440,20 +1440,20 @@ a:hover {
   inset: 0;
   pointer-events: none;
   z-index: 999;
-  backdrop-filter: blur(var(--dof-blur, 2.4px));
-  -webkit-backdrop-filter: blur(var(--dof-blur, 2.4px));
+  backdrop-filter: blur(var(--dof-blur, 1.2px));
+  -webkit-backdrop-filter: blur(var(--dof-blur, 1.2px));
   mask-image: radial-gradient(
     ellipse 60% var(--dof-focus, 50%) at 50% 50%,
-    transparent 30%,
-    rgba(0,0,0,0.3) 60%,
-    rgba(0,0,0,0.7) 85%,
+    transparent 45%,
+    rgba(0,0,0,0.15) 65%,
+    rgba(0,0,0,0.5) 85%,
     black 100%
   );
   -webkit-mask-image: radial-gradient(
     ellipse 60% var(--dof-focus, 50%) at 50% 50%,
-    transparent 30%,
-    rgba(0,0,0,0.3) 60%,
-    rgba(0,0,0,0.7) 85%,
+    transparent 45%,
+    rgba(0,0,0,0.15) 65%,
+    rgba(0,0,0,0.5) 85%,
     black 100%
   );
 }
