@@ -3,6 +3,12 @@
 > **Your listening history, beautifully reimagined.** A premium dual-theme dashboard for Last.fm — discover patterns, manage tags, and explore your music data through a warm plastic-neumorphism interface that feels tactile and alive.
 
 <p align="center">
+  <a href="https://lastfm-explorer.vercel.app" target="_blank" rel="noopener">
+    <img src="https://img.shields.io/badge/🚀_Live_Demo-Vercel-000?logo=vercel&logoColor=white&style=for-the-badge" alt="Live Demo on Vercel">
+  </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Last.fm-D51007?logo=last.fm&logoColor=white" alt="Last.fm">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19">
   <img src="https://img.shields.io/badge/Vite-6-646CFF?logo=vite" alt="Vite 6">

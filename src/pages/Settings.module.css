@@ -59,6 +59,12 @@
   to { transform: scale(1); opacity: 1; }
 }
 
+@keyframes edgeSparkPulse {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  35% { opacity: 0.5; transform: scale(1.35); }
+  70% { opacity: 0.1; transform: scale(1); }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Cards — breathing neumorphic panels
    ═══════════════════════════════════════════════════════════════ */
@@ -70,37 +76,57 @@
   padding: 18px;
   background: linear-gradient(155deg, var(--bg-surface), var(--bg-primary));
   border-radius: var(--border-radius);
-  box-shadow: 6px 6px 18px var(--shadow-warm), -6px -6px 18px var(--shadow-light);
+  box-shadow: 8px 8px 24px var(--shadow-warm), -6px -6px 24px var(--shadow-light);
   border: 1px solid var(--glass-border);
   position: relative;
-  animation: cardBreathe 6s ease-in-out infinite;
+  overflow: hidden;
+  animation: cardBreathe 8s ease-in-out infinite;
   transition: all 0.3s ease;
 }
 
+/* Top-edge soft glow — light catching the surface, no reflection */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+  background: var(--accent-glass);
+  filter: blur(5px);
+  opacity: 0.45;
+  transition: opacity 0.6s ease;
+}
+
+/* Corner spark — tiny toxic glow dot, pulsing subtly */
 .card::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  top: 10px;
+  right: 16px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
   pointer-events: none;
-  background: linear-gradient(140deg, transparent 30%, var(--highlight-glass) 48%, var(--highlight-glass) 50%, transparent 70%);
-  background-size: 200% 100%;
-  animation: specular-sweep 10s ease-in-out infinite;
-  opacity: 0.25;
+  z-index: 1;
+  background: var(--toxic-green);
+  box-shadow: 0 0 10px var(--toxic-green-glow), 0 0 20px var(--toxic-green-glow);
+  opacity: 0;
+  animation: edgeSparkPulse 7s ease-in-out infinite;
 }
-
-[data-theme="dark"] .card::after,
-[data-theme="teal"] .card::after,
-[data-theme="crimson"] .card::after { opacity: 0.1; }
 
 .card:hover {
   animation-play-state: paused;
+  transform: translateY(-1px);
+  box-shadow: 10px 10px 30px var(--shadow-warm), -8px -8px 30px var(--shadow-light), 0 0 0 1px var(--accent-glass);
 }
 
-.card:hover::after {
-  animation-play-state: paused;
-  opacity: 0.4;
-}
+.card:hover::before { opacity: 0.8; }
+
+.card:hover::after { opacity: 0.55; }
 
 /* ═══════════════════════════════════════════════════════════════
    Section Head — glowing dot + title
@@ -945,7 +971,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card { animation: none !important; }
-  .card::after { animation: none !important; display: none; }
+  .card::after { animation: none !important; }
   .sectionDot, .sectionDotTeal, .sectionDotGold { animation: none !important; }
   .badgeUnsaved { animation: none !important; }
   .statusOk { animation: none !important; }

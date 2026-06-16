@@ -346,6 +346,74 @@
   transform: scaleY(1);
 }
 
+/* Playlist Creator trigger */
+.navItemPlaylist {
+  border-left: 2px solid var(--toxic-green);
+}
+
+.navItemPlaylist:hover {
+  background: var(--toxic-green-glow);
+  border-left-color: var(--toxic-green);
+}
+
+.playlistNavIcon {
+  font-size: 1.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px var(--toxic-green-glow));
+  transition: filter 0.2s ease;
+}
+
+.navItemPlaylist:hover .playlistNavIcon {
+  filter: drop-shadow(0 0 12px var(--toxic-green-glow));
+}
+
+/* Playlist count badge — glass + glow hybrid, modern readable */
+.playlistCountBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--toxic-green);
+  background: rgba(59, 240, 122, 0.12);
+  border: 1px solid rgba(59, 240, 122, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 8px rgba(59, 240, 122, 0.2),
+    0 0 16px rgba(59, 240, 122, 0.08);
+  text-shadow: 0 0 6px rgba(59, 240, 122, 0.4);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+  opacity: 0;
+  transform: scale(0.8);
+  margin-left: auto;
+}
+
+.sidebar.expanded .playlistCountBadge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.navItemPlaylist:hover .playlistCountBadge {
+  color: #fff;
+  background: rgba(59, 240, 122, 0.35);
+  border-color: rgba(59, 240, 122, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 14px rgba(59, 240, 122, 0.35),
+    0 0 24px rgba(59, 240, 122, 0.15);
+  text-shadow: 0 0 8px rgba(59, 240, 122, 0.6);
+}
+
 /* Active state — intense neon pulse with color cycling */
 .navItemActive {
   color: var(--accent, #d418d4);

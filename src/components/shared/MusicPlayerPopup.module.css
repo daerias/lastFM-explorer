@@ -1,46 +1,490 @@
 /* ═══════════════════════════════════════════════════════════════
-   Music Player Popup — Premium Plastic Neumorphism
-   Floating glass panel, warm shadows, coral glow, soft specular sweep.
-   "Nicht noob — premium. Aus einem Guss mit dem Plastic-Theme."
+   Toxic Orb Music Player — Cyberpunk Liquid Core
+   Floating bottom-right orb · Neon green glow · Liquid slosh
+   Bubbles rising · Glass shell · Pulsating heartbeat
+   "Giftig, pulsierend, mit Flüssigkeit gefüllt — Cyberpunky"
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Bottom-Docked Panel — emerges from the app, grounded, centered ── */
-.panel {
+/* ── Floating Orb Container (collapsed state anchor) ── */
+.orbAnchor {
   position: fixed;
-  bottom: env(safe-area-inset-bottom, 0);
-  left: 50%;
-  z-index: 251;
-  width: 520px;
-  max-width: calc(100vw - 24px);
-  max-height: 60vh;
-  background: linear-gradient(
-    170deg,
-    rgba(252, 251, 248, 0.82) 0%,
-    rgba(242, 239, 232, 0.76) 100%
+  bottom: 24px;
+  right: 24px;
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* ── The Orb Itself — toxic liquid core ── */
+.orb {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  flex-shrink: 0;
+
+  /* Glass outer shell */
+  background: radial-gradient(
+    circle at 40% 35%,
+    rgba(20, 30, 20, 0.75) 0%,
+    rgba(8, 16, 8, 0.85) 60%,
+    rgba(4, 8, 4, 0.92) 100%
   );
-  backdrop-filter: blur(28px) saturate(1.2);
-  -webkit-backdrop-filter: blur(28px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-bottom: none;
-  border-radius: var(--border-radius, 24px) var(--border-radius, 24px) 0 0;
+  border: 1.5px solid rgba(59, 240, 122, 0.35);
+  backdrop-filter: blur(8px);
+
+  /* Neon glow */
+  box-shadow:
+    0 0 18px rgba(59, 240, 122, 0.5),
+    0 0 40px rgba(59, 240, 122, 0.25),
+    0 0 70px rgba(59, 240, 122, 0.12),
+    0 0 100px rgba(59, 240, 122, 0.06),
+    inset 0 0 30px rgba(59, 240, 122, 0.08);
+
+  animation: orbBreathe 3s ease-in-out infinite;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease;
+}
+
+.orb:hover {
+  transform: scale(1.1);
+  box-shadow:
+    0 0 28px rgba(59, 240, 122, 0.7),
+    0 0 60px rgba(59, 240, 122, 0.35),
+    0 0 100px rgba(59, 240, 122, 0.18),
+    0 0 140px rgba(59, 240, 122, 0.08),
+    inset 0 0 40px rgba(59, 240, 122, 0.12);
+}
+
+.orb:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+/* Orb playing state — more intense pulse */
+.orbPlaying {
+  animation: orbBreatheFast 1.8s ease-in-out infinite;
+}
+
+@keyframes orbBreathe {
+  0%, 100% {
+    box-shadow:
+      0 0 18px rgba(59, 240, 122, 0.5),
+      0 0 40px rgba(59, 240, 122, 0.25),
+      0 0 70px rgba(59, 240, 122, 0.12),
+      inset 0 0 30px rgba(59, 240, 122, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 28px rgba(59, 240, 122, 0.7),
+      0 0 56px rgba(59, 240, 122, 0.35),
+      0 0 90px rgba(59, 240, 122, 0.18),
+      inset 0 0 45px rgba(59, 240, 122, 0.14);
+  }
+}
+
+@keyframes orbBreatheFast {
+  0%, 100% {
+    box-shadow:
+      0 0 22px rgba(59, 240, 122, 0.6),
+      0 0 48px rgba(59, 240, 122, 0.3),
+      0 0 80px rgba(59, 240, 122, 0.15),
+      inset 0 0 35px rgba(59, 240, 122, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 36px rgba(59, 240, 122, 0.85),
+      0 0 72px rgba(59, 240, 122, 0.45),
+      0 0 110px rgba(59, 240, 122, 0.25),
+      inset 0 0 55px rgba(59, 240, 122, 0.18);
+  }
+}
+
+/* ── Liquid Fill — the toxic goo inside the orb ── */
+.liquidFill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+  /* Default: about 40% filled */
+  height: 40%;
+  transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.orbPlaying .liquidFill {
+  height: 85%;
+}
+
+/* Liquid gradient — toxic green goo */
+.liquidFill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 120% 60% at 50% 0%,
+      rgba(59, 240, 122, 0.7) 0%,
+      rgba(40, 200, 90, 0.5) 30%,
+      rgba(20, 140, 60, 0.35) 60%,
+      rgba(10, 80, 30, 0.15) 100%
+    );
+  /* Sloshing surface wave */
+  clip-path: polygon(
+    0% 15%,
+    8% 22%,
+    18% 8%,
+    28% 20%,
+    38% 5%,
+    48% 18%,
+    58% 10%,
+    68% 22%,
+    78% 14%,
+    88% 20%,
+    100% 8%,
+    100% 100%,
+    0% 100%
+  );
+  animation: liquidSlosh 3.5s ease-in-out infinite;
+}
+
+/* Secondary liquid layer — deeper green, offset wave */
+.liquidFill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 100% 50% at 50% 10%,
+      rgba(59, 240, 122, 0.3) 0%,
+      rgba(30, 160, 70, 0.2) 50%,
+      transparent 80%
+    );
+  clip-path: polygon(
+    0% 25%,
+    12% 14%,
+    24% 28%,
+    36% 10%,
+    48% 24%,
+    60% 16%,
+    72% 26%,
+    84% 12%,
+    100% 20%,
+    100% 100%,
+    0% 100%
+  );
+  animation: liquidSlosh2 4.2s ease-in-out infinite 0.8s;
+}
+
+@keyframes liquidSlosh {
+  0%, 100% {
+    clip-path: polygon(
+      0% 15%, 8% 22%, 18% 8%, 28% 20%, 38% 5%,
+      48% 18%, 58% 10%, 68% 22%, 78% 14%, 88% 20%,
+      100% 8%, 100% 100%, 0% 100%
+    );
+  }
+  25% {
+    clip-path: polygon(
+      0% 10%, 8% 18%, 18% 22%, 28% 8%, 38% 16%,
+      48% 22%, 58% 6%, 68% 18%, 78% 24%, 88% 10%,
+      100% 16%, 100% 100%, 0% 100%
+    );
+  }
+  50% {
+    clip-path: polygon(
+      0% 20%, 8% 8%, 18% 16%, 28% 24%, 38% 10%,
+      48% 6%, 58% 20%, 68% 14%, 78% 8%, 88% 22%,
+      100% 12%, 100% 100%, 0% 100%
+    );
+  }
+  75% {
+    clip-path: polygon(
+      0% 12%, 8% 24%, 18% 10%, 28% 16%, 38% 22%,
+      48% 14%, 58% 8%, 68% 20%, 78% 16%, 88% 6%,
+      100% 18%, 100% 100%, 0% 100%
+    );
+  }
+}
+
+@keyframes liquidSlosh2 {
+  0%, 100% {
+    clip-path: polygon(
+      0% 25%, 12% 14%, 24% 28%, 36% 10%, 48% 24%,
+      60% 16%, 72% 26%, 84% 12%, 100% 20%,
+      100% 100%, 0% 100%
+    );
+  }
+  33% {
+    clip-path: polygon(
+      0% 16%, 12% 28%, 24% 14%, 36% 24%, 48% 8%,
+      60% 20%, 72% 14%, 84% 26%, 100% 10%,
+      100% 100%, 0% 100%
+    );
+  }
+  66% {
+    clip-path: polygon(
+      0% 28%, 12% 10%, 24% 24%, 36% 16%, 48% 26%,
+      60% 10%, 72% 22%, 84% 8%, 100% 24%,
+      100% 100%, 0% 100%
+    );
+  }
+}
+
+/* Playing state — faster slosh */
+.orbPlaying .liquidFill::before {
+  animation-duration: 1.8s;
+}
+.orbPlaying .liquidFill::after {
+  animation-duration: 2.1s;
+}
+
+/* ── Bubbles rising inside the orb ── */
+.bubbles {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(140, 255, 180, 0.7),
+    rgba(59, 240, 122, 0.15) 70%,
+    transparent
+  );
+  box-shadow:
+    inset 0 0 4px rgba(255, 255, 255, 0.3),
+    0 0 6px rgba(59, 240, 122, 0.4);
+  animation: bubbleRise 4s ease-in infinite;
+  opacity: 0;
+}
+
+.bubble:nth-child(1) {
+  width: 6px; height: 6px;
+  left: 25%; bottom: 10%;
+  animation-duration: 3.2s;
+  animation-delay: -0.5s;
+}
+
+.bubble:nth-child(2) {
+  width: 4px; height: 4px;
+  left: 55%; bottom: 15%;
+  animation-duration: 4.5s;
+  animation-delay: -2.1s;
+}
+
+.bubble:nth-child(3) {
+  width: 8px; height: 8px;
+  left: 38%; bottom: 8%;
+  animation-duration: 3.8s;
+  animation-delay: -1.3s;
+}
+
+.bubble:nth-child(4) {
+  width: 3px; height: 3px;
+  left: 65%; bottom: 20%;
+  animation-duration: 5.2s;
+  animation-delay: -3.4s;
+}
+
+.bubble:nth-child(5) {
+  width: 5px; height: 5px;
+  left: 45%; bottom: 12%;
+  animation-duration: 4.1s;
+  animation-delay: -0.8s;
+}
+
+.bubble:nth-child(6) {
+  width: 7px; height: 7px;
+  left: 72%; bottom: 10%;
+  animation-duration: 3.5s;
+  animation-delay: -2.7s;
+}
+
+.orbPlaying .bubble {
+  opacity: 1;
+}
+
+.orbPlaying .bubble:nth-child(1) { animation-duration: 1.6s; }
+.orbPlaying .bubble:nth-child(2) { animation-duration: 2.3s; }
+.orbPlaying .bubble:nth-child(3) { animation-duration: 1.9s; }
+.orbPlaying .bubble:nth-child(4) { animation-duration: 2.6s; }
+.orbPlaying .bubble:nth-child(5) { animation-duration: 2.0s; }
+.orbPlaying .bubble:nth-child(6) { animation-duration: 1.7s; }
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.3);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+    transform: translateY(-16px) translateX(2px) scale(1);
+  }
+  50% {
+    transform: translateY(-32px) translateX(-4px) scale(1.3);
+    opacity: 0.5;
+  }
+  85% {
+    transform: translateY(-44px) translateX(3px) scale(2);
+    opacity: 0.15;
+  }
+  100% {
+    transform: translateY(-50px) translateX(0) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ── Toxic drip particles orbiting the orb ── */
+.dripParticles {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.orbPlaying .dripParticles {
+  opacity: 1;
+}
+
+.drip {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--toxic-green, #3bf07a);
+  box-shadow: 0 0 6px rgba(59, 240, 122, 0.7), 0 0 12px rgba(59, 240, 122, 0.3);
+  animation: dripOrbit 3s linear infinite;
+}
+
+.drip:nth-child(1) { animation-duration: 2.8s; }
+.drip:nth-child(2) { animation-duration: 3.5s; animation-delay: -0.7s; }
+.drip:nth-child(3) { animation-duration: 4.1s; animation-delay: -1.4s; }
+.drip:nth-child(4) { animation-duration: 3.2s; animation-delay: -2.1s; }
+.drip:nth-child(5) { animation-duration: 2.5s; animation-delay: -2.8s; }
+.drip:nth-child(6) { animation-duration: 3.8s; animation-delay: -1.0s; }
+.drip:nth-child(7) { animation-duration: 4.4s; animation-delay: -1.8s; }
+.drip:nth-child(8) { animation-duration: 2.9s; animation-delay: -2.4s; }
+
+@keyframes dripOrbit {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(38px) rotate(0deg);
+    opacity: 0;
+  }
+  20% { opacity: 0.9; }
+  50% { opacity: 0.4; }
+  80% { opacity: 0.9; }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(38px) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+/* ── Orb Icon (play/pause symbol) ── */
+.orbIcon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  color: rgba(59, 240, 122, 0.9);
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(59, 240, 122, 0.6);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* ── Orb Label (track name tooltip on hover) ── */
+.orbLabel {
+  position: absolute;
+  right: 72px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(8, 16, 8, 0.9);
+  border: 1px solid rgba(59, 240, 122, 0.3);
+  border-radius: 10px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(59, 240, 122, 0.9);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 0 16px rgba(59, 240, 122, 0.2);
+  text-shadow: 0 0 6px rgba(59, 240, 122, 0.3);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.orb:hover + .orbLabel,
+.orbLabel:hover {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Expanded Panel — slides up from the orb
+   ═══════════════════════════════════════════════════════════════ */
+
+.panel {
+  width: 400px;
+  max-width: calc(100vw - 48px);
+  background:
+    linear-gradient(
+      170deg,
+      rgba(12, 20, 14, 0.92) 0%,
+      rgba(6, 12, 8, 0.88) 100%
+    );
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  border: 1px solid rgba(59, 240, 122, 0.2);
+  border-radius: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transform: translate(-50%, 0);
-  animation: playerSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   box-shadow:
-    0 -4px 24px var(--shadow-warm, rgba(180, 160, 140, 0.2)),
-    0 -12px 48px var(--shadow-warm, rgba(180, 160, 140, 0.12)),
-    -8px 0 28px var(--shadow-warm, rgba(180, 160, 140, 0.08)),
-    8px 0 28px var(--shadow-warm, rgba(180, 160, 140, 0.08)),
-    inset 0 1px 0 var(--highlight-glass, rgba(255, 255, 255, 0.6));
+    0 -4px 24px rgba(0, 0, 0, 0.6),
+    0 -8px 48px rgba(59, 240, 122, 0.1),
+    0 0 0 1px rgba(59, 240, 122, 0.08);
+  animation: panelSlideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  position: relative;
 }
 
-.panel.closing {
-  animation: playerSlideDown 0.25s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(59, 240, 122, 0.04) 0%,
+      transparent 30%,
+      transparent 70%,
+      rgba(59, 240, 122, 0.03) 100%
+    );
 }
 
-/* ── Specular sweep — premium glass light beam ── */
+/* Specular sweep on panel */
 .panel::after {
   content: '';
   position: absolute;
@@ -49,43 +493,59 @@
   pointer-events: none;
   z-index: 1;
   background: linear-gradient(
-    145deg,
-    transparent 25%,
-    rgba(255, 255, 255, 0.18) 48%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0.18) 52%,
-    transparent 75%
+    125deg,
+    transparent 30%,
+    rgba(59, 240, 122, 0.06) 48%,
+    rgba(59, 240, 122, 0.12) 50%,
+    rgba(59, 240, 122, 0.06) 52%,
+    transparent 70%
   );
-  background-size: 220% 220%;
+  background-size: 250% 250%;
   background-position: 0% 0%;
-  opacity: 0.2;
+  opacity: 0.5;
 }
 
-@keyframes playerSlideUp {
-  from { transform: translate(-50%, 100%); opacity: 0; }
-  to { transform: translate(-50%, 0); opacity: 1; }
+.panel.closing {
+  animation: panelSlideDown 0.22s cubic-bezier(0.55, 0, 1, 0.45) forwards;
 }
 
-@keyframes playerSlideDown {
-  from { transform: translate(-50%, 0); opacity: 1; }
-  to { transform: translate(-50%, 100%); opacity: 0; }
+@keyframes panelSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* ── Header — raised surface with soft bottom edge ── */
+@keyframes panelSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+}
+
+/* ── Panel Header — toxic styled ── */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  gap: 12px;
+  padding: 12px 16px;
+  gap: 10px;
   position: relative;
   z-index: 2;
   background: linear-gradient(
     180deg,
-    rgba(252, 251, 248, 0.55) 0%,
-    rgba(242, 239, 232, 0.35) 100%
+    rgba(20, 30, 22, 0.5) 0%,
+    rgba(10, 18, 12, 0.3) 100%
   );
-  border-bottom: 1px solid rgba(180, 160, 140, 0.1);
+  border-bottom: 1px solid rgba(59, 240, 122, 0.12);
 }
 
 .headerInfo {
@@ -97,18 +557,19 @@
 }
 
 .headerTrack {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-primary, #2c2822);
+  color: #c8ffd4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-shadow: 0 0 8px rgba(59, 240, 122, 0.3);
   letter-spacing: -0.01em;
 }
 
 .headerArtist {
-  font-size: 0.7rem;
-  color: var(--text-muted, #9e9890);
+  font-size: 0.64rem;
+  color: rgba(59, 240, 122, 0.5);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -122,135 +583,114 @@
   flex-shrink: 0;
 }
 
-/* ── Source Badge — soft inset pill ── */
+/* ── Source Badge — toxic pill ── */
 .sourceBadge {
-  font-size: 0.56rem;
+  font-size: 0.5rem;
   font-weight: 700;
   font-family: inherit;
-  padding: 4px 10px;
-  border-radius: 14px;
-  background: linear-gradient(
-    155deg,
-    var(--accent-glass, rgba(212, 121, 94, 0.06)),
-    rgba(212, 121, 94, 0.02)
-  );
-  color: var(--accent, #d4795e);
-  box-shadow:
-    inset 1px 1px 3px rgba(180, 160, 140, 0.1),
-    inset -1px -1px 2px rgba(255, 255, 255, 0.7);
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: rgba(59, 240, 122, 0.08);
+  border: 1px solid rgba(59, 240, 122, 0.2);
+  color: rgba(59, 240, 122, 0.8);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   white-space: nowrap;
+  text-shadow: 0 0 6px rgba(59, 240, 122, 0.3);
 }
 
-/* ── External YouTube link button ── */
+/* ── External YT link ── */
 .externalBtn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: linear-gradient(
-    155deg,
-    var(--bg-surface, #fcfbf8),
-    var(--bg-primary, #f2efe8)
-  );
-  border: none;
-  border-radius: 12px;
-  padding: 6px 11px;
-  font-size: 0.6rem;
+  gap: 3px;
+  background: rgba(20, 30, 20, 0.6);
+  border: 1px solid rgba(59, 240, 122, 0.2);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.55rem;
   font-weight: 700;
   font-family: inherit;
-  color: var(--text-secondary, #6b655d);
+  color: rgba(59, 240, 122, 0.7);
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   white-space: nowrap;
   text-decoration: none;
-  box-shadow:
-    2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
-    -2px -2px 5px var(--shadow-light, #ffffff),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+  text-shadow: 0 0 4px rgba(59, 240, 122, 0.2);
 }
 
 .externalBtn:hover {
-  color: var(--accent, #d4795e);
-  box-shadow:
-    3px 3px 8px var(--shadow-warm, rgba(180,160,140,0.2)),
-    -3px -3px 8px var(--shadow-light, #ffffff),
-    inset 0 1px 0 rgba(255,255,255,0.8);
-  transform: translateY(-1px);
+  border-color: rgba(59, 240, 122, 0.5);
+  color: #3bf07a;
+  box-shadow: 0 0 12px rgba(59, 240, 122, 0.25);
+  text-shadow: 0 0 8px rgba(59, 240, 122, 0.4);
 }
 
-.externalBtn:active {
-  box-shadow:
-    inset 2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
-    inset -2px -2px 5px var(--shadow-light, #ffffff);
-  transform: scale(0.97);
-}
-
-/* ── Close button — warm pressed circle ── */
+/* ── Close button — toxic X ── */
 .closeBtn {
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(
-    155deg,
-    var(--bg-surface, #fcfbf8),
-    var(--bg-primary, #f2efe8)
-  );
-  border: none;
+  width: 26px;
+  height: 26px;
+  background: rgba(20, 30, 20, 0.6);
+  border: 1px solid rgba(59, 240, 122, 0.2);
   border-radius: 50%;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   cursor: pointer;
-  color: var(--text-muted, #9e9890);
+  color: rgba(59, 240, 122, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
-    -2px -2px 5px var(--shadow-light, #ffffff),
-    inset 0 1px 0 rgba(255,255,255,0.8);
+  transition: all 0.2s ease;
   flex-shrink: 0;
   font-family: inherit;
   padding: 0;
 }
 
 .closeBtn:hover {
-  color: var(--accent, #d4795e);
-  box-shadow:
-    3px 3px 8px var(--shadow-warm, rgba(180,160,140,0.2)),
-    -3px -3px 8px var(--shadow-light, #ffffff);
-  transform: scale(1.05);
+  border-color: rgba(59, 240, 122, 0.5);
+  color: #3bf07a;
+  box-shadow: 0 0 12px rgba(59, 240, 122, 0.3);
+  transform: scale(1.1);
 }
 
-.closeBtn:active {
-  box-shadow:
-    inset 2px 2px 5px var(--shadow-warm, rgba(180,160,140,0.15)),
-    inset -2px -2px 5px var(--shadow-light, #ffffff);
-  transform: scale(0.94);
-}
-
-/* ── Player area — soft dark frame, rounded inner recess ── */
+/* ── Player area — toxic frame ── */
 .playerWrap {
   aspect-ratio: 16 / 9;
   background:
-    radial-gradient(ellipse at center, #1a1a1a 0%, #0d0d0d 100%);
+    radial-gradient(ellipse at center, #0a1a0a 0%, #040a04 100%);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   z-index: 2;
-  margin: 12px 14px 14px;
-  border-radius: var(--border-radius-sm, 18px);
+  margin: 10px 12px 12px;
+  border-radius: 14px;
   overflow: hidden;
+  border: 1px solid rgba(59, 240, 122, 0.15);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 2px 10px rgba(0, 0, 0, 0.4),
-    0 4px 20px var(--shadow-warm, rgba(180, 160, 140, 0.2)),
-    0 1px 3px var(--shadow-warm, rgba(180, 160, 140, 0.1));
+    inset 0 2px 10px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(59, 240, 122, 0.08),
+    0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Toxic scanline overlay on video */
+.playerWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(59, 240, 122, 0.015) 2px,
+    rgba(59, 240, 122, 0.015) 4px
+  );
 }
 
 .player {
@@ -259,78 +699,90 @@
   border: none;
 }
 
-/* ── Loading state — warm, breathing, premium feeling ── */
+/* ── Loading state ── */
 .checkingOverlay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 32px 16px;
+  gap: 14px;
+  padding: 28px 16px;
+  z-index: 2;
 }
 
 .spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid rgba(180, 160, 140, 0.15);
-  border-top-color: var(--accent, #d4795e);
+  width: 32px;
+  height: 32px;
+  border: 2.5px solid rgba(59, 240, 122, 0.12);
+  border-top-color: #3bf07a;
   border-radius: 50%;
-  animation: playerSpin 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: toxicSpin 0.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   box-shadow:
-    0 0 16px var(--accent-glow, rgba(212,121,94,0.25)),
-    0 0 32px var(--accent-glow, rgba(212,121,94,0.1));
+    0 0 16px rgba(59, 240, 122, 0.3),
+    0 0 32px rgba(59, 240, 122, 0.1);
 }
 
 .spinnerSmall {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(180, 160, 140, 0.15);
-  border-top-color: var(--accent, #d4795e);
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(59, 240, 122, 0.12);
+  border-top-color: #3bf07a;
   border-radius: 50%;
-  animation: playerSpin 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: toxicSpin 0.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   display: inline-block;
   vertical-align: middle;
   flex-shrink: 0;
 }
 
-@keyframes playerSpin {
+@keyframes toxicSpin {
   to { transform: rotate(360deg); }
 }
 
 .checkingText {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  color: var(--text-muted, #9e9890);
-  animation: playerPulse 1.6s ease-in-out infinite;
-  letter-spacing: 0.02em;
+  color: rgba(59, 240, 122, 0.5);
+  animation: toxicPulse 1.5s ease-in-out infinite;
+  text-shadow: 0 0 6px rgba(59, 240, 122, 0.2);
 }
 
-@keyframes playerPulse {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.85; }
+@keyframes toxicPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
 }
 
-/* ── No-source state — warm soft centered with accent CTA ── */
+/* ── No source fallback ── */
 .noSource {
   text-align: center;
-  padding: 36px 20px;
+  padding: 28px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  z-index: 2;
 }
 
 .noSource p {
   margin: 0;
-  font-size: 0.78rem;
-  color: var(--text-muted, #9e9890);
+  font-size: 0.72rem;
+  color: rgba(59, 240, 122, 0.4);
   font-weight: 500;
 }
 
 /* ── Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
+  .orb { animation: none; }
+  .orbPlaying { animation: none; }
+  .liquidFill::before { animation: none; }
+  .liquidFill::after { animation: none; }
+  .orbPlaying .liquidFill::before { animation: none; }
+  .orbPlaying .liquidFill::after { animation: none; }
+  .bubble { animation: none; display: none; }
+  .drip { animation: none; display: none; }
+  .dripParticles { opacity: 0; }
   .panel { animation: none; }
   .panel.closing { animation: none; }
   .spinner,
   .spinnerSmall { animation: none; }
   .checkingText { animation: none; opacity: 0.6; }
+  .orb:hover { transform: none; }
 }

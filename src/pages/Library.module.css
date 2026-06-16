@@ -698,3 +698,35 @@
   .nowBadge { animation: none !important; opacity: 1; }
   .rowTagsLoading { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Sync Button — subtle neumorphic
+   ═══════════════════════════════════════════════════════════════ */
+
+.syncBtn {
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(155deg, var(--bg-surface), var(--bg-primary));
+  color: var(--text-secondary);
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 1px 1px 3px var(--shadow-warm), -1px -1px 3px var(--shadow-light);
+  letter-spacing: 0.03em;
+}
+
+.syncBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent-glass);
+  box-shadow: 1px 1px 3px var(--shadow-warm), -1px -1px 3px var(--shadow-light), 0 0 10px var(--accent-glass);
+  transform: translateY(-1px);
+}
+
+.syncBtn:active {
+  box-shadow: inset 2px 2px 5px var(--shadow-warm);
+  transform: scale(0.97);
+}

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useMusicPlayer } from '../context/MusicPlayerContext'
 import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, type Track } from '../services/lastfm'
-import { getCachedRecentTracks } from '../services/indexedDB'
+import { getCachedAllTracks, getCachedTrackCount, startFullSync, incrementalSync, getSyncMeta, clearTrackCache, type SyncProgress } from '../services/indexedDB'
 import { DEMO_TOP_TAGS, generateDemoTimeline } from '../services/demoData'
 import { useCoverFallback } from '../hooks/useCoverFallback'
 import { useVirtualScroll } from '../hooks/useVirtualScroll'
@@ -12,7 +12,7 @@ import ArtistDetailPanel from '../components/shared/ArtistDetailPanel'
 import TagChips from '../components/shared/TagChips'
 import styles from './Library.module.css'
 
-// ── Genre quick-filter presets (DJ-oriented) ──
+// ── Genre quick-filter presets ──
 const GENRE_PRESETS = [
   { label: 'DnB', tag: 'drum and bass' },
   { label: 'Techno', tag: 'techno' },
@@ -129,6 +129,41 @@ function TimelineRow({
   )
 }
 
+// ── Sync Progress Bar ──
+function SyncBar({ progress, onCancel }: { progress: SyncProgress | null; onCancel: () => void }) {
+  if (!progress) return null
+  const pct = progress.totalPages > 0 ? Math.round((progress.page / progress.totalPages) * 100) : 0
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px',
+      background: 'var(--accent-glass)', border: '1px solid var(--accent-glow)',
+      borderRadius: '10px', marginBottom: '10px', fontSize: '0.7rem', fontWeight: 600,
+      color: 'var(--accent)', boxShadow: '0 0 12px var(--accent-glow)',
+    }}>
+      <span style={{ flexShrink: 0 }}>📡</span>
+      <div style={{
+        flex: 1, height: '4px', background: 'var(--bg-primary)', borderRadius: '2px', overflow: 'hidden',
+        boxShadow: 'inset 1px 1px 2px var(--shadow-warm)',
+      }}>
+        <div style={{
+          height: '100%', width: `${pct}%`, background: 'var(--accent)',
+          borderRadius: '2px', transition: 'width 0.3s ease',
+          boxShadow: '0 0 8px var(--accent-glow)',
+        }} />
+      </div>
+      <span style={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+        {progress.tracksSoFar.toLocaleString()} tracks
+      </span>
+      {!progress.done && (
+        <button onClick={onCancel} style={{
+          background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer',
+          fontSize: '0.65rem', fontWeight: 700, padding: '2px 6px',
+        }}>✕</button>
+      )}
+    </div>
+  )
+}
+
 // ── Main Library ──
 
 export default function Library() {
@@ -142,6 +177,12 @@ export default function Library() {
   const [tagsLoading, setTagsLoading] = useState(false)
   const [selectedTrack, setSelectedTrack] = useState<{ artist: string; name: string } | null>(null)
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null)
+
+  // Sync state
+  const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null)
+  const [syncActive, setSyncActive] = useState(false)
+  const [cachedCount, setCachedCount] = useState(0)
+  const abortRef = useRef(false)
 
   // Bulk tagging
   const [selectMode, setSelectMode] = useState(false)
@@ -161,7 +202,7 @@ export default function Library() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
 
-  // Keyboard: x=select, /=search, Escape
+  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
@@ -219,10 +260,8 @@ export default function Library() {
     const fetchAndIntersect = async () => {
       const allTags = [...filterTags]
       if (activeGenre && !allTags.includes(activeGenre)) allTags.push(activeGenre)
-
       const results = await Promise.all(allTags.map((tag) => getPersonalTags(username, tag, 200, 1)))
       if (cancelled) return
-
       const sets = results.map((r) => { const keys = new Set<string>(); for (const a of r.artists) keys.add(a.name.toLowerCase()); return keys })
       const common = new Set(sets[0])
       for (let i = 1; i < sets.length; i++) { for (const name of common) { if (!sets[i].has(name)) common.delete(name) } }
@@ -233,25 +272,114 @@ export default function Library() {
     return () => { cancelled = true }
   }, [filterTags, activeGenre, username])
 
-  // Toggle genre preset
   const toggleGenre = useCallback((tag: string) => {
     setActiveGenre((prev) => prev === tag ? null : tag)
   }, [])
 
-  // Load tracks
-  const loadTracks = useCallback(() => {
+  // ── Full Cache Load + Background Sync ──
+  const loadFromCache = useCallback(async () => {
     if (!isAuthenticated || !username) { setLoading(false); return }
-    let cancelled = false
     setLoading(true); setError(null)
-    getCachedRecentTracks(username, 200)
-      .then(({ tracks: t }) => { if (!cancelled) setTracks(t) })
-      .catch((err) => { if (!cancelled) setError(err.message || 'Failed to load') })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
+
+    try {
+      // 1. Load all cached tracks instantly
+      const cached = await getCachedAllTracks(username)
+      if (!abortRef.current) {
+        setTracks(cached)
+        const count = await getCachedTrackCount(username)
+        setCachedCount(count)
+        setLoading(false)
+      }
+
+      // 2. Check if we need incremental sync
+      const meta = await getSyncMeta(username)
+      if (!meta || !meta.syncComplete) {
+        // First time or incomplete — start full sync in background
+        if (!abortRef.current) setSyncActive(true)
+        await startFullSync(username, (prog) => {
+          if (!abortRef.current) setSyncProgress(prog)
+        })
+        if (!abortRef.current) {
+          setSyncActive(false)
+          setSyncProgress(null)
+          // Reload from cache to get fresh data
+          const fresh = await getCachedAllTracks(username)
+          setTracks(fresh)
+          const count = await getCachedTrackCount(username)
+          setCachedCount(count)
+        }
+      } else {
+        // Incremental sync in background
+        if (!abortRef.current) setSyncActive(true)
+        await incrementalSync(username, (prog) => {
+          if (!abortRef.current && prog.tracksSoFar > 0) setSyncProgress(prog)
+        })
+        if (!abortRef.current) {
+          setSyncActive(false)
+          setSyncProgress(null)
+          if (meta.totalTracks > 0) {
+            const fresh = await getCachedAllTracks(username)
+            setTracks(fresh)
+            const count = await getCachedTrackCount(username)
+            setCachedCount(count)
+          }
+        }
+      }
+    } catch (err: any) {
+      if (!abortRef.current) setError(err.message || 'Failed to load')
+      setLoading(false)
+    }
   }, [username, isAuthenticated])
 
-  useEffect(() => { return loadTracks() }, [loadTracks])
+  useEffect(() => {
+    abortRef.current = false
+    loadFromCache()
+    return () => { abortRef.current = true }
+  }, [loadFromCache])
 
+  // Manual full resync
+  const handleFullResync = useCallback(async () => {
+    if (!username || syncActive) return
+    abortRef.current = false
+    setSyncActive(true); setSyncProgress(null)
+    try {
+      await startFullSync(username, (prog) => {
+        if (!abortRef.current) setSyncProgress(prog)
+      })
+      const fresh = await getCachedAllTracks(username)
+      if (!abortRef.current) {
+        setTracks(fresh)
+        const count = await getCachedTrackCount(username)
+        setCachedCount(count)
+      }
+    } catch (err: any) {
+      setError(err.message || 'Sync failed')
+    } finally {
+      if (!abortRef.current) { setSyncActive(false); setSyncProgress(null) }
+    }
+  }, [username, syncActive])
+
+  const handleCancelSync = useCallback(() => {
+    abortRef.current = true
+    setSyncActive(false)
+    setSyncProgress(null)
+  }, [])
+
+  const handleClearCache = useCallback(async () => {
+    if (!username || !window.confirm('Clear all cached tracks? You can re-sync afterward.')) return
+    await clearTrackCache(username)
+    setTracks([])
+    setCachedCount(0)
+    setSyncActive(false)
+    setSyncProgress(null)
+  }, [username])
+
+  // Demo mode
+  const isDemo = !isAuthenticated
+  useEffect(() => { if (!isDemo) return; setTracks(generateDemoTimeline() as unknown as Track[]); setLoading(false); setCachedCount(20) }, [isDemo])
+  useEffect(() => { if (!isDemo) return; setSuggestions(DEMO_TOP_TAGS) }, [isDemo])
+
+  // ── Fast in-memory search ──
   const filtered = useMemo(() => {
     let result = tracks
     if (tagFilteredKeys && tagFilteredKeys.size > 0) {
@@ -259,7 +387,9 @@ export default function Library() {
     }
     if (search.trim()) {
       const q = search.toLowerCase()
-      result = result.filter((t) => t.name.toLowerCase().includes(q) || getArtistName(t).toLowerCase().includes(q))
+      result = result.filter((t) =>
+        t.name.toLowerCase().includes(q) || getArtistName(t).toLowerCase().includes(q),
+      )
     }
     return result
   }, [tracks, search, tagFilteredKeys])
@@ -292,17 +422,39 @@ export default function Library() {
   const ROW_HEIGHT = 32
   const { virtualItems, totalHeight } = useVirtualScroll(filtered, ROW_HEIGHT, timelineRef, 15)
 
-  const isDemo = !isAuthenticated
-  useEffect(() => { if (!isDemo) return; setTracks(generateDemoTimeline() as unknown as Track[]); setLoading(false) }, [isDemo])
-  useEffect(() => { if (!isDemo) return; setSuggestions(DEMO_TOP_TAGS) }, [isDemo])
-
   const hasActiveFilters = search || filterTags.length > 0 || activeGenre
 
   return (
     <div className={styles.library}>
       <div className={styles.header}>
-        <h1>Library</h1>
-        <p className={styles.desc}>{tracks.length} recent tracks{hasActiveFilters ? ` · ${filtered.length} shown` : ''}</p>
+        <div>
+          <h1>Library</h1>
+          <p className={styles.desc}>
+            {cachedCount > 0 ? `${cachedCount.toLocaleString()} tracks cached` : `${tracks.length} recent tracks`}
+            {hasActiveFilters ? ` · ${filtered.length} shown` : ''}
+          </p>
+        </div>
+        {isAuthenticated && !isDemo && (
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            {!syncActive && !syncProgress && (
+              <button
+                className={styles.syncBtn}
+                onClick={handleFullResync}
+                title="Re-sync full scrobble history from Last.fm"
+              >
+                🔄 Full Sync
+              </button>
+            )}
+            <button
+              className={styles.syncBtn}
+              onClick={handleClearCache}
+              title="Clear all cached tracks"
+              style={{ opacity: 0.5, fontSize: '0.55rem' }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {error && (
@@ -311,9 +463,11 @@ export default function Library() {
         </div>
       )}
 
+      {/* Sync Progress */}
+      <SyncBar progress={syncProgress} onCancel={handleCancelSync} />
+
       {/* ── Sticky Filter Header ── */}
       <div className={styles.stickyFilter}>
-        {/* Row 1: Search + Tag toggle + Clear */}
         <div className={styles.filterRow1}>
           <div className={styles.searchWrap}>
             <span className="neuro-icon neuro-icon-search" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: '0.8rem', color: 'var(--text-muted)', pointerEvents: 'none', zIndex: 1 }} />
@@ -321,7 +475,7 @@ export default function Library() {
               ref={searchInputRef}
               className={styles.searchInput}
               type="text"
-              placeholder="Search tracks or artists… (press /)"
+              placeholder={`Search ${tracks.length.toLocaleString()} tracks… (press /)`}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -345,7 +499,6 @@ export default function Library() {
           )}
         </div>
 
-        {/* Row 2: Genre quick chips */}
         <div className={styles.filterRow2}>
           <span className={styles.genreLabel}>Quick:</span>
           {GENRE_PRESETS.map((g) => (
@@ -357,7 +510,6 @@ export default function Library() {
               {g.label}
             </button>
           ))}
-          {/* Tag filter chips */}
           <TagChips
             tags={filterTags}
             onAdd={(tag) => setFilterTags((p) => [...p, tag])}
@@ -378,8 +530,14 @@ export default function Library() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="neuro-pressed" style={{ padding: '48px', textAlign: 'center' }}>
-          <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>{hasActiveFilters ? '🔍' : '📭'}</span>
-          <p style={{ color: 'var(--text-muted)' }}>{hasActiveFilters ? 'No tracks match.' : 'No recent tracks. Scrobble some music!'}</p>
+          <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>
+            {hasActiveFilters ? '🔍' : syncActive ? '📡' : '📭'}
+          </span>
+          <p style={{ color: 'var(--text-muted)' }}>
+            {hasActiveFilters ? 'No tracks match.'
+              : syncActive ? 'Syncing your full history…'
+              : isDemo ? 'Demo mode — no real tracks.' : 'No tracks cached. Click "Full Sync" to load your history.'}
+          </p>
           {hasActiveFilters && (
             <button className="neuro-btn" onClick={() => { setSearch(''); setFilterTags([]); setActiveGenre(null) }} style={{ marginTop: 12 }}>
               Clear filters

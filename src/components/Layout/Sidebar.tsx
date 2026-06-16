@@ -6,12 +6,22 @@ import { getUserInfo, getTrackTags, addTrackTags, removeTrackTag, getUserTopTags
 import styles from './Sidebar.module.css'
 
 const PIN_STORAGE_KEY = 'lastfm_sidebar_pinned'
+const PLAYLIST_LS_KEY = 'lastfm-playlists'
 
 function getPinned(): boolean {
   try { return localStorage.getItem(PIN_STORAGE_KEY) === 'true' } catch { return false }
 }
 function setPinnedStorage(v: boolean): void {
   try { localStorage.setItem(PIN_STORAGE_KEY, String(v)) } catch {}
+}
+
+function getPlaylistCount(): number {
+  try {
+    const raw = localStorage.getItem(PLAYLIST_LS_KEY)
+    if (!raw) return 0
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.length : 0
+  } catch { return 0 }
 }
 
 interface NavItem {
@@ -26,6 +36,10 @@ const navItems: NavItem[] = [
   { to: '/tags',      label: 'Tags',     icon: 'tags' },
   { to: '/settings',  label: 'Settings', icon: 'settings' },
 ]
+
+function triggerPlaylistCreator() {
+  window.dispatchEvent(new Event('toggle-playlist-creator'))
+}
 
 export default function Sidebar() {
   const { isAuthenticated, username, login } = useAuth()
@@ -43,6 +57,7 @@ export default function Sidebar() {
   const [hovered, setHovered] = useState(false)
   const [pinned, setPinned] = useState(getPinned)
   const [crystalAnim, setCrystalAnim] = useState<'idle' | 'activating' | 'deactivating'>('idle')
+  const [playlistCount, setPlaylistCount] = useState(getPlaylistCount)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const animTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
@@ -173,7 +188,20 @@ export default function Sidebar() {
     }
   }
 
-  // Cleanup timers on unmount
+  // Listen for playlist changes (localStorage updates from PlaylistCreator)
+  useEffect(() => {
+    const handler = () => setPlaylistCount(getPlaylistCount())
+    window.addEventListener('storage', handler)
+    // Also poll for same-tab changes (PlaylistCreator saves to same origin)
+    const interval = setInterval(() => {
+      const current = getPlaylistCount()
+      setPlaylistCount((prev) => prev !== current ? current : prev)
+    }, 2000)
+    return () => {
+      window.removeEventListener('storage', handler)
+      clearInterval(interval)
+    }
+  }, [])
   useEffect(() => () => {
     clearTimeout(hoverTimer.current)
     clearTimeout(animTimer.current)
@@ -248,6 +276,21 @@ export default function Sidebar() {
             <span className={styles.navLabel}>{item.label}</span>
           </NavLink>
         ))}
+
+        {/* Playlist Creator trigger */}
+        <button
+          className={`${styles.navItem} ${styles.navItemPlaylist}`}
+          onClick={triggerPlaylistCreator}
+          title="Open Playlist Creator (Ctrl+P)"
+        >
+          <span className={styles.navIconWrap}>
+            <span className={styles.playlistNavIcon}>🎧</span>
+          </span>
+          <span className={styles.navLabel}>Playlists</span>
+          {playlistCount > 0 && (
+            <span className={styles.playlistCountBadge}>{playlistCount}</span>
+          )}
+        </button>
       </nav>
 
       {/* ── Now Playing + Tag Editor ── */}

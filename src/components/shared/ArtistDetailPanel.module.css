@@ -1,78 +1,138 @@
+/* ═══════════════════════════════════════════════════════════════
+   Artist Detail Panel — Center-Stage Glass Card
+   Floating centered card · Glass backdrop · Scale-in animation
+   "Kein rechtes Sidebar — zentriert, elegant, ergonomisch"
+   ═══════════════════════════════════════════════════════════════ */
+
 .overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
   animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 
 .panel {
-  width: 420px;
-  max-width: 90vw;
-  height: 100vh;
+  width: 440px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px);
   overflow-y: auto;
-  background: var(--bg-secondary);
-  border-left: 1px solid var(--glass-border);
-  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
-  padding: 28px 24px;
+  background: linear-gradient(
+    170deg,
+    var(--glass-bg, rgba(252, 251, 248, 0.78)),
+    rgba(242, 239, 232, 0.7)
+  );
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.5));
+  border-radius: var(--border-radius, 24px);
+  padding: 24px 22px 28px;
   position: relative;
-  animation: slideIn 0.3s ease;
+  animation: cardScaleIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.25),
+    0 2px 12px var(--shadow-warm, rgba(180, 160, 140, 0.15)),
+    inset 0 1px 0 var(--highlight-glass, rgba(255, 255, 255, 0.6));
 }
 
-@keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+/* Specular sweep */
+.panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    145deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.12) 48%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.12) 52%,
+    transparent 75%
+  );
+  background-size: 220% 220%;
+  background-position: 0% 0%;
+  opacity: 0.25;
+}
+
+@keyframes cardScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+.panel::-webkit-scrollbar {
+  width: 4px;
+}
+.panel::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 20px 0;
+}
+.panel::-webkit-scrollbar-thumb {
+  background: var(--glass-border, rgba(180, 160, 140, 0.2));
+  border-radius: 2px;
 }
 
 .close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: var(--bg-surface);
+  top: 14px;
+  right: 14px;
+  background: linear-gradient(155deg, var(--bg-surface, #fcfbf8), var(--bg-primary, #f2efe8));
   border: none;
   border-radius: 50%;
   width: 32px;
   height: 32px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  color: var(--text-muted);
-  transition: all var(--transition);
+  color: var(--text-muted, #9e9890);
+  z-index: 2;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  padding: 0;
   box-shadow:
-    2px 2px 4px var(--shadow-dark),
-    -2px -2px 4px rgba(0,0,0,0.2);
-  animation: close-breathe 4s ease-in-out infinite;
+    1px 1px 3px var(--shadow-warm, rgba(180,160,140,0.15)),
+    -1px -1px 3px var(--shadow-light, #ffffff);
 }
 
 .close:hover {
-  color: var(--accent);
-  animation-play-state: paused;
+  color: var(--accent, #d4795e);
   box-shadow:
-    3px 3px 6px var(--shadow-dark),
-    -3px -3px 6px rgba(0,0,0,0.2);
+    inset 1px 1px 3px var(--shadow-warm, rgba(180,160,140,0.15)),
+    inset -1px -1px 3px var(--shadow-light, #ffffff);
 }
 
 .loading {
   text-align: center;
-  padding: 40px;
+  padding: 48px 20px;
   color: var(--text-muted);
 }
 
 .error {
   text-align: center;
-  padding: 40px;
+  padding: 48px 20px;
   color: var(--accent);
 }
 
@@ -80,9 +140,12 @@
   animation: fadeSlideUp 0.4s ease-out;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
+  position: relative;
+  z-index: 0;
 }
 
+/* ── Hero ── */
 .hero {
   display: flex;
   gap: 16px;
@@ -90,25 +153,27 @@
 }
 
 .heroImg {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
   object-fit: cover;
   box-shadow:
-    4px 4px 10px var(--shadow-dark),
-    -2px -2px 8px rgba(0,0,0,0.2);
+    2px 4px 12px var(--shadow-warm, rgba(180,160,140,0.2)),
+    -1px -1px 4px var(--shadow-light, #ffffff);
 }
 
 .hero h2 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+  color: var(--text-primary);
 }
 
 .stats {
   margin-top: 4px;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
 }
 
+/* ── Tags ── */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -116,21 +181,36 @@
 }
 
 .tag {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background: var(--bg-surface);
+  background: linear-gradient(155deg, var(--bg-primary), var(--bg-base));
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 3px 10px;
   box-shadow:
-    inset 1px 1px 2px var(--shadow-dark),
-    inset -1px -1px 2px rgba(0,0,0,0.2);
-  animation: shadow-breathe-pressed 5s ease-in-out infinite;
+    inset 1px 1px 2px var(--shadow-warm),
+    inset -1px -1px 2px var(--shadow-light);
+  animation: shadowBreathePressed 5s ease-in-out infinite;
 }
 
 .tag:nth-child(odd) { animation-delay: 0s; }
 .tag:nth-child(even) { animation-delay: 2s; }
 
+@keyframes shadowBreathePressed {
+  0%, 100% {
+    box-shadow:
+      inset 1px 1px 2px var(--shadow-warm),
+      inset -1px -1px 2px var(--shadow-light);
+  }
+  50% {
+    box-shadow:
+      inset 2px 2px 4px var(--shadow-warm),
+      inset -2px -2px 4px var(--shadow-light);
+  }
+}
+
+/* ── Bio ── */
 .bio {
   display: flex;
   flex-direction: column;
@@ -138,20 +218,24 @@
 }
 
 .bio h3 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
 }
 
 .bio p {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
   line-height: 1.6;
 }
 
+/* ── Section Heading ── */
 .sectionHeading {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin-bottom: 8px;
+  color: var(--text-primary);
 }
 
+/* ── Similar Artists ── */
 .similarList {
   display: flex;
   flex-wrap: wrap;
@@ -159,26 +243,28 @@
 }
 
 .similarItem {
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
-  background: var(--bg-primary);
+  background: linear-gradient(155deg, var(--bg-primary), var(--bg-base));
+  border: 1px solid var(--glass-border);
   border-radius: 6px;
   padding: 4px 10px;
   cursor: default;
   box-shadow:
-    inset 1px 1px 2px var(--shadow-dark),
-    inset -1px -1px 2px rgba(0,0,0,0.2);
-  animation: shadow-breathe-pressed 5s ease-in-out infinite;
+    inset 1px 1px 2px var(--shadow-warm),
+    inset -1px -1px 2px var(--shadow-light);
+  animation: shadowBreathePressed 5s ease-in-out infinite;
 }
 
 .similarItem:nth-child(odd) { animation-delay: 0s; }
 .similarItem:nth-child(even) { animation-delay: 2.5s; }
 
+/* ── Track List ── */
 .trackList {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-height: 400px;
+  max-height: 300px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -189,24 +275,26 @@
   gap: 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: var(--bg-surface);
+  background: linear-gradient(155deg, var(--bg-surface), var(--bg-primary));
+  border: 1px solid var(--glass-border);
   box-shadow:
-    inset 1px 1px 2px var(--shadow-dark),
-    inset -1px -1px 2px rgba(0,0,0,0.2);
-  transition: all var(--transition);
+    1px 1px 3px var(--shadow-warm),
+    -1px -1px 3px var(--shadow-light);
+  transition: all 0.2s ease;
   cursor: default;
 }
 
 .trackRow:hover {
   box-shadow:
-    2px 2px 6px var(--shadow-dark),
-    -2px -2px 6px rgba(0,0,0,0.2);
-  background: var(--bg-secondary);
+    2px 2px 6px var(--shadow-warm),
+    -2px -2px 6px var(--shadow-light);
+  background: linear-gradient(155deg, var(--bg-primary), var(--bg-secondary));
+  transform: translateX(2px);
 }
 
 .trackCover {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
@@ -214,8 +302,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
+  box-shadow: inset 1px 1px 2px var(--shadow-warm);
 }
 
 .trackCover img {
@@ -233,7 +322,7 @@
 }
 
 .trackName {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -242,32 +331,44 @@
 }
 
 .trackPlays {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
 }
 
 .trackPlayBtn {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: none;
-  background: var(--bg-primary);
+  background: linear-gradient(155deg, var(--bg-surface), var(--bg-primary));
   color: var(--accent);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   box-shadow:
-    2px 2px 4px var(--shadow-dark),
-    -2px -2px 4px rgba(0,0,0,0.2);
-  transition: all var(--transition);
+    1px 1px 2px var(--shadow-warm),
+    -1px -1px 2px var(--shadow-light);
+  transition: all 0.2s ease;
+  font-family: inherit;
+  padding: 0;
 }
 
 .trackPlayBtn:hover {
-  color: var(--accent-glow);
+  color: var(--accent-hover);
   box-shadow:
-    3px 3px 6px var(--shadow-dark),
-    -3px -3px 6px rgba(0,0,0,0.2);
+    0 0 10px var(--accent-glow),
+    1px 1px 3px var(--shadow-warm),
+    -1px -1px 3px var(--shadow-light);
+  transform: scale(1.1);
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .panel { animation: none; }
+  .tag { animation: none; }
+  .similarItem { animation: none; }
+  .overlay { animation: none; }
 }

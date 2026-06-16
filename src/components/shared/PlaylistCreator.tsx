@@ -455,10 +455,26 @@ export default function PlaylistCreator({ visible = true }: { visible?: boolean 
     if (!isAuthenticated || !visible) return
     if (playlists.length > 0 && !activePlaylistId) {
       switchPlaylist(playlists[0].id)
+    } else if (playlists.length === 0 && !activePlaylistId && playlists !== undefined) {
+      // Auto-create first playlist so user sees the search immediately
+      createPlaylist()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, visible])
 
-  if (!isAuthenticated) return null
+  if (!isAuthenticated) {
+    return (
+      <div className={styles.creator} style={{ display: visible ? undefined : 'none' }}>
+        <div className={styles.body} style={{ padding: '20px 14px' }}>
+          <div className={styles.emptyState}>
+            <span className={styles.emptyIcon}>🔐</span>
+            <span className={styles.emptyText}>Log in to create playlists</span>
+            <span className={styles.emptyHint}>Search your listening history and build custom playlists from your tracks.</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // ── Render ──
 
