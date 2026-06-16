@@ -1,6 +1,6 @@
-# 🔊 Last.fm Explorer
+# 🎧 Last.fm Explorer
 
-> **Your listening history, reimagined.** A dark-themed neuromorphic dashboard for Last.fm — discover patterns, manage tags, and explore your music data through a stunning cyberpunk interface.
+> **Your listening history, beautifully reimagined.** A premium dual-theme dashboard for Last.fm — discover patterns, manage tags, and explore your music data through a warm plastic-neumorphism interface that feels tactile and alive.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Last.fm-D51007?logo=last.fm&logoColor=white" alt="Last.fm">
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <em>The Home dashboard — interactive listening charts, stat cards, compare mode, and top artists. All wrapped in a dark neuromorphic design with neon accents.</em>
+  <em>The Home dashboard — interactive listening charts, at-a-glance stats, compare mode, top artists & tracks, genre and tag exploration. Dark theme shown.</em>
 </p>
 
 ---
@@ -23,43 +23,49 @@
 ## ✨ Features
 
 ### 📊 Deep Listening Analytics
-- **Interactive charts** — day / week / month aggregation with multi-filter system
-- **Calendar heatmap** — GitHub-style grid of your listening density
+- **Interactive listening chart** — day / week / month aggregation with multi-filter system
 - **Compare mode** — overlay two date ranges to see how your taste evolves
-- **Top artists & tracks** with period selectors (7d / 1m / 3m / 6m / 1y / all)
+- **Top artists & top tracks** — computed from your filtered scrobble data in real-time
+- **Tag exploration** — drill into any tag to browse tracks, genres, and artists
+- **At-a-glance stats** — scrobbles, daily average, top artist, top track — right at the top
 
 ### 📚 Library Browser
-- **Live timeline** — recent scrobbles with relative timestamps
-- **Multi-tag filtering** — intersect your personal Last.fm tags
-- **Artist detail panel** — bio, stats, top tracks in a slide-over
-- **Full-text search** across all scrobbled tracks
+- **Virtual-scrolling timeline** — browse hundreds of recent scrobbles with zero lag
+- **DJ-style quick filters** — 8 genre presets (DnB, Techno, House, Psytrance…), tag chips, full-text search
+- **Multi-select bulk tagging** — tag dozens of tracks at once (`x` to enter select mode)
+- **Inline track details** — click any track for a slide-over detail panel
+- **Cover art** — auto-fetched from multiple sources with fallback chain
 
 <p align="center">
   <img src="screenshots/library.png" alt="Library Browser" width="800">
 </p>
 
 ### 🏷️ Tag Management
-- **Chip cloud** — browse hundreds of tags grouped by letter
-- **Rename & delete** tags globally across all tracks
-- **Tag exploration** — click any tag to see every tagged track
-- **Regex search** for power users
+- **Bulk tag operations** — rename, merge, delete tags globally across all tracks
+- **Chip cloud explorer** — browse hundreds of tags grouped by letter
+- **Regex search** — find exactly the tags you need
+- **Smart suggestions** — autocomplete from your personal tag library
 
 <p align="center">
   <img src="screenshots/tags.png" alt="Tag Management" width="800">
 </p>
 
 ### 🎵 Music Playback
-- **Auto-detect free sources** — Deezer widget with YouTube fallback
-- **Slide-out player** — page stays fully interactive while music plays
-- **Now Playing** — dancing equalizer bars + track info in sidebar
+- **YouTube-first search proxy** — finds free playable sources via HTML parsing (no API key needed)
+- **Multi-strategy fallback** — YouTube → alternative sources, always finds something
+- **Bottom-docked player** — glass panel that slides up, stays connected to the app
+- **Now Playing** — dancing equalizer bars + inline tag editor in the sidebar
+- **Playlist Creator** — named playlists, drag-drop, bulk ops, export (TXT/CSV/M3U8), clipboard copy
 
-### 🎨 Visual Design System
-- **10 curated themes** — Dark, Light, EDM, Ocean, Forest, Sunset, Midnight, Toxic, Cherry, Mono
-- **Neuromorphic UI** — multi-layer shadows, glass effects, neon edge glows
-- **Atmospheric effects** — noise, scanlines, chromatic aberration, vignette, particles
-- **3D depth system** — realistic perspective with `translateZ()`
-- **Cinematic LUTs** — 8 color grading presets (Teal & Orange, Noir, Cyberpunk, Wes Anderson…)
-- **7 icon styles** — Neon, Glass, Minimal, Brutal, Retro, Sketch, Chrome
+### 🎨 Premium Design System
+- **Dual theme** — 🌚 Dark (warm charcoal, glowing coral) & 🌞 Light (warm cream, soft neumorphism)
+- **Plastic neumorphism** — multi-layer warm shadows, specular light sweeps, breathing cards
+- **Fine-tune effects** — animation speed, glass intensity, vignette, particles, glow boost, 3D depth
+- **Cinematic LUTs** — 8 color grading presets (Teal & Orange, Matrix, Noir, Cyberpunk, Wes Anderson…)
+- **7 icon styles** — Neon, Glass, Minimal, Brutal, Retro, Sketch, Chrome — each with fine-tune sliders
+- **Depth of Field** — cinematic blur vignette, sharp center, soft edges
+- **Calendar heatmap** — GitHub-style grid of your listening density
+- **Profile system** — save, load, export, import your theme configurations
 
 <p align="center">
   <img src="screenshots/settings.png" alt="Theme Settings" width="800">
@@ -99,8 +105,10 @@ Deploy the `dist/` folder to Vercel, Netlify, or any static host.
 | React Router 7 | Client-side routing |
 | CSS Modules | Scoped component styles |
 | Last.fm API v2.0 | Music data + OAuth |
+| IndexedDB | Client-side track cache |
+| Web Audio API | YouTube proxy for free music playback |
 
-**Zero UI libraries. Zero CSS frameworks.** Every pixel is custom CSS.
+**Zero UI libraries. Zero CSS frameworks.** Every pixel is hand-crafted CSS. CSS-variable-driven theming adapts instantly between light and dark.
 
 ---
 
@@ -112,22 +120,22 @@ src/
 ├── App.tsx               # Routes + context providers
 ├── components/
 │   ├── Layout/           # Floating sidebar dock + app shell
-│   └── shared/           # Charts, cards, panels, player, tag chips
+│   └── shared/           # Charts, cards, panels, player, tag chips, playlist creator
 ├── context/              # AuthContext, MusicPlayerContext
-├── hooks/                # useCoverFallback, useAudioReactiveLava, useMicrophoneReactivity
+├── hooks/                # useCoverFallback, useVirtualScroll, useVimKeys
 ├── pages/                # Home, Library, Tags, Settings, DayDetail
-├── services/             # Last.fm client, cover art search, free music source finder
-├── store/                # Theme, icon style, cinematic LUTs, credentials (localStorage)
+├── services/             # Last.fm client, cover art search, YouTube search proxy, IndexedDB
+├── store/                # Theme (dual light/dark), icon style, cinematic LUTs, credentials
 └── styles/               # Design system (theme.css) + icon system (neuro-icons.css)
 ```
 
 | Route | Page |
 |-------|------|
-| `/` | **Home** — listening charts, compare mode, top artists |
-| `/library` | **Library** — timeline, tag filter, top artists & tracks |
-| `/tags` | **Tags** — manage, rename, delete, explore |
-| `/settings` | **Settings** — credentials, themes, effects, audio reactivity |
-| `/day/:date` | **Day Detail** — single day's scrobbles |
+| `/` | **Home** — listening chart, compare mode, stats, top artists & tracks, tag drill-down |
+| `/library` | **Library** — virtual-scrolling timeline, genre quick-filters, multi-select bulk tagging |
+| `/tags` | **Tags** — manage, rename, delete, regex search, letter-grouped chip cloud |
+| `/settings` | **Settings** — credentials, theme toggle, effects fine-tune, icon style, cinematic LUTs |
+| `/day/:date` | **Day Detail** — single day's scrobbles with heatmap |
 
 ---
 
