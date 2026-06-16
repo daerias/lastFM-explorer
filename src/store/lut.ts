@@ -140,9 +140,13 @@ export function getDofSettings(): DofSettings {
         parsed.intensity >= 0 && parsed.intensity <= 100 &&
         parsed.focusPoint >= 0 && parsed.focusPoint <= 100
       ) {
-        // Cap old high-intensity values to prevent excessive blur
-        if (parsed.intensity > 60) {
-          parsed.intensity = 60
+        // Migration: cap old high-intensity stored values, disable if extreme
+        if (parsed.intensity > 50) {
+          parsed.enabled = false
+          parsed.intensity = 20
+          try { localStorage.setItem(DOF_KEY, JSON.stringify(parsed)) } catch {}
+        } else if (parsed.intensity > 30) {
+          parsed.intensity = 30
           try { localStorage.setItem(DOF_KEY, JSON.stringify(parsed)) } catch {}
         }
         return parsed
@@ -184,6 +188,14 @@ export function applyDof(dof: DofSettings): void {
   } else {
     document.documentElement.removeAttribute('data-dof')
   }
+}
+
+export function resetAllCinematic(): void {
+  try { localStorage.removeItem(LUT_KEY) } catch {}
+  try { localStorage.removeItem(DOF_KEY) } catch {}
+  applyLut('none')
+  applyDof(DOF_DEFAULTS)
+  window.dispatchEvent(new CustomEvent(CINEMATIC_CHANGE_EVENT))
 }
 
 // ── Full apply ──
