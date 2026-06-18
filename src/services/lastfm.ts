@@ -342,15 +342,31 @@ async function getAllPersonalTracks(user: string, tag: string): Promise<TaggedTr
   return [...page1.tracks, ...remaining.flatMap((r) => r.tracks)]
 }
 
-/** Bulk delete a tag from ALL tracks that have it.
- *  Returns { removed: number } — count of tracks the tag was removed from. */
+/** Fetch ALL pages of a user's personally tagged artists for a given tag */
+async function getAllPersonalArtists(user: string, tag: string): Promise<Artist[]> {
+  const page1 = await getPersonalTags(user, tag, 200, 1)
+  if (page1.totalPages <= 1) return page1.artists
+  const remaining = await Promise.all(
+    Array.from({ length: page1.totalPages - 1 }, (_, i) =>
+      getPersonalTags(user, tag, 200, i + 2),
+    ),
+  )
+  return [...page1.artists, ...remaining.flatMap((r) => r.artists)]
+}
+
+/** Bulk delete a tag from ALL tracks AND artists that have it.
+ *  Returns { removed: number } — count of tracks+artists the tag was removed from. */
 export async function deleteTagGlobally(
   user: string,
   tag: string,
 ): Promise<{ removed: number }> {
-  const tracks = await getAllPersonalTracks(user, tag)
+  const [tracks, artists] = await Promise.all([
+    getAllPersonalTracks(user, tag),
+    getAllPersonalArtists(user, tag),
+  ])
   let removed = 0
 
+  // Remove from tracks
   for (const t of tracks) {
     try {
       await removeTrackTag(t.artist.name, t.name, tag)
@@ -360,22 +376,35 @@ export async function deleteTagGlobally(
     }
   }
 
+  // Remove from artists
+  for (const a of artists) {
+    try {
+      await removeArtistTag(a.name, tag)
+      removed++
+    } catch {
+      // Continue — tag may already be gone
+    }
+  }
+
   return { removed }
 }
 
-/** Bulk rename a tag across all tracks: remove oldTag, add newTag on every track.
- *  Returns { renamed: number } — count of tracks successfully processed. */
+/** Bulk rename a tag across all tracks AND artists: remove oldTag, add newTag.
+ *  Returns { renamed: number } — count of tracks+artists successfully processed. */
 export async function renameTagGlobally(
   user: string,
   oldTag: string,
   newTag: string,
 ): Promise<{ renamed: number }> {
-  const tracks = await getAllPersonalTracks(user, oldTag)
+  const [tracks, artists] = await Promise.all([
+    getAllPersonalTracks(user, oldTag),
+    getAllPersonalArtists(user, oldTag),
+  ])
   let renamed = 0
 
+  // Rename on tracks
   for (const t of tracks) {
     try {
-      // Remove the old tag (ignore if it fails — tag might already be gone)
       await removeTrackTag(t.artist.name, t.name, oldTag)
     } catch {
       // Continue — the tag may already have been removed
@@ -385,6 +414,21 @@ export async function renameTagGlobally(
       renamed++
     } catch {
       // Skip tracks where add fails
+    }
+  }
+
+  // Rename on artists
+  for (const a of artists) {
+    try {
+      await removeArtistTag(a.name, oldTag)
+    } catch {
+      // Continue — the tag may already have been removed
+    }
+    try {
+      await addArtistTags(a.name, [newTag])
+      renamed++
+    } catch {
+      // Skip artists where add fails
     }
   }
 
@@ -517,4 +561,20 @@ export async function removeTrackTag(
   tag: string,
 ): Promise<void> {
   await authPost({ method: 'track.removeTag', artist, track, tag })
+}
+
+/** Add tags to an artist — Last.fm appends, does not replace. */
+export async function addArtistTags(
+  artist: string,
+  tags: string[],
+): Promise<void> {
+  await authPost({ method: 'artist.addTags', artist, tags: tags.join(',') })
+}
+
+/** Remove a single tag from an artist */
+export async function removeArtistTag(
+  artist: string,
+  tag: string,
+): Promise<void> {
+  await authPost({ method: 'artist.removeTag', artist, tag })
 }
