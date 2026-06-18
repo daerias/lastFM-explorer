@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useMusicPlayer } from '../context/MusicPlayerContext'
-import { getTrackTags, getPersonalTags, getUserTopTags, addTrackTags, getRecentTracks, getPersonalTracks, type Track, type TaggedTrack } from '../services/lastfm'
+import { getTrackTags, getUserTopTags, addTrackTags, getRecentTracks, getPersonalTracks, type Track, type TaggedTrack } from '../services/lastfm'
 import { getCachedAllTracks, getCachedTrackCount, startFullSync, incrementalSync, getSyncMeta, clearTrackCache, processRetryQueue, queueRetryTask, type SyncProgress } from '../services/indexedDB'
 import { DEMO_TOP_TAGS, generateDemoTimeline } from '../services/demoData'
 import { useCoverFallback } from '../hooks/useCoverFallback'
@@ -270,7 +270,8 @@ export default function Library() {
     getUserTopTags(username, 500).then(setSuggestions).catch(() => setSuggestions([]))
   }, [username, isAuthenticated])
 
-  // Fetch tag-filtered tracks
+  // Fetch tag-filtered tracks — uses track-level tags so it works whether the user
+  // tagged artists or individual tracks on Last.fm.
   useEffect(() => {
     if (filterTags.length === 0 && !activeGenre) { setTagFilteredKeys(null); return }
     if (!username) return
@@ -278,14 +279,32 @@ export default function Library() {
     setTagLoading(true)
 
     const fetchAndIntersect = async () => {
-      const allTags = [...filterTags]
-      if (activeGenre && !allTags.includes(activeGenre)) allTags.push(activeGenre)
-      const results = await Promise.all(allTags.map((tag) => getPersonalTags(username, tag, 200, 1)))
-      if (cancelled) return
-      const sets = results.map((r) => { const keys = new Set<string>(); for (const a of r.artists) keys.add(a.name.toLowerCase()); return keys })
-      const common = new Set(sets[0])
-      for (let i = 1; i < sets.length; i++) { for (const name of common) { if (!sets[i].has(name)) common.delete(name) } }
-      if (!cancelled) setTagFilteredKeys(common)
+      try {
+        const allTags = [...filterTags]
+        if (activeGenre && !allTags.includes(activeGenre)) allTags.push(activeGenre)
+
+        // Fetch track-level tagged data — returns tracks the user has personally tagged
+        const results = await Promise.all(allTags.map((tag) => getPersonalTracks(username, tag, 200, 1)))
+        if (cancelled) return
+
+        // Build sets of composite "artist::track" keys for intersection
+        const sets = results.map((r) => {
+          const keys = new Set<string>()
+          for (const t of r.tracks) keys.add(`${t.artist.name.toLowerCase()}::${t.name.toLowerCase()}`)
+          return keys
+        })
+
+        // Intersect: tracks must be tagged with ALL specified tags
+        const common = new Set(sets[0])
+        for (let i = 1; i < sets.length; i++) {
+          for (const key of common) { if (!sets[i].has(key)) common.delete(key) }
+        }
+
+        if (!cancelled) setTagFilteredKeys(common)
+      } catch {
+        // On API error, reset filter so the user sees all tracks rather than stale results
+        if (!cancelled) setTagFilteredKeys(null)
+      }
     }
 
     fetchAndIntersect().finally(() => { if (!cancelled) setTagLoading(false) })
@@ -573,9 +592,9 @@ export default function Library() {
       return result
     }
 
-    // Normal mode — filter cached tracks by tagged artists
+    // Normal mode — filter cached tracks by tag-filtered track keys
     if (tagFilteredKeys && tagFilteredKeys.size > 0) {
-      result = result.filter((t) => tagFilteredKeys.has(getArtistName(t).toLowerCase()))
+      result = result.filter((t) => tagFilteredKeys.has(`${getArtistName(t).toLowerCase()}::${t.name.toLowerCase()}`))
     }
     if (search.trim()) {
       const q = search.toLowerCase()
