@@ -823,6 +823,44 @@
   box-shadow: 1px 1px 2px var(--shadow-warm);
 }
 
+/* ── New Tracks Badge — subtle pulsating pill ── */
+
+.newTracksBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 99px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--toxic-green);
+  background: rgba(59, 240, 122, 0.08);
+  border: 1px solid rgba(59, 240, 122, 0.22);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(59, 240, 122, 0.15);
+  animation: badgePulse 2.8s ease-in-out infinite;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+}
+
+.newTracksBadge:hover {
+  background: rgba(59, 240, 122, 0.14);
+  border-color: rgba(59, 240, 122, 0.4);
+  box-shadow: 0 0 14px rgba(59, 240, 122, 0.25);
+  transform: scale(1.05);
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(59, 240, 122, 0.12);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(59, 240, 122, 0.28);
+    opacity: 1;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Reduced Motion
    ═══════════════════════════════════════════════════════════════ */
@@ -835,6 +873,7 @@
   .healthDotGreen, .healthDotYellow, .healthDotRed { animation: none !important; }
   .spinDot { animation: none !important; }
   .syncSpinner { animation: none !important; }
+  .newTracksBadge { animation: none !important; opacity: 0.85; }
 }
 
 /* ═══════════════════════════════════════════════════════════════

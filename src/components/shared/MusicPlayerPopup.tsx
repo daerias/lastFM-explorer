@@ -3,12 +3,7 @@ import { useMusicPlayer } from '../../context/MusicPlayerContext'
 import styles from './MusicPlayerPopup.module.css'
 
 function youtubeEmbedUrl(videoId: string): string {
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3`
-}
-
-function youtubeSearchEmbed(artist: string, track: string): string {
-  const q = encodeURIComponent(`${artist} ${track}`)
-  return `https://www.youtube.com/embed?autoplay=1&listType=search&list=${q}&modestbranding=1&rel=0`
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&modestbranding=1&rel=0&iv_load_policy=3&origin=${encodeURIComponent(window.location.origin)}`
 }
 
 export default function MusicPlayerPopup() {
@@ -30,7 +25,23 @@ export default function MusicPlayerPopup() {
     }, 260)
   }, [closePlayer, closing])
 
-  // Cleanup timers
+  // ── Force play on iframe load via postMessage (bypasses browser autoplay blocks) ──
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [iframeReady, setIframeReady] = useState(false)
+
+  // Reset ready state when videoId changes (new track)
+  useEffect(() => {
+    setIframeReady(false)
+  }, [source?.youtubeVideoId])
+
+  // Send playVideo when iframe is loaded and panel is expanded
+  useEffect(() => {
+    if (!expanded || !iframeReady || !iframeRef.current) return
+    iframeRef.current.contentWindow?.postMessage(
+      JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
+      '*',
+    )
+  }, [expanded, iframeReady])
   useEffect(() => {
     return () => {
       if (closeTimer.current) clearTimeout(closeTimer.current)
@@ -139,23 +150,14 @@ export default function MusicPlayerPopup() {
 
             {videoId && (
               <iframe
+                ref={iframeRef}
                 key={`yt-${videoId}`}
                 className={styles.player}
                 src={youtubeEmbedUrl(videoId)}
                 allow="autoplay; fullscreen"
                 allowFullScreen
                 title={`${artist} - ${track} (YouTube)`}
-              />
-            )}
-
-            {!resolving && !videoId && source?.type === 'youtube' && (
-              <iframe
-                key={`yt-search-${artist}-${track}`}
-                className={styles.player}
-                src={youtubeSearchEmbed(artist, track)}
-                allow="autoplay; fullscreen"
-                allowFullScreen
-                title={`${artist} - ${track} (YouTube Search)`}
+                onLoad={() => setIframeReady(true)}
               />
             )}
 

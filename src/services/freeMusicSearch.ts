@@ -135,9 +135,9 @@ export async function findBestSource(
   if (videoId) {
     return { type: 'youtube', youtubeVideoId: videoId }
   }
-  // No specific video found — still return 'youtube' so the popup
-  // can use the search embed as a last-resort fallback.
-  return { type: 'youtube' }
+  // No video found — signal 'none' so the popup shows a fallback message
+  // instead of a broken search embed that doesn't actually play anything.
+  return { type: 'none' }
 }
 
 /** Clear the cache (useful for testing) */

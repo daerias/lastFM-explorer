@@ -12,6 +12,9 @@ import ArtistDetailPanel from '../components/shared/ArtistDetailPanel'
 import TagChips from '../components/shared/TagChips'
 import styles from './Library.module.css'
 
+// ── Sync throttle: don't re-sync if cache is fresh (< 5 min since last sync) ──
+const SYNC_COOLDOWN_MS = 5 * 60 * 1000
+
 // ── Genre quick-filter presets ──
 const GENRE_PRESETS = [
   { label: 'DnB', tag: 'drum and bass' },
@@ -42,6 +45,16 @@ function getArtistName(track: Track): string {
   return track.artist?.['#text'] || 'Unknown'
 }
 
+/** Format a Unix timestamp as a relative sync age string */
+function formatSyncAge(timestamp: number | null): string {
+  if (!timestamp) return ''
+  const diff = Date.now() - timestamp * 1000
+  if (diff < 60_000) return 'Synced just now'
+  if (diff < 3_600_000) return `Synced ${Math.floor(diff / 60_000)}m ago`
+  if (diff < 86_400_000) return `Synced ${Math.floor(diff / 3_600_000)}h ago`
+  return `Synced ${Math.floor(diff / 86_400_000)}d ago`
+}
+
 /** Convert TaggedTrack from LastFM API to Track shape for timeline display */
 function taggedToTrack(tt: TaggedTrack): Track {
   return {
@@ -50,6 +63,13 @@ function taggedToTrack(tt: TaggedTrack): Track {
     url: tt.url,
     image: [],
   }
+}
+
+/** Build a Set of "artist::track" composite keys from a tagged-tracks API response */
+function buildTrackKeySet(r: { tracks: TaggedTrack[] }): Set<string> {
+  const keys = new Set<string>()
+  for (const t of r.tracks) keys.add(`${t.artist.name.toLowerCase()}::${t.name.toLowerCase()}`)
+  return keys
 }
 
 // ── TimelineRow (module-level, pure) ──
@@ -183,6 +203,8 @@ export default function Library() {
   const [error, setError] = useState<string | null>(null)
   const [syncWarning, setSyncWarning] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  // Debounced for filtering performance — avoids UI freeze on every keystroke (Bug 4)
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [showTags, setShowTags] = useState(false)
   const [trackTags, setTrackTags] = useState<Map<string, string[]>>(new Map())
   const [tagsLoading, setTagsLoading] = useState(false)
@@ -192,6 +214,8 @@ export default function Library() {
   // Sync state
   const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null)
   const [syncActive, setSyncActive] = useState(false)
+  const [lastSyncTime, setLastSyncTime] = useState<number | null>(null)
+  const [newTracksCount, setNewTracksCount] = useState(0)
   const syncActiveRef = useRef(false)
   const [cachedCount, setCachedCount] = useState(0)
   const abortRef = useRef(false)
@@ -221,6 +245,21 @@ export default function Library() {
   const [activeGenre, setActiveGenre] = useState<string | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
+
+  // Debounce search input to avoid filtering on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 200)
+    return () => clearTimeout(timer)
+  }, [search])
+
+  // When cached tracks arrive while directTagTracks is showing, transition back
+  // (tracks.length fires on every count change but guard prevents unnecessary resets)
+  useEffect(() => {
+    if (tracks.length > 0 && directTagTracks !== null) {
+      setDirectTagTracks(null)
+      setDirectTagLabel(null)
+    }
+  }, [tracks.length, directTagTracks])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -278,36 +317,45 @@ export default function Library() {
     let cancelled = false
     setTagLoading(true)
 
-    const fetchAndIntersect = async () => {
+    const fetchAndCompute = async () => {
       try {
-        const allTags = [...filterTags]
-        if (activeGenre && !allTags.includes(activeGenre)) allTags.push(activeGenre)
-
-        // Fetch track-level tagged data — returns tracks the user has personally tagged
-        const results = await Promise.all(allTags.map((tag) => getPersonalTracks(username, tag, 200, 1)))
-        if (cancelled) return
-
-        // Build sets of composite "artist::track" keys for intersection
-        const sets = results.map((r) => {
-          const keys = new Set<string>()
-          for (const t of r.tracks) keys.add(`${t.artist.name.toLowerCase()}::${t.name.toLowerCase()}`)
-          return keys
-        })
-
-        // Intersect: tracks must be tagged with ALL specified tags
-        const common = new Set(sets[0])
-        for (let i = 1; i < sets.length; i++) {
-          for (const key of common) { if (!sets[i].has(key)) common.delete(key) }
+        // Fetch filterTags with AND semantics (track must have ALL specified tags)
+        let tagKeys: Set<string> | null = null
+        if (filterTags.length > 0) {
+          const tagResults = await Promise.all(filterTags.map((tag) => getPersonalTracks(username, tag, 200, 1)))
+          if (cancelled) return
+          const sets = tagResults.map(buildTrackKeySet)
+          tagKeys = new Set(sets[0])
+          for (let i = 1; i < sets.length; i++) {
+            for (const key of tagKeys) { if (!sets[i].has(key)) tagKeys.delete(key) }
+          }
         }
 
-        if (!cancelled) setTagFilteredKeys(common)
+        // Fetch activeGenre separately with UNION (OR) semantics — genre + tags = either/or
+        let genreKeys: Set<string> | null = null
+        if (activeGenre) {
+          const genreResult = await getPersonalTracks(username, activeGenre, 200, 1)
+          if (cancelled) return
+          genreKeys = buildTrackKeySet(genreResult)
+        }
+
+        // Combine: union of tag AND-set with genre set
+        if (tagKeys && genreKeys) {
+          const combined = new Set(tagKeys)
+          for (const key of genreKeys) combined.add(key)
+          if (!cancelled) setTagFilteredKeys(combined)
+        } else if (tagKeys) {
+          if (!cancelled) setTagFilteredKeys(tagKeys)
+        } else if (genreKeys) {
+          if (!cancelled) setTagFilteredKeys(genreKeys)
+        }
       } catch {
-        // On API error, reset filter so the user sees all tracks rather than stale results
-        if (!cancelled) setTagFilteredKeys(null)
+        // On API error, show empty results instead of silently dropping all filters
+        if (!cancelled) setTagFilteredKeys(new Set())
       }
     }
 
-    fetchAndIntersect().finally(() => { if (!cancelled) setTagLoading(false) })
+    fetchAndCompute().finally(() => { if (!cancelled) setTagLoading(false) })
     return () => { cancelled = true }
   }, [filterTags, activeGenre, username])
 
@@ -375,11 +423,23 @@ export default function Library() {
         if (!abortRef.current) {
           setTracks(cached)
           setCachedCount(meta?.totalTracks ?? cached.length)
+          setLastSyncTime(meta?.lastSyncTimestamp ?? null)
           setLoading(false)
           didShowTracks = true
         }
 
-        // 2. Incremental sync in background (only fetch new tracks since last sync)
+        // 2. Throttle check — skip background sync if cache is fresh & complete
+        const syncAge = meta?.lastSyncTimestamp
+          ? (Date.now() - meta.lastSyncTimestamp * 1000)
+          : Infinity
+
+        if (syncAge < SYNC_COOLDOWN_MS && meta?.syncComplete) {
+          // Cache is fresh — skip sync but still process any pending retry tasks
+          processRetry()
+          return
+        }
+
+        // Incremental sync in background (only fetch new tracks since last sync)
         syncType = 'incremental'
         if (!abortRef.current) setSyncActive(true)
         const incResult = await incrementalSync(username, (prog) => {
@@ -397,6 +457,13 @@ export default function Library() {
             const count = await getCachedTrackCount(username)
             setCachedCount(count)
           }
+          // Track how many new tracks were found this sync
+          if (incResult.newTracks > 0) {
+            setNewTracksCount((prev) => prev + incResult.newTracks)
+          }
+          // Update last sync time after successful incremental sync
+          const updatedMeta = await getSyncMeta(username)
+          setLastSyncTime(updatedMeta?.lastSyncTimestamp ?? null)
           if (!meta?.syncComplete) {
             setSyncWarning((prev) => prev ? `${prev} Full sync recommended.` : 'Full sync recommended to cache your entire history.')
           }
@@ -431,6 +498,7 @@ export default function Library() {
           if (updatedMeta && !updatedMeta.syncComplete) {
             setSyncWarning('Some pages failed during sync — not all tracks cached. Full Sync to retry.')
           }
+          setLastSyncTime(updatedMeta?.lastSyncTimestamp ?? null)
         }
       }
 
@@ -479,15 +547,52 @@ export default function Library() {
         setTracks(fresh)
         const count = await getCachedTrackCount(username)
         setCachedCount(count)
+        setNewTracksCount(0)
         // Check if sync was incomplete
         const meta = await getSyncMeta(username)
         if (meta && !meta.syncComplete) {
           setSyncWarning('Some pages failed during sync — not all tracks cached. Retry or check connection.')
         }
+        setLastSyncTime(meta?.lastSyncTimestamp ?? null)
       }
     } catch (err: any) {
       if (!abortRef.current) {
         queueRetryTask(username, 'full')
+      }
+      setError(err.message || 'Sync failed')
+    } finally {
+      if (!abortRef.current) { setSyncActive(false); setSyncProgress(null) }
+    }
+  }, [username, syncActive])
+
+  // Quick sync — incremental only, catches up recent tracks fast
+  const handleQuickSync = useCallback(async () => {
+    if (!username || syncActive) return
+    abortRef.current = false
+    setSyncActive(true); setSyncProgress(null); setError(null); setSyncWarning(null)
+    try {
+      const incResult = await incrementalSync(username, (prog) => {
+        if (!abortRef.current && prog.tracksSoFar > 0) setSyncProgress(prog)
+      })
+      if (!abortRef.current) {
+        if (incResult.failedPages > 0) {
+          setSyncWarning(`${incResult.failedPages} page(s) failed — some tracks may be missing.`)
+        }
+        if (incResult.newTracks > 0 || incResult.failedPages > 0) {
+          const fresh = await getCachedAllTracks(username)
+          setTracks(fresh)
+          const count = await getCachedTrackCount(username)
+          setCachedCount(count)
+        }
+        if (incResult.newTracks > 0) {
+          setNewTracksCount((prev) => prev + incResult.newTracks)
+        }
+        const updatedMeta = await getSyncMeta(username)
+        setLastSyncTime(updatedMeta?.lastSyncTimestamp ?? null)
+      }
+    } catch (err: any) {
+      if (!abortRef.current) {
+        queueRetryTask(username, 'incremental')
       }
       setError(err.message || 'Sync failed')
     } finally {
@@ -506,6 +611,7 @@ export default function Library() {
     await clearTrackCache(username)
     setTracks([])
     setCachedCount(0)
+    setNewTracksCount(0)
     setSyncActive(false)
     setSyncProgress(null)
   }, [username])
@@ -576,15 +682,17 @@ export default function Library() {
     }
   }, [healthStatus, cachedCount, syncWarning, syncActive, error, isDemo])
 
-  // ── Fast in-memory search ──
+  // ── Fast in-memory search (debounced, with tag/genre intersection) ──
   const filtered = useMemo(() => {
-    // Direct tag mode — show API-fetched tagged tracks
     let result = directTagTracks ?? tracks
 
     if (directTagTracks) {
-      // In direct tag mode, only apply search filter (tag filter is the source)
-      if (search.trim()) {
-        const q = search.toLowerCase()
+      // Also apply manual tag filters when directTagTracks is active
+      if (tagFilteredKeys !== null) {
+        result = result.filter((t) => tagFilteredKeys.has(`${getArtistName(t).toLowerCase()}::${t.name.toLowerCase()}`))
+      }
+      if (debouncedSearch.trim()) {
+        const q = debouncedSearch.toLowerCase()
         result = result.filter((t) =>
           t.name.toLowerCase().includes(q) || getArtistName(t).toLowerCase().includes(q),
         )
@@ -592,18 +700,18 @@ export default function Library() {
       return result
     }
 
-    // Normal mode — filter cached tracks by tag-filtered track keys
-    if (tagFilteredKeys && tagFilteredKeys.size > 0) {
+    // Check !== null instead of size > 0 — empty filters show nothing, not everything
+    if (tagFilteredKeys !== null) {
       result = result.filter((t) => tagFilteredKeys.has(`${getArtistName(t).toLowerCase()}::${t.name.toLowerCase()}`))
     }
-    if (search.trim()) {
-      const q = search.toLowerCase()
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase()
       result = result.filter((t) =>
         t.name.toLowerCase().includes(q) || getArtistName(t).toLowerCase().includes(q),
       )
     }
     return result
-  }, [tracks, directTagTracks, search, tagFilteredKeys])
+  }, [tracks, directTagTracks, debouncedSearch, tagFilteredKeys])
 
   // Fetch personal tags for displayed tracks
   useEffect(() => {
@@ -651,6 +759,16 @@ export default function Library() {
           </h1>
           <p className={styles.desc}>
             {cachedCount > 0 ? `${cachedCount.toLocaleString()} tracks cached` : `${tracks.length} recent tracks`}
+            {lastSyncTime ? ` · ${formatSyncAge(lastSyncTime)}` : ''}
+            {newTracksCount > 0 && (
+              <span
+                className={styles.newTracksBadge}
+                title={`${newTracksCount} new track${newTracksCount !== 1 ? 's' : ''} since last full sync`}
+                onClick={() => setNewTracksCount(0)}
+              >
+                +{newTracksCount}
+              </span>
+            )}
             {hasActiveFilters ? ` · ${filtered.length} shown` : ''}
             {syncActive && !loading && <span className={styles.syncSpinner}><span className={styles.spinDot} /> Syncing…</span>}
           </p>
@@ -658,13 +776,23 @@ export default function Library() {
         {isAuthenticated && !isDemo && (
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
             {!syncActive && !syncProgress && (
-              <button
-                className={styles.syncBtn}
-                onClick={handleFullResync}
-                title="Re-sync full scrobble history from Last.fm"
-              >
-                🔄 Full Sync
-              </button>
+              <>
+                <button
+                  className={styles.syncBtn}
+                  onClick={handleQuickSync}
+                  title="Quick sync — catch up recent scrobbles"
+                  style={{ fontSize: '0.56rem' }}
+                >
+                  ⚡ Quick
+                </button>
+                <button
+                  className={styles.syncBtn}
+                  onClick={handleFullResync}
+                  title="Re-sync full scrobble history from Last.fm"
+                >
+                  🔄 Full Sync
+                </button>
+              </>
             )}
             <button
               className={styles.syncBtn}
